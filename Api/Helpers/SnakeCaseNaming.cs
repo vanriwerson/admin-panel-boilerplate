@@ -1,6 +1,6 @@
 namespace Api.Helpers
 {
-  public static class SnakeCaseNamingHelper
+  public static class SnakeCaseNaming
   {
     /// <summary>
     /// Converte PascalCase para snake_case
