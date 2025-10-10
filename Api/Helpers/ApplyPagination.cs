@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Helpers
 {
-  public class PaginateResult<T>
+  public class PaginatedResult<T>
   {
     public int TotalItems { get; set; }
     public int Page { get; set; }
@@ -11,9 +11,9 @@ namespace Api.Helpers
     public IEnumerable<T> Data { get; set; } = Enumerable.Empty<T>();
   }
 
-  public static class Pagination
+  public static class ApplyPagination
   {
-    public static async Task<PaginateResult<T>> PaginateAsync<T>(
+    public static async Task<PaginatedResult<T>> PaginateAsync<T>(
         IQueryable<T> query,
         int page = 1,
         int pageSize = 10)
@@ -28,7 +28,7 @@ namespace Api.Helpers
           .Take(pageSize)
           .ToListAsync();
 
-      return new PaginateResult<T>
+      return new PaginatedResult<T>
       {
         TotalItems = totalItems,
         Page = page,
