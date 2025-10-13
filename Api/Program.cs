@@ -1,4 +1,5 @@
 using Api.Data;
+using Api.Helpers;
 using Api.Interfaces;
 using Api.Repositories;
 using Api.Services.UsersServices;
@@ -8,23 +9,15 @@ using System.Reflection;
 
 Env.Load();
 
-var logger = LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger("Startup");
+var logger = Logger.LogToConsole("Startup");
 
 // --- Variáveis obrigatórias ---
-string GetEnvOrThrow(string key)
-{
-    var value = Environment.GetEnvironmentVariable(key);
-    if (string.IsNullOrWhiteSpace(value))
-        throw new InvalidOperationException($"Variável '{key}' não configurada.");
-    return value;
-}
-
-var apiPort = GetEnvOrThrow("API_PORT");
-var dbHost = GetEnvOrThrow("DB_HOST");
-var dbPort = GetEnvOrThrow("DB_PORT");
-var dbUser = GetEnvOrThrow("DB_USER");
-var dbPassword = GetEnvOrThrow("DB_PASSWORD");
-var dbName = GetEnvOrThrow("DB_NAME");
+var apiPort = EnvLoader.GetEnv("API_PORT");
+var dbHost = EnvLoader.GetEnv("DB_HOST");
+var dbPort = EnvLoader.GetEnv("DB_PORT");
+var dbUser = EnvLoader.GetEnv("DB_USER");
+var dbPassword = EnvLoader.GetEnv("DB_PASSWORD");
+var dbName = EnvLoader.GetEnv("DB_NAME");
 
 // --- Configurar Kestrel ---
 var builder = WebApplication.CreateBuilder(args);
