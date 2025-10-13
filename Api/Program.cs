@@ -1,3 +1,4 @@
+using System.Reflection;
 using Api.Data;
 using Api.Helpers;
 using Api.Interfaces;
@@ -5,7 +6,6 @@ using Api.Repositories;
 using Api.Services.UsersServices;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 Env.Load();
 
@@ -27,13 +27,15 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 // --- Configurar DbContext ---
-var connectionString = $"Host={dbHost};Port={dbPort};Username={dbUser};Password={dbPassword};Database={dbName}";
-builder.Services.AddDbContext<ApiDbContext>(options =>
-    options.UseNpgsql(connectionString));
+var connectionString =
+    $"Host={dbHost};Port={dbPort};Username={dbUser};Password={dbPassword};Database={dbName}";
+builder.Services.AddDbContext<ApiDbContext>(options => options.UseNpgsql(connectionString));
 
 // --- Registrar repositório genérico ---
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 Console.WriteLine("Repositório genérico registrado.");
+
+builder.Services.AddControllers();
 
 // --- Registro automático de Services ---
 var assembly = Assembly.GetExecutingAssembly();
@@ -41,8 +43,11 @@ int servicesRegistrados = 0;
 
 try
 {
-    foreach (var type in assembly.GetTypes()
-                 .Where(t => t.IsClass && t.Namespace != null && t.Namespace.StartsWith("Api.Services")))
+    foreach (
+        var type in assembly
+            .GetTypes()
+            .Where(t => t.IsClass && t.Namespace != null && t.Namespace.StartsWith("Api.Services"))
+    )
     {
         builder.Services.AddTransient(type);
         servicesRegistrados++;
@@ -88,5 +93,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+app.MapControllers();
 app.Run();
