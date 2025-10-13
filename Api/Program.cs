@@ -1,29 +1,58 @@
+using Api.Data;
 using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 
 Env.Load();
 
-var builder = WebApplication.CreateBuilder(args);
-
-var apiPort = Environment.GetEnvironmentVariable("API_PORT");
-
-if (string.IsNullOrWhiteSpace(apiPort))
+// --- Variáveis obrigatórias ---
+string GetEnvOrThrow(string key)
 {
-    throw new InvalidOperationException("Variável 'API_PORT' não configurada.");
+    var value = Environment.GetEnvironmentVariable(key);
+    if (string.IsNullOrWhiteSpace(value))
+        throw new InvalidOperationException($"Variável '{key}' não configurada.");
+    return value;
 }
 
-// Configurar Kestrel para escutar na porta especificada
+var apiPort = GetEnvOrThrow("API_PORT");
+var dbHost = GetEnvOrThrow("DB_HOST");
+var dbPort = GetEnvOrThrow("DB_PORT");
+var dbUser = GetEnvOrThrow("DB_USER");
+var dbPassword = GetEnvOrThrow("DB_PASSWORD");
+var dbName = GetEnvOrThrow("DB_NAME");
+
+// --- Configurar Kestrel ---
+var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(int.Parse(apiPort));
 });
 
-// Add services to the container.
+// --- Configurar DbContext ---
+var connectionString = $"Host={dbHost};Port={dbPort};Username={dbUser};Password={dbPassword};Database={dbName}";
+builder.Services.AddDbContext<ApiDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// --- Serviços ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure o pipeline HTTP
+// --- Testar conexão com DB ---
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+    db.Database.CanConnect();
+    Console.WriteLine("Conexão com DB ok");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Falha na conexão com DB: " + ex.Message);
+    throw;
+}
+
+// --- Pipeline HTTP ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -31,30 +60,4 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast(
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
