@@ -1,8 +1,14 @@
 using Api.Data;
+using Api.Interfaces;
+using Api.Repositories;
+using Api.Services.UsersServices;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 Env.Load();
+
+var logger = LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger("Startup");
 
 // --- Variáveis obrigatórias ---
 string GetEnvOrThrow(string key)
@@ -32,7 +38,31 @@ var connectionString = $"Host={dbHost};Port={dbPort};Username={dbUser};Password=
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// --- Serviços ---
+// --- Registrar repositório genérico ---
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+Console.WriteLine("Repositório genérico registrado.");
+
+// --- Registro automático de Services ---
+var assembly = Assembly.GetExecutingAssembly();
+int servicesRegistrados = 0;
+
+try
+{
+    foreach (var type in assembly.GetTypes()
+                 .Where(t => t.IsClass && t.Namespace != null && t.Namespace.StartsWith("Api.Services")))
+    {
+        builder.Services.AddTransient(type);
+        servicesRegistrados++;
+    }
+    logger.LogInformation("{count} services registrados automaticamente.", servicesRegistrados);
+}
+catch (Exception ex)
+{
+    logger.LogError(ex, "Erro ao registrar services automaticamente.");
+    throw;
+}
+
+// --- Serviços do Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -43,8 +73,14 @@ try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
-    db.Database.CanConnect();
-    Console.WriteLine("Conexão com DB ok");
+    if (db.Database.CanConnect())
+    {
+        Console.WriteLine("Conexão com DB ok");
+    }
+    else
+    {
+        Console.WriteLine("Falha ao conectar no DB");
+    }
 }
 catch (Exception ex)
 {
