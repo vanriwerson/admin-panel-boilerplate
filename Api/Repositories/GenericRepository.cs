@@ -1,3 +1,4 @@
+using Api.Data;
 using Api.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -6,10 +7,10 @@ namespace Api.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly DbContext _context;
+        private readonly ApiDbContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public GenericRepository(DbContext context)
+        public GenericRepository(ApiDbContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
