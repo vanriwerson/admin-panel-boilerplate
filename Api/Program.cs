@@ -38,6 +38,19 @@ Console.WriteLine("Repositório genérico registrado.");
 // --- Registrar controllers ---
 builder.Services.AddControllers();
 
+// --- Configurar CORS ---
+var frontendUrl = "http://localhost:5173";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy.WithOrigins(frontendUrl)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // necessário se usar cookies ou JWT no header
+    });
+});
+
 // --- Registro automático de Services ---
 var assembly = Assembly.GetExecutingAssembly();
 int servicesRegistrados = 0;
@@ -85,7 +98,11 @@ catch (Exception ex)
     throw;
 }
 
+// --- Middleware de exceção ---
 app.UseExceptionHandlerMiddleware();
+
+// --- Habilitar CORS ---
+app.UseCors("FrontendPolicy");
 
 // --- Pipeline HTTP ---
 if (app.Environment.IsDevelopment())
