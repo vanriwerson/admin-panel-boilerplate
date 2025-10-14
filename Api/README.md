@@ -34,7 +34,7 @@ generic-login-dotnet-react/
 │   └── .env              # Variáveis de ambiente
 │
 ├── docker-compose.yml    # Orquestração Docker
-└── frontend/             # Frontend React + Vite + TypeScript
+└── WebApp/               # Frontend React + Vite + TypeScript
 ```
 
 ---
@@ -49,7 +49,7 @@ Vide arquivo `./docker-compose.yml`
 
 ## Rodando a aplicação localmente
 
-Antes de rodar a aplicação, crie o arquivo `Api/.env` conforme o arquivo `API/.env.example`.
+Antes de rodar a aplicação, crie o arquivo `Api/.env` conforme o arquivo `Api/.env.example`.
 
 > 🔒 **Dica:** Gere uma chave segura para `JWT_SECRET_KEY` executando o comando:
 >
