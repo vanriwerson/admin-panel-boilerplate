@@ -1,5 +1,6 @@
 using Api.Helpers;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Api.Middlewares
@@ -32,7 +33,7 @@ namespace Api.Middlewares
 
         if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
         {
-          context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+          context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
           await context.Response.WriteAsync("Header Authorization ausente ou inválido");
           return;
         }
@@ -41,7 +42,7 @@ namespace Api.Middlewares
 
         if (!JsonWebToken.Verify(token, _jwtSecret))
         {
-          context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+          context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
           await context.Response.WriteAsync("Token inválido ou expirado");
           return;
         }

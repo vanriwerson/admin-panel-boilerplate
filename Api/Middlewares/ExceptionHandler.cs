@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using Api.Helpers;
 
 namespace Api.Middlewares
 {
@@ -29,7 +28,7 @@ namespace Api.Middlewares
       }
       catch (Exception)
       {
-        context.Response.StatusCode = HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         context.Response.ContentType = "application/json";
 
         var result = JsonSerializer.Serialize(new { error = "Ocorreu um erro inesperado." });
