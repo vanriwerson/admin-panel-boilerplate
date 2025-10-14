@@ -2,6 +2,7 @@ using System.Reflection;
 using Api.Data;
 using Api.Helpers;
 using Api.Interfaces;
+using Api.Middlewares;
 using Api.Repositories;
 using Api.Services.UsersServices;
 using DotNetEnv;
@@ -35,6 +36,7 @@ builder.Services.AddDbContext<ApiDbContext>(options => options.UseNpgsql(connect
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 Console.WriteLine("Repositório genérico registrado.");
 
+// --- Registrar controllers ---
 builder.Services.AddControllers();
 
 // --- Registro automático de Services ---
@@ -52,6 +54,7 @@ try
         builder.Services.AddTransient(type);
         servicesRegistrados++;
     }
+
     logger.LogInformation("{count} services registrados automaticamente.", servicesRegistrados);
 }
 catch (Exception ex)
@@ -60,7 +63,7 @@ catch (Exception ex)
     throw;
 }
 
-// --- Serviços do Swagger ---
+// --- Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -71,14 +74,11 @@ try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
     if (db.Database.CanConnect())
-    {
         Console.WriteLine("Conexão com DB ok");
-    }
     else
-    {
         Console.WriteLine("Falha ao conectar no DB");
-    }
 }
 catch (Exception ex)
 {
@@ -94,5 +94,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
+app.UseRequireAuthorization();
+
 app.MapControllers();
 app.Run();
