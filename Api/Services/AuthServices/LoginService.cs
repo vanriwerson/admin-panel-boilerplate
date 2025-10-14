@@ -16,7 +16,7 @@ namespace Api.Services.AuthServices
         public LoginService(ApiDbContext context)
         {
             _context = context;
-            _jwtSecret = EnvLoader.GetEnv("JWT_SECRET");
+            _jwtSecret = EnvLoader.GetEnv("JWT_SECRET_KEY");
         }
 
         public async Task<string?> LoginAsync(string identifier, string password)
