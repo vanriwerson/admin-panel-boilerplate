@@ -4,7 +4,6 @@ using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Repositories;
-using Api.Services.UsersServices;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 
