@@ -86,6 +86,8 @@ catch (Exception ex)
     throw;
 }
 
+app.UseExceptionHandlerMiddleware();
+
 // --- Pipeline HTTP ---
 if (app.Environment.IsDevelopment())
 {
