@@ -1,19 +1,17 @@
 # Generic Login .NET + React
 
-> Boilerplate criado com fluxo completo de autenticação JWT, pensado em PostgreSQL + .NET + React.
-> Com seu Repositório Genérico, possibilita grande reaproveitamento de código, bastando injetar o dto específico para obter o CRUD básico para quaisquer entidades criadas.
+> Boilerplate com fluxo completo de autenticação **JWT**, implementado em **PostgreSQL + .NET**.  
+> Inclui **hash seguro de senhas (BCrypt)**, **emissão e validação de tokens JWT**, e um **repositório genérico** que permite criar CRUDs rapidamente apenas injetando DTOs específicos.
 
 ---
 
 ## Tecnologias Utilizadas
 
+- [**PostgreSQL**](https://www.postgresql.org/): Banco de dados relacional open source, robusto e altamente extensível, com suporte completo ao padrão SQL.
 - [**.NET 8**](https://learn.microsoft.com/en-us/dotnet/core/introduction): Framework moderno, multiplataforma e de código aberto para criação de APIs, aplicações web e serviços.
 - [**Entity Framework Core**](https://learn.microsoft.com/en-us/ef/core/): ORM oficial do .NET que simplifica o acesso a bancos de dados relacionais por meio de mapeamento objeto-relacional.
-- [**PostgreSQL**](https://www.postgresql.org/): Banco de dados relacional open source, robusto e altamente extensível, com suporte completo ao padrão SQL.
+- [**BCrypt**](https://www.nuget.org/packages/BCrypt.Net-Next/): Biblioteca utilizada para hash e verificação de senhas com o algoritmo bcrypt, garantindo maior segurança no armazenamento de credenciais.
 - [**JSON Web Token (JWT)**](https://jwt.io/introduction/): Padrão aberto para autenticação e troca segura de informações entre cliente e servidor.
-- [**React**](https://react.dev/): Biblioteca JavaScript para criação de interfaces de usuário dinâmicas e componentizadas.
-- [**Vite**](https://vitejs.dev/): Ferramenta de build rápida e moderna que melhora o desempenho do desenvolvimento frontend.
-- [**TypeScript**](https://www.typescriptlang.org/): Superset do JavaScript que adiciona tipagem estática e recursos avançados para maior produtividade e segurança no código.
 - [**Docker Compose**](https://docs.docker.com/compose/): Ferramenta para definir e gerenciar múltiplos containers Docker de forma simples e declarativa.
 
 ---
@@ -29,7 +27,7 @@ generic-login-dotnet-react/
 │   ├── Dtos/             # Data Transfer Objects
 │   ├── Helpers/          # Helpers utilitários (paginação, snake_case, etc)
 │   ├── Middlewares/      # Validações adicionais
-│   ├── Models/           # Models do banco de dados
+│   ├── Models/           # Entidades do banco de dados
 │   ├── Services/         # Lógica de negócios
 │   ├── Program.cs        # Configuração da aplicação
 │   └── .env              # Variáveis de ambiente
@@ -50,7 +48,21 @@ Vide arquivo `./docker-compose.yml`
 
 ## Rodando a aplicação localmente
 
+Antes de rodar a aplicação, crie o arquivo `Api/.env` conforme o arquivo `API/.env.example`.
+
+> 🔒 **Dica:** Gere uma chave segura para `JWT_SECRET_KEY` executando o comando:
+>
+> ```bash
+> echo "JWT_SECRET_KEY=$(openssl rand -base64 64)"
+> ```
+
+---
+
 ### 1. Subir o container do banco
+
+Vide arquivo `./docker-compose.yml`
+
+O banco PostgreSQL será exposto na **porta 5432** do host.
 
 ```bash
 docker compose up -d
@@ -89,6 +101,102 @@ dotnet run
 
 - As variáveis de ambiente são obrigatórias; se alguma não estiver configurada, a aplicação lançará uma exceção ao iniciar.
 - Logs de inicialização indicam se a **conexão com o banco** foi bem-sucedida.
+
+---
+
+## 🔐 Fluxo de Autenticação JWT
+
+A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpers e services abaixo:
+
+### Helpers
+
+| Helper            | Função                                                                   |
+| ----------------- | ------------------------------------------------------------------------ |
+| `PasswordHashing` | Criação e verificação de hashes de senha com **BCrypt**                  |
+| `JsonWebToken`    | Geração, validação e decodificação de tokens JWT usando `JWT_SECRET_KEY` |
+
+---
+
+### Services
+
+| Service                | Descrição                                                                                                                                |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------------------- |
+| `LoginService`         | Autentica usuários via e-mail                                                                                                            |     | userName / senha, valida com BCrypt e gera JWT |
+| `ExternalTokenService` | (Uso corporativo: Redirecionamento via intranet) Recebe um token externo, valida com o mesmo `JWT_SECRET_KEY` e troca por um JWT interno |
+| `UserService`          | CRUD genérico para gerenciamento de usuários                                                                                             |
+
+---
+
+## 🌐 Endpoints Principais
+
+### **Autenticação (`/api/auth`)**
+
+| Método | Rota                 | Descrição                                                                               |
+| ------ | -------------------- | --------------------------------------------------------------------------------------- |
+| `POST` | `/api/auth/login`    | Login com credenciais locais (`identifier`, `password`). Retorna um JWT válido.         |
+| `POST` | `/api/auth/external` | Autenticação via token externo corporativo. Decodifica, valida e troca por JWT interno. |
+| `GET`  | `/api/auth/validate` | Valida se o token JWT recebido no header ainda é válido.                                |
+
+#### Exemplo — Login local
+
+**Request**
+
+```json
+{
+  "identifier": "usuario@empresa.com",
+  "password": "senha123"
+}
+```
+
+**Response**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+#### Exemplo — Autenticação via token externo
+
+**Request**
+
+```json
+{
+  "externalToken": "token_fornecido_pelo_sso_corporativo"
+}
+```
+
+**Response**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+---
+
+### **Usuários (`/api/users`)**
+
+| Método   | Rota              | Descrição                     |
+| -------- | ----------------- | ----------------------------- |
+| `GET`    | `/api/users`      | Lista todos os usuários       |
+| `GET`    | `/api/users/{id}` | Obtém detalhes de um usuário  |
+| `POST`   | `/api/users`      | Cria um novo usuário          |
+| `PUT`    | `/api/users/{id}` | Atualiza um usuário existente |
+| `DELETE` | `/api/users/{id}` | Remove um usuário             |
+
+---
+
+## 🧪 Testando o JWT
+
+Envie o token obtido no login no header da requisição:
+
+```
+Authorization: Bearer <token_aqui>
+```
+
+Caso o token esteja expirado ou inválido, a API retornará `401 Unauthorized`.
 
 ---
 
