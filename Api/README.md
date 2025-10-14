@@ -12,6 +12,7 @@
 - [**Entity Framework Core**](https://learn.microsoft.com/en-us/ef/core/): ORM oficial do .NET que simplifica o acesso a bancos de dados relacionais por meio de mapeamento objeto-relacional.
 - [**BCrypt**](https://www.nuget.org/packages/BCrypt.Net-Next/): Biblioteca utilizada para hash e verificação de senhas com o algoritmo bcrypt, garantindo maior segurança no armazenamento de credenciais.
 - [**JSON Web Token (JWT)**](https://jwt.io/introduction/): Padrão aberto para autenticação e troca segura de informações entre cliente e servidor.
+- [**Swagger**](https://swagger.io/docs/): Conjunto de ferramentas para documentação e testes interativos de APIs REST.
 - [**Docker Compose**](https://docs.docker.com/compose/): Ferramenta para definir e gerenciar múltiplos containers Docker de forma simples e declarativa.
 
 ---
@@ -120,14 +121,14 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 ### Services
 
 | Service                | Descrição                                                                                                                                |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------------------- |
-| `LoginService`         | Autentica usuários via e-mail                                                                                                            |     | userName / senha, valida com BCrypt e gera JWT |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `LoginService`         | Autentica usuários via e-mail ou userName (identifier) / senha, valida com BCrypt e gera JWT                                             |
 | `ExternalTokenService` | (Uso corporativo: Redirecionamento via intranet) Recebe um token externo, valida com o mesmo `JWT_SECRET_KEY` e troca por um JWT interno |
-| `UserService`          | CRUD genérico para gerenciamento de usuários                                                                                             |
+| `UsersServices`        | CRUD genérico para gerenciamento de usuários                                                                                             |
 
 ---
 
-## 🌐 Endpoints Principais
+## 🌐 Endpoints Disponíveis
 
 ### **Autenticação (`/api/auth`)**
 
@@ -135,7 +136,6 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 | ------ | -------------------- | --------------------------------------------------------------------------------------- |
 | `POST` | `/api/auth/login`    | Login com credenciais locais (`identifier`, `password`). Retorna um JWT válido.         |
 | `POST` | `/api/auth/external` | Autenticação via token externo corporativo. Decodifica, valida e troca por JWT interno. |
-| `GET`  | `/api/auth/validate` | Valida se o token JWT recebido no header ainda é válido.                                |
 
 #### Exemplo — Login local
 
@@ -143,8 +143,8 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 
 ```json
 {
-  "identifier": "usuario@empresa.com",
-  "password": "senha123"
+  "identifier": "judy", // Usuário criado no seed
+  "password": "123456"
 }
 ```
 
@@ -178,13 +178,23 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 
 ### **Usuários (`/api/users`)**
 
-| Método   | Rota              | Descrição                     |
-| -------- | ----------------- | ----------------------------- |
-| `GET`    | `/api/users`      | Lista todos os usuários       |
-| `GET`    | `/api/users/{id}` | Obtém detalhes de um usuário  |
-| `POST`   | `/api/users`      | Cria um novo usuário          |
-| `PUT`    | `/api/users/{id}` | Atualiza um usuário existente |
-| `DELETE` | `/api/users/{id}` | Remove um usuário             |
+| Método   | Rota                                | Descrição                                                              |
+| -------- | ----------------------------------- | ---------------------------------------------------------------------- |
+| `GET`    | `/api/users`                        | Lista todos os usuários                                                |
+| `GET`    | `/api/users/search?key=algumaCoisa` | Lista todos os usuários encontrados na busca (name, fullName ou email) |
+| `GET`    | `/api/users/{id}`                   | Obtém detalhes de um usuário                                           |
+| `POST`   | `/api/users`                        | Cria um novo usuário                                                   |
+| `PUT`    | `/api/users/{id}`                   | Atualiza um usuário existente                                          |
+| `DELETE` | `/api/users/{id}`                   | Remove um usuário                                                      |
+
+---
+
+### Documentação da API
+
+A API já vem integrada com **Swagger**. Para visualizar a documentação dos endpoints e testar requisições:
+
+- Abra no navegador: `http://localhost:<API_PORT>/swagger/`
+- Todos os endpoints disponíveis serão listados com detalhes de parâmetros, respostas e exemplos.
 
 ---
 
