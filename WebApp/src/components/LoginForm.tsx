@@ -1,55 +1,78 @@
 import { useState } from 'react';
-import { TextField, Button, Box, Typography, Paper } from '@mui/material';
-import { useAuth } from '../hooks/useAuth';
+import { TextField, Button, Box, Alert } from '@mui/material';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import type { LoginPayload } from '../types';
+import api from '../api';
 
-export default function LoginForm() {
-  const { login } = useAuth();
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
+const LoginForm = () => {
+  const [form, setForm] = useState<LoginPayload>({
+    identifier: '',
+    password: '',
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     try {
-      await login({ identifier, password });
-      window.location.href = '/dashboard';
-    } catch (err) {
-      console.error(err);
-      alert('Falha no login');
+      const response = await api.post('/auth/login', form);
+
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+
+      navigate('/dashboard');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Erro ao tentar logar. Tente novamente.');
+      }
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
     >
-      <Paper sx={{ p: 4, width: 320 }}>
-        <Typography variant="h6" gutterBottom>
-          Login
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="E-mail ou usuário"
-            margin="normal"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Senha"
-            type="password"
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
-            Entrar
-          </Button>
-        </form>
-      </Paper>
+      {error && <Alert severity="error">{error}</Alert>}
+      <TextField
+        label="Username ou Email"
+        name="identifier"
+        value={form.identifier}
+        onChange={handleChange}
+        required
+      />
+      <TextField
+        label="Senha"
+        type="password"
+        name="password"
+        value={form.password}
+        onChange={handleChange}
+        required
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        disabled={loading}
+      >
+        {loading ? 'Entrando...' : 'Entrar'}
+      </Button>
     </Box>
   );
-}
+};
+
+export default LoginForm;
