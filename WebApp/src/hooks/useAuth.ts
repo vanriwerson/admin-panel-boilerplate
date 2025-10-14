@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../api';
-import type { LoginPayload } from '../types';
+import type { ExternalLoginPayload, LoginPayload } from '../types';
 
 export function useAuth() {
   const [token, setToken] = useState<string | null>(
@@ -13,10 +13,16 @@ export function useAuth() {
     setToken(data.token);
   }
 
+  async function externalLogin(payload: ExternalLoginPayload) {
+    const { data } = await api.post('/auth/external', payload);
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+  }
+
   function logout() {
     localStorage.removeItem('token');
     setToken(null);
   }
 
-  return { token, login, logout };
+  return { token, login, externalLogin, logout };
 }
