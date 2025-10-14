@@ -1,7 +1,10 @@
 using Api.Dtos;
 using Api.Helpers;
 using Api.Interfaces;
+using Api.Middlewares;
 using Api.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Api.Services.UsersServices
 {
@@ -16,6 +19,9 @@ namespace Api.Services.UsersServices
 
         public async Task<UserReadDto> ExecuteAsync(UserCreateDto dto)
         {
+            if (!ValidateEntity.HasValidProperties<UserCreateDto>(dto))
+                throw new AppException("A requisição não possui os campos esperados.", (int)HttpStatusCode.BadRequest);
+
             var user = new User
             {
                 Username = dto.Username,
@@ -25,6 +31,9 @@ namespace Api.Services.UsersServices
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+
+            if (await _userRepo.Query().AnyAsync(u => u.Email == user.Email || u.Username == user.Username))
+                throw new AppException("Email ou Username já cadastrado.", (int)HttpStatusCode.Conflict);
 
             var createdUser = await _userRepo.CreateAsync(user);
 
