@@ -11,23 +11,40 @@ export default function Dashboard() {
   async function handleCreate(user: UserCreateDto) {
     try {
       await api.post('/users', user);
-      alert('Usuário cadastrado com sucesso!');
+      alert('✅ Usuário cadastrado com sucesso!');
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert('Erro ao cadastrar usuário');
+      alert('❌ Erro ao cadastrar usuário');
     }
   }
 
   async function handleUpdate(user: UserCreateDto) {
+    if (!editingUser) return;
     try {
-      await api.put(`/users/${editingUser?.id}`, user);
-      alert('Usuário atualizado com sucesso!');
+      await api.put(`/users/${editingUser.id}`, user);
+      alert('✅ Usuário atualizado com sucesso!');
       setOpen(false);
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert('Erro ao atualizar usuário');
+      alert('❌ Erro ao atualizar usuário');
+    }
+  }
+
+  async function handleDelete(user: UserReadDto) {
+    const confirmDelete = confirm(
+      `Tem certeza que deseja excluir o usuário "${user.username}"?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/users/${user.id}`);
+      alert('🗑️ Usuário excluído com sucesso!');
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert('❌ Erro ao excluir usuário');
     }
   }
 
@@ -43,7 +60,8 @@ export default function Dashboard() {
       </Typography>
 
       <UserForm onSubmit={handleCreate} />
-      <UserTable onEdit={handleEdit} />
+
+      <UserTable onEdit={handleEdit} onDelete={handleDelete} />
 
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
@@ -59,7 +77,10 @@ export default function Dashboard() {
           <Typography variant="h6" gutterBottom>
             Editar Usuário
           </Typography>
-          <UserForm user={editingUser!} onSubmit={handleUpdate} />
+
+          {editingUser && (
+            <UserForm user={editingUser} onSubmit={handleUpdate} />
+          )}
         </Box>
       </Modal>
     </Container>
