@@ -1,7 +1,7 @@
 services:
-  postgres:
+  db:
     image: postgres:15
-    container_name: generic-login-postgres
+    container_name: admin-panel-db
     env_file:
       - ./Api/.env
     ports:
@@ -14,11 +14,11 @@ services:
     build:
       context: ./Api
       dockerfile: Dockerfile
-    container_name: generic-login-api
+    container_name: admin-panel-api
     env_file:
       - ./Api/.env
     depends_on:
-      - postgres
+      - db
     ports:
       - '5209:5209' # ajuste conforme a porta da sua API
     restart: always
@@ -27,7 +27,7 @@ services:
     build:
       context: ./WebApp
       dockerfile: Dockerfile
-    container_name: generic-login-webapp
+    container_name: admin-panel-webapp
     depends_on:
       - api
     ports:

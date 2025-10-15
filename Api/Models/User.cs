@@ -27,7 +27,7 @@ namespace Api.Models
 
     [Required]
     [Column("active")]
-    public required bool Active { get; set; } = true;
+    public bool Active { get; set; } = true;
 
     public ICollection<AccessPermission>? AccessPermissions { get; set; }
 
