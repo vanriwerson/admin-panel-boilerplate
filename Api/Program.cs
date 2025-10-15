@@ -11,7 +11,7 @@ Env.Load();
 
 var logger = Logger.LogToConsole("Startup");
 
-// --- Variáveis obrigatórias ---
+// --- Variáveis da connection string ---
 var apiPort = EnvLoader.GetEnv("API_PORT");
 var dbHost = EnvLoader.GetEnv("DB_HOST");
 var dbPort = EnvLoader.GetEnv("DB_PORT");
@@ -39,7 +39,7 @@ Console.WriteLine("Repositório genérico registrado.");
 builder.Services.AddControllers();
 
 // --- Configurar CORS ---
-var frontendUrl = "http://localhost:5173";
+var frontendUrl = EnvLoader.GetEnv("WEB_APP_URL");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
