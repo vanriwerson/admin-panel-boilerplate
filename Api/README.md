@@ -1,6 +1,6 @@
-# Generic Login .NET + React
+# Generic Login Backend - PostgreSQL + .NET
 
-> Boilerplate com fluxo completo de autenticação **JWT**, implementado em **PostgreSQL + .NET**.  
+> Api com fluxo completo de autenticação **JWT**, implementado em **PostgreSQL + .NET**.  
 > Inclui **hash seguro de senhas (BCrypt)**, **emissão e validação de tokens JWT**, e um **repositório genérico** que permite criar CRUDs rapidamente apenas injetando DTOs específicos.
 
 ---
