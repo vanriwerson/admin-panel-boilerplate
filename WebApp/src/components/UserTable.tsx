@@ -11,8 +11,10 @@ import {
   IconButton,
   Typography,
   Box,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, Search } from '@mui/icons-material';
 import api from '../api';
 import type { UserReadDto, UsersPagination } from '../types';
 
@@ -27,13 +29,22 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [searchKey, setSearchKey] = useState('');
 
-  const fetchUsers = async (pageNumber = 1, pageSize = 10) => {
+  const fetchUsers = async (
+    pageNumber = 1,
+    pageSize = 10,
+    key: string = ''
+  ) => {
     try {
       setLoading(true);
-      const response = await api.get<UsersPagination>(
-        `/users?page=${pageNumber}&pageSize=${pageSize}`
-      );
+      const endpoint = key
+        ? `/users/search?key=${encodeURIComponent(
+            key
+          )}&page=${pageNumber}&pageSize=${pageSize}`
+        : `/users?page=${pageNumber}&pageSize=${pageSize}`;
+
+      const response = await api.get<UsersPagination>(endpoint);
       setUsers(response.data.data);
       setTotalItems(response.data.totalItems);
     } catch (error) {
@@ -44,20 +55,49 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
   };
 
   useEffect(() => {
-    fetchUsers(page + 1, rowsPerPage);
-  }, [page, rowsPerPage]);
+    fetchUsers(page + 1, rowsPerPage, searchKey);
+  }, [page, rowsPerPage, searchKey]);
 
   const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
+
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(e.target.value, 10));
     setPage(0);
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(0);
+    fetchUsers(1, rowsPerPage, searchKey);
+  };
+
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Usuários cadastrados
-      </Typography>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Typography variant="h6">Usuários cadastrados</Typography>
+
+        <form onSubmit={handleSearchSubmit}>
+          <TextField
+            size="small"
+            variant="outlined"
+            placeholder="Buscar usuário..."
+            value={searchKey}
+            onChange={(e) => setSearchKey(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </form>
+      </Box>
 
       <TableContainer>
         <Table>
