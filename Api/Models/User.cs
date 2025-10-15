@@ -25,6 +25,12 @@ namespace Api.Models
     [Column("full_name")]
     public required string FullName { get; set; }
 
+    [Required]
+    [Column("active")]
+    public required bool Active { get; set; } = true;
+
+    public ICollection<AccessPermission>? AccessPermissions { get; set; }
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
