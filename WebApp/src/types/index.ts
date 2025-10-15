@@ -22,3 +22,13 @@ export interface LoginPayload {
 export interface ExternalLoginPayload {
   externalToken: string;
 }
+
+export interface PaginatedResponse<T> {
+  totalItems: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  data: T[];
+}
+
+export type UsersPagination = PaginatedResponse<UserReadDto>;
