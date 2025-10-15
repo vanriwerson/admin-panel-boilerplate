@@ -10,5 +10,31 @@ services:
       - pgdata:/var/lib/postgresql/data
     restart: always
 
+  api:
+    build:
+      context: ./Api
+      dockerfile: Dockerfile
+    container_name: generic-login-api
+    env_file:
+      - ./Api/.env
+    depends_on:
+      - postgres
+    ports:
+      - '5209:5209' # ajuste conforme a porta da sua API
+    restart: always
+
+  webapp:
+    build:
+      context: ./WebApp
+      dockerfile: Dockerfile
+    container_name: generic-login-webapp
+    depends_on:
+      - api
+    ports:
+      - '5173:5173' # porta do Vite
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5209/api
+    restart: always
+
 volumes:
   pgdata:
