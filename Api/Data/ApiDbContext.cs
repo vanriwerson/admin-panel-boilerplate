@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Api.Models;
-using Api.Helpers;
 using System.Reflection;
 
 namespace Api.Data
@@ -10,29 +9,44 @@ namespace Api.Data
     public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<SystemResource> SystemResources { get; set; } = null!;
+    public DbSet<AccessPermission> AccessPermissions { get; set; } = null!;
+    public DbSet<SystemLog> SystemLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       base.OnModelCreating(modelBuilder);
 
-      foreach (var entity in modelBuilder.Model.GetEntityTypes())
-      {
-        entity.SetTableName(SnakeCaseNaming.ToSnakeCase(entity.GetTableName()!));
+      modelBuilder.Entity<AccessPermission>()
+          .HasOne(ap => ap.User)
+          .WithMany(u => u.AccessPermissions)
+          .HasForeignKey(ap => ap.UserId)
+          .OnDelete(DeleteBehavior.Cascade);
 
-        foreach (var property in entity.GetProperties())
-          property.SetColumnName(SnakeCaseNaming.ToSnakeCase(property.Name));
+      modelBuilder.Entity<AccessPermission>()
+          .HasOne(ap => ap.SystemResource)
+          .WithMany()
+          .HasForeignKey(ap => ap.SystemResourceId)
+          .OnDelete(DeleteBehavior.Cascade);
 
-        foreach (var key in entity.GetKeys())
-          key.SetName(SnakeCaseNaming.ToSnakeCase(key.GetName()!));
+      modelBuilder.Entity<SystemLog>()
+          .HasOne(sl => sl.User)
+          .WithMany()
+          .HasForeignKey(sl => sl.UserId)
+          .OnDelete(DeleteBehavior.Restrict);
 
-        foreach (var index in entity.GetIndexes())
-          index.SetDatabaseName(SnakeCaseNaming.ToSnakeCase(index.GetDatabaseName()!));
+      modelBuilder.Entity<User>()
+          .HasIndex(u => u.Username)
+          .IsUnique();
 
-        foreach (var fk in entity.GetForeignKeys())
-          fk.SetConstraintName(SnakeCaseNaming.ToSnakeCase(fk.GetConstraintName()!));
-      }
+      modelBuilder.Entity<User>()
+          .HasIndex(u => u.Email)
+          .IsUnique();
 
-      // Aplicar todas as configurações externas IEntityTypeConfiguration
+      modelBuilder.Entity<SystemResource>()
+          .HasIndex(r => r.Name)
+          .IsUnique();
+
       modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
   }
