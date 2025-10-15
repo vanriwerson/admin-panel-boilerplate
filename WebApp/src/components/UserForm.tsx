@@ -39,7 +39,15 @@ export default function UserForm({ onSubmit, user }: Props) {
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 400 }}
+      sx={{
+        alignItems: 'center',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 2,
+        justifyContent: 'center',
+        marginBottom: 4,
+        maxWidth: 800,
+      }}
     >
       <TextField
         label="Nome Completo"
@@ -47,6 +55,7 @@ export default function UserForm({ onSubmit, user }: Props) {
         value={form.fullName}
         onChange={handleChange}
         required
+        fullWidth
       />
       <TextField
         label="Usuário"
@@ -54,6 +63,7 @@ export default function UserForm({ onSubmit, user }: Props) {
         value={form.username}
         onChange={handleChange}
         required
+        sx={{ flexGrow: 1 }}
       />
       <TextField
         label="E-mail"
@@ -61,17 +71,17 @@ export default function UserForm({ onSubmit, user }: Props) {
         value={form.email}
         onChange={handleChange}
         required
+        sx={{ flexGrow: 1 }}
       />
-      {!user && (
-        <TextField
-          label="Senha"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-      )}
+      <TextField
+        label="Senha"
+        name="password"
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+        required
+        sx={{ flexGrow: 1 }}
+      />
       <Button variant="contained" type="submit">
         {user ? 'Atualizar' : 'Cadastrar'}
       </Button>

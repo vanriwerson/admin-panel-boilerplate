@@ -54,7 +54,16 @@ export default function Dashboard() {
   }
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container
+      sx={{
+        mt: 4,
+        alignItems: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        textAlign: 'center',
+      }}
+    >
       <Typography variant="h5" gutterBottom>
         Cadastro de Usuários
       </Typography>

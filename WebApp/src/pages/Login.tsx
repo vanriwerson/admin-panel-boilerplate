@@ -5,7 +5,7 @@ const Login = () => {
   return (
     <Box
       sx={{
-        height: '100%',
+        height: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -22,7 +22,7 @@ const Login = () => {
         }}
       >
         <Typography variant="h5" align="center" gutterBottom>
-          Painel Administrativo
+          Faça login no sistema
         </Typography>
         <LoginForm />
       </Paper>
