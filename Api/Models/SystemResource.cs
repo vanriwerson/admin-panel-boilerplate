@@ -15,6 +15,11 @@ namespace Api.Models
     public required string Name { get; set; }
 
     [Required]
+    [Column("exhibition_name")]
+    [MaxLength(100)]
+    public required string ExhibitionName { get; set; }
+
+    [Required]
     [Column("active")]
     public bool Active { get; set; } = true;
 

@@ -12,7 +12,11 @@ namespace Api.Data.Configurations
 
       builder.Property(r => r.Name)
              .IsRequired()
-             .HasMaxLength(100);
+             .HasMaxLength(40);
+
+      builder.Property(r => r.ExhibitionName)
+             .IsRequired()
+             .HasMaxLength(120);
 
       builder.HasMany<AccessPermission>()
              .WithOne(ap => ap.SystemResource)
