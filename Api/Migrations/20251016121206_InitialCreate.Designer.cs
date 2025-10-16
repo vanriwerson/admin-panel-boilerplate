@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20251015183338_InitialCreate")]
+    [Migration("20251016121206_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -53,7 +53,8 @@ namespace Api.Migrations
 
                     b.HasIndex("SystemResourceId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "SystemResourceId")
+                        .IsUnique();
 
                     b.ToTable("access_permissions");
                 });
@@ -177,13 +178,13 @@ namespace Api.Migrations
                     b.HasOne("Api.Models.SystemResource", "SystemResource")
                         .WithMany()
                         .HasForeignKey("SystemResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Api.Models.User", "User")
                         .WithMany("AccessPermissions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("SystemResource");

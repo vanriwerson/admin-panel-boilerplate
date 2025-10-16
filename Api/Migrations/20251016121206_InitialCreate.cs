@@ -66,13 +66,13 @@ namespace Api.Migrations
                         column: x => x.system_resource_id,
                         principalTable: "system_resources",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_access_permissions_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,9 +102,10 @@ namespace Api.Migrations
                 column: "system_resource_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_access_permissions_user_id",
+                name: "IX_access_permissions_user_id_system_resource_id",
                 table: "access_permissions",
-                column: "user_id");
+                columns: new[] { "user_id", "system_resource_id" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_system_logs_user_id",
