@@ -67,10 +67,57 @@ namespace Api.Data
             Console.WriteLine("Seed de system resources executada.");
         }
 
+        public static async Task CreateRootAsync(ApiDbContext context)
+        {
+            if (await context.Users.AnyAsync(u => u.Username == "root"))
+                return;
+
+            var rootResource = await context.SystemResources.FirstOrDefaultAsync(r => r.Name == "root");
+            if (rootResource == null)
+            {
+                rootResource = new SystemResource
+                {
+                    Name = "root",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await context.SystemResources.AddAsync(rootResource);
+                await context.SaveChangesAsync();
+            }
+
+            var rootUser = new User
+            {
+                Username = "root",
+                Email = "root@admin.com",
+                Password = PasswordHashing.Generate("root1234"), // trocar para senha segura em produção
+                FullName = "Administrador",
+                Active = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await context.Users.AddAsync(rootUser);
+            await context.SaveChangesAsync();
+
+            var accessPermission = new AccessPermission
+            {
+                UserId = rootUser.Id,
+                SystemResourceId = rootResource.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await context.AccessPermissions.AddAsync(accessPermission);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine("Usuário root criado com sucesso.");
+        }
+
         public static async Task SeedAllAsync(ApiDbContext context)
         {
             await SeedUsersAsync(context);
             await SeedSystemResourcesAsync(context);
+            await CreateRootAsync(context);
         }
     }
 }
