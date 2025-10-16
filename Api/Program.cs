@@ -81,7 +81,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// --- Testar conexão com DB ---
+// --- Testar conexão com DB e executar seed ---
 try
 {
     using var scope = app.Services.CreateScope();
@@ -91,10 +91,13 @@ try
         Console.WriteLine("Conexão com DB ok");
     else
         Console.WriteLine("Falha ao conectar no DB");
+
+    // Executar seeds
+    await DbInitializer.SeedAllAsync(db);
 }
 catch (Exception ex)
 {
-    Console.WriteLine("Falha na conexão com DB: " + ex.Message);
+    Console.WriteLine("Falha na execução do seed: " + ex.Message);
     throw;
 }
 

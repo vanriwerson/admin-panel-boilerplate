@@ -6,10 +6,14 @@ namespace Api.Data
 {
     public static class DbInitializer
     {
-        public static async Task SeedAsync(ApiDbContext context)
+        public static async Task SeedUsersAsync(ApiDbContext context)
         {
+            var runSeed = Environment.GetEnvironmentVariable("RUN_USERS_SEED");
+            if (!string.Equals(runSeed, "true", StringComparison.OrdinalIgnoreCase))
+                return;
+
             if (await context.Users.AnyAsync())
-                return; // já existem usuários, não faz nada
+                return;
 
             var users = new List<User>
             {
@@ -25,7 +29,6 @@ namespace Api.Data
                 new User { Username = "judy", Email = "judy@test.com", Password = "123456", FullName = "Judy Hopps" },
             };
 
-            // Hash das senhas e definir timestamps
             foreach (var user in users)
             {
                 user.Password = PasswordHashing.Generate(user.Password);
@@ -36,7 +39,38 @@ namespace Api.Data
             await context.Users.AddRangeAsync(users);
             await context.SaveChangesAsync();
 
-            Console.WriteLine("Seed de 10 usuários fictícios executada.");
+            Console.WriteLine("Seed de usuários de teste executada.");
+        }
+
+        public static async Task SeedSystemResourcesAsync(ApiDbContext context)
+        {
+            if (await context.SystemResources.AnyAsync())
+                return;
+
+            var resources = new List<SystemResource>
+            {
+                new SystemResource { Name = "root" },
+                new SystemResource { Name = "users" },
+                new SystemResource { Name = "systemResources" },
+                new SystemResource { Name = "reports" },
+            };
+
+            foreach (var resource in resources)
+            {
+                resource.CreatedAt = DateTime.UtcNow;
+                resource.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await context.SystemResources.AddRangeAsync(resources);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine("Seed de system resources executada.");
+        }
+
+        public static async Task SeedAllAsync(ApiDbContext context)
+        {
+            await SeedUsersAsync(context);
+            await SeedSystemResourcesAsync(context);
         }
     }
 }
