@@ -78,6 +78,7 @@ namespace Api.Data
                 rootResource = new SystemResource
                 {
                     Name = "root",
+                    ExhibitionName = "Administrador",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
