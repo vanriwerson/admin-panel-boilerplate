@@ -6,7 +6,11 @@ namespace Api.Dtos
     public string Username { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string FullName { get; set; } = default!;
+    public bool Active { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public List<string> SystemResources { get; set; } = new();
   }
 }
