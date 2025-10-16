@@ -56,7 +56,19 @@ namespace Api.Repositories
             if (entity == null)
                 return false;
 
-            _dbSet.Remove(entity);
+            var entityType = entity.GetType();
+            var activeProp = entityType.GetProperty("Active");
+
+            if (activeProp != null && activeProp.PropertyType == typeof(bool))
+            {
+                activeProp.SetValue(entity, false);
+                _context.Update(entity);
+            }
+            else
+            {
+                _dbSet.Remove(entity);
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
