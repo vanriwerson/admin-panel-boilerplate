@@ -17,36 +17,7 @@ namespace Api.Data
     {
       base.OnModelCreating(modelBuilder);
 
-      modelBuilder.Entity<AccessPermission>()
-          .HasOne(ap => ap.User)
-          .WithMany(u => u.AccessPermissions)
-          .HasForeignKey(ap => ap.UserId)
-          .OnDelete(DeleteBehavior.Cascade);
-
-      modelBuilder.Entity<AccessPermission>()
-          .HasOne(ap => ap.SystemResource)
-          .WithMany()
-          .HasForeignKey(ap => ap.SystemResourceId)
-          .OnDelete(DeleteBehavior.Cascade);
-
-      modelBuilder.Entity<SystemLog>()
-          .HasOne(sl => sl.User)
-          .WithMany()
-          .HasForeignKey(sl => sl.UserId)
-          .OnDelete(DeleteBehavior.Restrict);
-
-      modelBuilder.Entity<User>()
-          .HasIndex(u => u.Username)
-          .IsUnique();
-
-      modelBuilder.Entity<User>()
-          .HasIndex(u => u.Email)
-          .IsUnique();
-
-      modelBuilder.Entity<SystemResource>()
-          .HasIndex(r => r.Name)
-          .IsUnique();
-
+      // Aplica configurações de IEntityTypeConfiguration<T>
       modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
   }
