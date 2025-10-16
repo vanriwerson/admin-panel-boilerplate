@@ -12,7 +12,6 @@ Env.Load();
 var logger = Logger.LogToConsole("Startup");
 
 // --- Variáveis da connection string ---
-var apiPort = EnvLoader.GetEnv("API_PORT");
 var dbHost = EnvLoader.GetEnv("DB_HOST");
 var dbPort = EnvLoader.GetEnv("DB_PORT");
 var dbUser = EnvLoader.GetEnv("DB_USER");
@@ -21,6 +20,8 @@ var dbName = EnvLoader.GetEnv("DB_NAME");
 
 // --- Configurar Kestrel ---
 var builder = WebApplication.CreateBuilder(args);
+var apiPort = EnvLoader.GetEnv("API_PORT");
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(int.Parse(apiPort));
