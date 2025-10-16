@@ -49,10 +49,10 @@ namespace Api.Data
 
             var resources = new List<SystemResource>
             {
-                new SystemResource { Name = "root" },
-                new SystemResource { Name = "users" },
-                new SystemResource { Name = "systemResources" },
-                new SystemResource { Name = "reports" },
+                new SystemResource { Name = "root", ExhibitionName = "Administrador" },
+                new SystemResource { Name = "users", ExhibitionName = "Gerenciamento de Usuários" },
+                new SystemResource { Name = "systemResources", ExhibitionName = "Recursos do Sistema" },
+                new SystemResource { Name = "reports", ExhibitionName = "Auditoria do Sistema" },
             };
 
             foreach (var resource in resources)
