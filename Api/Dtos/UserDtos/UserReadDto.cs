@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Api.Dtos
 {
   public class UserReadDto
@@ -7,10 +10,9 @@ namespace Api.Dtos
     public string Email { get; set; } = default!;
     public string FullName { get; set; } = default!;
     public bool Active { get; set; }
-
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public List<string> SystemResources { get; set; } = new();
+    public List<SystemResourceOptionDto> Permissions { get; set; } = new();
   }
 }
