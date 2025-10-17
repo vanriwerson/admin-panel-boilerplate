@@ -53,6 +53,14 @@ namespace Api.Controllers
       return Ok(allResources);
     }
 
+    // GET: api/resources/options
+    [HttpGet("options")]
+    public async Task<IActionResult> GetOptions()
+    {
+      var options = await _getAllSystemResources.GetOptionsAsync();
+      return Ok(options);
+    }
+
     // GET: api/resources/{id}
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
