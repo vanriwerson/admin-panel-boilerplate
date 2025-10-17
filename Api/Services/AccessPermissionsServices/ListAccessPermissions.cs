@@ -1,5 +1,6 @@
 using Api.Interfaces;
 using Api.Models;
+using Api.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services.AccessPermissionsServices
@@ -13,11 +14,20 @@ namespace Api.Services.AccessPermissionsServices
       _repo = repo;
     }
 
-    public async Task<List<AccessPermission>> ExecuteAsync(int userId)
+    public async Task<List<AccessPermissionReadDto>> ExecuteAsync(int userId)
     {
-      return await _repo.Query()
-                        .Where(ap => ap.UserId == userId)
-                        .ToListAsync();
+      var permissions = await _repo.Query()
+          .Where(ap => ap.UserId == userId)
+          .ToListAsync();
+
+      return permissions.Select(ap => new AccessPermissionReadDto
+      {
+        Id = ap.Id,
+        UserId = ap.UserId,
+        SystemResourceId = ap.SystemResourceId,
+        CreatedAt = ap.CreatedAt,
+        UpdatedAt = ap.UpdatedAt
+      }).ToList();
     }
   }
 }

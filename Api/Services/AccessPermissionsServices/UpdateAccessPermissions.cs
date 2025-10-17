@@ -1,5 +1,6 @@
 using Api.Interfaces;
 using Api.Models;
+using Api.Dtos;
 
 namespace Api.Services.AccessPermissionsServices
 {
@@ -12,26 +13,38 @@ namespace Api.Services.AccessPermissionsServices
       _repo = repo;
     }
 
-    // Faz hard delete das permissões antigas e cria novas
-    public async Task ExecuteAsync(int userId, List<int> systemResourceIds)
+    public async Task<List<AccessPermissionReadDto>> ExecuteAsync(int userId, List<int> systemResourceIds)
     {
       var existing = await _repo.SearchAsync(ap => ap.UserId == userId);
 
       foreach (var ap in existing)
-      {
         await _repo.DeleteAsync(ap.Id);
-      }
+
+      var createdList = new List<AccessPermissionReadDto>();
 
       foreach (var resourceId in systemResourceIds)
       {
-        await _repo.CreateAsync(new AccessPermission
+        var newPermission = new AccessPermission
         {
           UserId = userId,
           SystemResourceId = resourceId,
           CreatedAt = DateTime.UtcNow,
           UpdatedAt = DateTime.UtcNow
+        };
+
+        var created = await _repo.CreateAsync(newPermission);
+
+        createdList.Add(new AccessPermissionReadDto
+        {
+          Id = created.Id,
+          UserId = created.UserId,
+          SystemResourceId = created.SystemResourceId,
+          CreatedAt = created.CreatedAt,
+          UpdatedAt = created.UpdatedAt
         });
       }
+
+      return createdList;
     }
   }
 }
