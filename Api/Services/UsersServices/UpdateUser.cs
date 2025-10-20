@@ -1,8 +1,10 @@
+using Api.Data;
 using Api.Dtos;
 using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
+using Api.Services.AccessPermissionsServices;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
@@ -11,53 +13,89 @@ namespace Api.Services.UsersServices
     public class UpdateUser
     {
         private readonly IGenericRepository<User> _userRepo;
+        private readonly ApiDbContext _context;
+        private readonly DeleteAccessPermissions _deleteAccessPermissions;
+        private readonly CreateAccessPermission _createAccessPermission;
 
-        public UpdateUser(IGenericRepository<User> userRepo)
+        public UpdateUser(
+            IGenericRepository<User> userRepo,
+            DeleteAccessPermissions deleteAccessPermissions,
+            CreateAccessPermission createAccessPermission,
+            ApiDbContext context)
         {
             _userRepo = userRepo;
+            _deleteAccessPermissions = deleteAccessPermissions;
+            _createAccessPermission = createAccessPermission;
+            _context = context;
         }
 
         public async Task<UserReadDto?> ExecuteAsync(int id, UserUpdateDto dto)
         {
-            if (!ValidateEntity.HasValidProperties<UserUpdateDto>(dto))
-                throw new AppException("A requisição não possui os campos esperados.", (int)HttpStatusCode.BadRequest);
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var user = await _userRepo.GetByIdAsync(id);
-            if (user == null) return null;
-
-            if (!string.IsNullOrWhiteSpace(dto.Email) || !string.IsNullOrWhiteSpace(dto.Username))
+            try
             {
-                bool isDuplicate = await _userRepo.Query()
-                    .AnyAsync(u =>
-                        u.Id != id &&
-                        ((dto.Email != null && u.Email == dto.Email) ||
-                         (dto.Username != null && u.Username == dto.Username))
-                    );
+                var user = await _userRepo.Query()
+                    .Include(u => u.AccessPermissions)
+                    .FirstOrDefaultAsync(u => u.Id == id);
 
-                if (isDuplicate)
-                    throw new AppException("Email ou Username já cadastrado por outro usuário.", (int)HttpStatusCode.Conflict);
+                if (user == null)
+                    return null;
+
+                // Verifica duplicidade de email/username
+                if (!string.IsNullOrWhiteSpace(dto.Email) || !string.IsNullOrWhiteSpace(dto.Username))
+                {
+                    bool isDuplicate = await _userRepo.Query()
+                        .AnyAsync(u =>
+                            u.Id != id &&
+                            ((dto.Email != null && u.Email == dto.Email) ||
+                             (dto.Username != null && u.Username == dto.Username)));
+
+                    if (isDuplicate)
+                        throw new AppException("Email ou Username já cadastrado por outro usuário.", (int)HttpStatusCode.Conflict);
+                }
+
+                // Atualiza dados básicos do usuário
+                user.Username = dto.Username ?? user.Username;
+                user.Email = dto.Email ?? user.Email;
+                user.FullName = dto.FullName ?? user.FullName;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                if (!string.IsNullOrWhiteSpace(dto.Password))
+                    user.Password = PasswordHashing.Generate(dto.Password);
+
+                await _deleteAccessPermissions.ExecuteAsync(user.Id);
+
+                if (dto.Permissions != null && dto.Permissions.Any())
+                {
+                    foreach (var resourceId in dto.Permissions)
+                    {
+                        var permissionDto = new AccessPermissionCreateDto
+                        {
+                            UserId = user.Id,
+                            SystemResourceId = resourceId
+                        };
+
+                        await _createAccessPermission.ExecuteAsync(permissionDto);
+                    }
+                }
+
+                await _userRepo.UpdateAsync(user);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                var updatedUser = await _userRepo.Query()
+                    .Include(u => u.AccessPermissions)
+                    .ThenInclude(ap => ap.SystemResource)
+                    .FirstAsync(u => u.Id == user.Id);
+
+                return UserMapper.MapToUserReadDto(updatedUser);
             }
-
-            user.Username = dto.Username ?? user.Username;
-            user.Email = dto.Email ?? user.Email;
-            user.FullName = dto.FullName ?? user.FullName;
-
-            if (!string.IsNullOrWhiteSpace(dto.Password))
-                user.Password = PasswordHashing.Generate(dto.Password);
-
-            user.UpdatedAt = DateTime.UtcNow;
-
-            var updatedUser = await _userRepo.UpdateAsync(user);
-
-            return new UserReadDto
+            catch
             {
-                Id = updatedUser.Id,
-                Username = updatedUser.Username,
-                Email = updatedUser.Email,
-                FullName = updatedUser.FullName,
-                CreatedAt = updatedUser.CreatedAt,
-                UpdatedAt = updatedUser.UpdatedAt
-            };
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }
