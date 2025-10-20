@@ -17,31 +17,19 @@ namespace Api.Services.UsersServices
 
         public async Task<PaginatedResult<UserReadDto>> ExecuteAsync(string searchKey, int page = 1, int pageSize = 10)
         {
-            var query = _userRepo.Query().Where(u =>
-                EF.Functions.ILike(u.FullName, $"%{searchKey}%") ||
-                EF.Functions.ILike(u.Username, $"%{searchKey}%") ||
-                EF.Functions.ILike(u.Email, $"%{searchKey}%")
-            );
+            var query = _userRepo.Query()
+                .Include(u => u.AccessPermissions)
+                .ThenInclude(ap => ap.SystemResource)
+                .Where(u =>
+                    EF.Functions.ILike(u.Username, $"%{searchKey}%") ||
+                    EF.Functions.ILike(u.Email, $"%{searchKey}%") ||
+                    EF.Functions.ILike(u.FullName, $"%{searchKey}%"))
+                .OrderBy(u => u.FullName)
+                .Select(u => UserMapper.MapToUserReadDto(u));
 
             var paginatedUsers = await ApplyPagination.PaginateAsync(query, page, pageSize);
 
-            var userDtos = paginatedUsers.Data.Select(user => new UserReadDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FullName = user.FullName,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
-            }).ToList();
-
-            return new PaginatedResult<UserReadDto>
-            {
-                Data = userDtos,
-                TotalItems = paginatedUsers.TotalItems,
-                Page = paginatedUsers.Page,
-                PageSize = paginatedUsers.PageSize
-            };
+            return paginatedUsers;
         }
     }
 }
