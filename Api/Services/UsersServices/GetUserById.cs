@@ -1,6 +1,8 @@
 using Api.Dtos;
+using Api.Helpers;
 using Api.Interfaces;
 using Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services.UsersServices
 {
@@ -15,18 +17,12 @@ namespace Api.Services.UsersServices
 
         public async Task<UserReadDto?> ExecuteAsync(int id)
         {
-            var user = await _userRepo.GetByIdAsync(id);
-            if (user == null) return null;
+            var user = await _userRepo.Query()
+                .Include(u => u.AccessPermissions)
+                .ThenInclude(ap => ap.SystemResource)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
-            return new UserReadDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FullName = user.FullName,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
-            };
+            return user == null ? null : UserMapper.MapToUserReadDto(user);
         }
     }
 }

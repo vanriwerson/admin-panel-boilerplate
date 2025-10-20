@@ -19,35 +19,13 @@ namespace Api.Services.UsersServices
         {
             var query = _userRepo.Query()
                 .Include(u => u.AccessPermissions)
-                .ThenInclude(ap => ap.SystemResource);
+                .ThenInclude(ap => ap.SystemResource)
+                .OrderBy(u => u.FullName)
+                .Select(u => UserMapper.MapToUserReadDto(u));
 
             var paginatedUsers = await ApplyPagination.PaginateAsync(query, page, pageSize);
 
-            var userDtos = paginatedUsers.Data.Select(user => new UserReadDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FullName = user.FullName,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt,
-                Permissions = user.AccessPermissions?
-                    .Select(ap => new SystemResourceOptionDto
-                    {
-                        Id = ap.SystemResource.Id,
-                        Name = ap.SystemResource.Name,
-                        ExhibitionName = ap.SystemResource.ExhibitionName
-                    })
-                    .ToList() ?? new List<SystemResourceOptionDto>()
-            }).ToList();
-
-            return new PaginatedResult<UserReadDto>
-            {
-                Data = userDtos,
-                TotalItems = paginatedUsers.TotalItems,
-                Page = paginatedUsers.Page,
-                PageSize = paginatedUsers.PageSize
-            };
+            return paginatedUsers;
         }
     }
 }
