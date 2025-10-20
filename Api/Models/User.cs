@@ -28,8 +28,7 @@ namespace Api.Models
     [Required]
     [Column("active")]
     public bool Active { get; set; } = true;
-
-    public ICollection<AccessPermission>? AccessPermissions { get; set; }
+    public ICollection<AccessPermission> AccessPermissions { get; set; } = new List<AccessPermission>();
 
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

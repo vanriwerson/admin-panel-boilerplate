@@ -9,9 +9,6 @@ namespace Api.Helpers
   {
     public static UserReadDto MapToUserReadDto(User user)
     {
-      if (user == null)
-        return null;
-
       return new UserReadDto
       {
         Id = user.Id,
