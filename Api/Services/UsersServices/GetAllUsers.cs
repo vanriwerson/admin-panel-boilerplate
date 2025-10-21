@@ -20,6 +20,7 @@ namespace Api.Services.UsersServices
             var query = _userRepo.Query()
                 .Include(u => u.AccessPermissions)
                 .ThenInclude(ap => ap.SystemResource)
+                .Where(u => u.Active)
                 .OrderBy(u => u.FullName)
                 .Select(u => UserMapper.MapToUserReadDto(u));
 

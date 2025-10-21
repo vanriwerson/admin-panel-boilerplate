@@ -20,6 +20,7 @@ namespace Api.Services.UsersServices
             var user = await _userRepo.Query()
                 .Include(u => u.AccessPermissions)
                 .ThenInclude(ap => ap.SystemResource)
+                .Where(u => u.Active)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             return user == null ? null : UserMapper.MapToUserReadDto(user);

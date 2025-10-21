@@ -23,7 +23,7 @@ namespace Api.Services.UsersServices
                 .Where(u =>
                     EF.Functions.ILike(u.Username, $"%{searchKey}%") ||
                     EF.Functions.ILike(u.Email, $"%{searchKey}%") ||
-                    EF.Functions.ILike(u.FullName, $"%{searchKey}%"))
+                    EF.Functions.ILike(u.FullName, $"%{searchKey}%") && u.Active)
                 .OrderBy(u => u.FullName)
                 .Select(u => UserMapper.MapToUserReadDto(u));
 
