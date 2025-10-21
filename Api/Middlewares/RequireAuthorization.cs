@@ -25,7 +25,7 @@ namespace Api.Middlewares
         return;
       }
 
-      if (method is "POST" or "PUT" or "DELETE")
+      if (method is "GET" or "POST" or "PUT" or "DELETE")
       {
         var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
 
