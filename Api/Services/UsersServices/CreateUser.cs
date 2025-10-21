@@ -1,3 +1,5 @@
+using System.Net;
+using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Dtos;
 using Api.Helpers;
@@ -5,8 +7,7 @@ using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
 using Api.Services.AccessPermissionsServices;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
+using Api.Services.SystemLogsServices;
 
 namespace Api.Services.UsersServices
 {
@@ -15,15 +16,18 @@ namespace Api.Services.UsersServices
         private readonly IGenericRepository<User> _userRepo;
         private readonly ApiDbContext _context;
         private readonly CreateAccessPermission _createAccessPermission;
+        private readonly CreateSystemLog _createSystemLog;
 
         public CreateUser(
             IGenericRepository<User> userRepo,
             CreateAccessPermission createAccessPermission,
-            ApiDbContext context)
+            ApiDbContext context,
+            CreateSystemLog createSystemLog)
         {
             _userRepo = userRepo;
             _context = context;
             _createAccessPermission = createAccessPermission;
+            _createSystemLog = createSystemLog;
         }
 
         public async Task<UserReadDto> ExecuteAsync(UserCreateDto dto)
@@ -68,6 +72,11 @@ namespace Api.Services.UsersServices
                 }
 
                 await transaction.CommitAsync();
+
+                await _createSystemLog.ExecuteAsync(
+                    userId: user.Id,
+                    action: LogActionDescribe.Create("User", user.Id)
+                );
 
                 var createdUser = await _userRepo.Query()
                     .Include(u => u.AccessPermissions)

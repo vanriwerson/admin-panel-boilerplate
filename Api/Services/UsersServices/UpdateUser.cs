@@ -1,3 +1,5 @@
+using System.Net;
+using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Dtos;
 using Api.Helpers;
@@ -5,8 +7,7 @@ using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
 using Api.Services.AccessPermissionsServices;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
+using Api.Services.SystemLogsServices;
 
 namespace Api.Services.UsersServices
 {
@@ -16,17 +17,20 @@ namespace Api.Services.UsersServices
         private readonly ApiDbContext _context;
         private readonly DeleteAccessPermissions _deleteAccessPermissions;
         private readonly CreateAccessPermission _createAccessPermission;
+        private readonly CreateSystemLog _createSystemLog;
 
         public UpdateUser(
             IGenericRepository<User> userRepo,
             DeleteAccessPermissions deleteAccessPermissions,
             CreateAccessPermission createAccessPermission,
-            ApiDbContext context)
+            ApiDbContext context,
+            CreateSystemLog createSystemLog)
         {
             _userRepo = userRepo;
             _deleteAccessPermissions = deleteAccessPermissions;
             _createAccessPermission = createAccessPermission;
             _context = context;
+            _createSystemLog = createSystemLog;
         }
 
         public async Task<UserReadDto?> ExecuteAsync(int id, UserUpdateDto dto)
@@ -42,7 +46,6 @@ namespace Api.Services.UsersServices
                 if (user == null)
                     return null;
 
-                // Verifica duplicidade de email/username
                 if (!string.IsNullOrWhiteSpace(dto.Email) || !string.IsNullOrWhiteSpace(dto.Username))
                 {
                     bool isDuplicate = await _userRepo.Query()
@@ -55,7 +58,6 @@ namespace Api.Services.UsersServices
                         throw new AppException("Email ou Username já cadastrado por outro usuário.", (int)HttpStatusCode.Conflict);
                 }
 
-                // Atualiza dados básicos do usuário
                 user.Username = dto.Username ?? user.Username;
                 user.Email = dto.Email ?? user.Email;
                 user.FullName = dto.FullName ?? user.FullName;
@@ -83,6 +85,11 @@ namespace Api.Services.UsersServices
                 await _userRepo.UpdateAsync(user);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                await _createSystemLog.ExecuteAsync(
+                    userId: user.Id,
+                    action: LogActionDescribe.Update("User", user.Id)
+                );
 
                 var updatedUser = await _userRepo.Query()
                     .Include(u => u.AccessPermissions)
