@@ -28,7 +28,7 @@ namespace Api.Controllers
 
     // POST api/auth/login
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
       try
       {
@@ -46,7 +46,7 @@ namespace Api.Controllers
 
     // POST api/auth/external
     [HttpPost("external")]
-    public async Task<IActionResult> ExchangeExternalToken([FromBody] ExternalTokenRequest request)
+    public async Task<IActionResult> ExchangeExternalToken([FromBody] ExternalTokenRequestDto request)
     {
       try
       {
@@ -99,28 +99,5 @@ namespace Api.Controllers
         return StatusCode(500, new { message = "Erro ao redefinir senha.", details = ex.Message });
       }
     }
-  }
-
-  // DTOs para requests
-  public class LoginRequest
-  {
-    public string Identifier { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-  }
-
-  public class ExternalTokenRequest
-  {
-    public string ExternalToken { get; set; } = string.Empty;
-  }
-
-  public class RequestNewPasswordDto
-  {
-    public string Email { get; set; } = string.Empty;
-  }
-
-  public class ResetPasswordDto
-  {
-    public string Token { get; set; } = string.Empty;
-    public string NewPassword { get; set; } = string.Empty;
   }
 }
