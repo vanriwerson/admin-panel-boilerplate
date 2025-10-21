@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Helpers;
+using Api.Services.SystemLogsServices;
 
 namespace Api.Services.AuthServices
 {
     public class ExternalTokenService
     {
         private readonly ApiDbContext _context;
+        private readonly CreateSystemLog _createSystemLog;
 
-        public ExternalTokenService(ApiDbContext context)
+        public ExternalTokenService(ApiDbContext context, CreateSystemLog createSystemLog)
         {
             _context = context;
+            _createSystemLog = createSystemLog;
         }
 
         public async Task<string?> ExchangeExternalTokenAsync(string externalToken)
@@ -44,8 +47,9 @@ namespace Api.Services.AuthServices
                 return null;
 
             var claims = DefaultJWTClaims.Generate(user);
-
             var token = JsonWebToken.Create(claims, expireMinutes: 120);
+
+            await _createSystemLog.ExecuteAsync(user.Id, LogActionDescribe.Login(user.Username));
 
             return token;
         }

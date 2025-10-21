@@ -7,16 +7,19 @@ using Api.Data;
 using Api.Middlewares;
 using Api.Models;
 using Api.Helpers;
+using Api.Services.SystemLogsServices;
 
 namespace Api.Services.AuthServices
 {
   public class PasswordServices
   {
     private readonly ApiDbContext _context;
+    private readonly CreateSystemLog _createSystemLog;
 
-    public PasswordServices(ApiDbContext context)
+    public PasswordServices(ApiDbContext context, CreateSystemLog createSystemLog)
     {
       _context = context;
+      _createSystemLog = createSystemLog;
     }
 
     public async Task RequestNewPasswordAsync(string email)
@@ -31,19 +34,19 @@ namespace Api.Services.AuthServices
 
       var claims = new[]
       {
-                new System.Security.Claims.Claim("userId", user.Id.ToString()),
-                new System.Security.Claims.Claim("email", user.Email)
-            };
+        new System.Security.Claims.Claim("userId", user.Id.ToString()),
+        new System.Security.Claims.Claim("email", user.Email)
+      };
 
       var token = JsonWebToken.Create(claims, expireMinutes: 15);
 
       var webAppUrl = EnvLoader.GetEnv("WEB_APP_URL");
       var resetLink = $"{webAppUrl.TrimEnd('/')}/reset-password?token={token}";
 
-      // Incluir serviço de envio de email
       Console.WriteLine($"[DEBUG] Link de redefinição enviado para {email}: {resetLink}");
-    }
 
+      await _createSystemLog.ExecuteAsync(user.Id, LogActionDescribe.NewPasswordRequest(user.Username));
+    }
 
     public async Task ResetPasswordAsync(string token, string newPassword)
     {
@@ -70,12 +73,13 @@ namespace Api.Services.AuthServices
       if (user == null)
         throw new AppException("Usuário não encontrado.", (int)HttpStatusCode.NotFound);
 
-      // Atualiza a senha
       user.Password = PasswordHashing.Generate(newPassword);
       user.UpdatedAt = DateTime.UtcNow;
 
       _context.Users.Update(user);
       await _context.SaveChangesAsync();
+
+      await _createSystemLog.ExecuteAsync(user.Id, LogActionDescribe.PasswordReset(user.Username));
     }
   }
 }
