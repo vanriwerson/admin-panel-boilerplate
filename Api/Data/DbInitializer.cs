@@ -51,7 +51,7 @@ namespace Api.Data
             {
                 new SystemResource { Name = "root", ExhibitionName = "Administrador" },
                 new SystemResource { Name = "users", ExhibitionName = "Gerenciamento de Usuários" },
-                new SystemResource { Name = "systemResources", ExhibitionName = "Recursos do Sistema" },
+                new SystemResource { Name = "resources", ExhibitionName = "Recursos do Sistema" },
                 new SystemResource { Name = "reports", ExhibitionName = "Auditoria do Sistema" },
             };
 
