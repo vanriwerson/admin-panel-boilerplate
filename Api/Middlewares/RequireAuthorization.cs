@@ -8,12 +8,10 @@ namespace Api.Middlewares
   public class RequireAuthorization
   {
     private readonly RequestDelegate _next;
-    private readonly string _jwtSecret;
 
     public RequireAuthorization(RequestDelegate next)
     {
       _next = next;
-      _jwtSecret = EnvLoader.GetEnv("JWT_SECRET_KEY");
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -40,7 +38,7 @@ namespace Api.Middlewares
 
         var token = authHeader.Substring("Bearer ".Length).Trim();
 
-        if (!JsonWebToken.Verify(token, _jwtSecret))
+        if (!JsonWebToken.Verify(token))
         {
           context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
           await context.Response.WriteAsync("Token inválido ou expirado");

@@ -8,23 +8,26 @@ namespace Api.Helpers
 {
     public static class JsonWebToken
     {
-        public static string Create(string secretKey, Claim[] claims, int expireMinutes = 60)
+        private static readonly string _secretKey = EnvLoader.GetEnv("JWT_SECRET_KEY");
+
+        public static string Create(Claim[] claims, int expireMinutes = 60)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(expireMinutes),
-                signingCredentials: creds);
+                signingCredentials: creds
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public static ClaimsPrincipal Decode(string token, string secretKey, bool validateLifetime = true)
+        public static ClaimsPrincipal Decode(string token, bool validateLifetime = true)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(secretKey);
+            var key = Encoding.UTF8.GetBytes(_secretKey);
 
             var validationParameters = new TokenValidationParameters
             {
@@ -39,17 +42,25 @@ namespace Api.Helpers
             return tokenHandler.ValidateToken(token, validationParameters, out _);
         }
 
-        public static bool Verify(string token, string secretKey)
+        public static bool Verify(string token)
         {
             try
             {
-                Decode(token, secretKey);
+                Decode(token);
                 return true;
             }
             catch
             {
                 return false;
             }
+        }
+
+        public static int[] GetPermissionIds(ClaimsPrincipal principal)
+        {
+            return principal.Claims
+                .Where(c => c.Type == "permission")
+                .Select(c => int.Parse(c.Value))
+                .ToArray();
         }
     }
 }
