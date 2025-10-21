@@ -1,9 +1,11 @@
 using System.Net;
 using System.Text.Json;
+using Api.Dtos;
 using Api.Helpers;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Api.Middlewares
 {
@@ -21,20 +23,13 @@ namespace Api.Middlewares
       var path = context.Request.Path.Value?.ToLower() ?? "";
       var method = context.Request.Method.ToUpper();
 
-      if (method == "GET")
-      {
-        await _next(context);
-        return;
-      }
-
-      if (path.Contains("/auth/"))
+      if (method == "GET" || path.Contains("/auth/"))
       {
         await _next(context);
         return;
       }
 
       var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-
       if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
       {
         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
@@ -43,73 +38,76 @@ namespace Api.Middlewares
       }
 
       var token = authHeader.Substring("Bearer ".Length).Trim();
-
       var principal = JsonWebToken.Decode(token);
-      var permissionIds = JsonWebToken.GetPermissionIds(principal);
 
-      // ✅ Usuário root (1) tem acesso total
-      if (permissionIds.Contains(1))
+      var userPermissionIds = GetPermissionIdsFromToken(principal);
+
+      // Usuário root (1) tem acesso total
+      if (userPermissionIds.Contains(1))
       {
         await _next(context);
         return;
       }
 
-      // ✅ Regras específicas para endpoints de usuários
-      if (path.Contains("/users"))
+      var requiredPermissions = EndpointPermissions.GetRequiredPermissions(path);
+      if (requiredPermissions.Any() && !requiredPermissions.Any(rp => userPermissionIds.Contains(rp)))
       {
-        if (!permissionIds.Contains(2))
-        {
-          context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-          await context.Response.WriteAsync("Acesso negado: você não possui permissão para gerenciar usuários.");
-          return;
-        }
-
-        // Protege contra criação/edição de usuários root (1) ou systemResources (3)
-        if (method == "POST" || method == "PUT")
-        {
-          context.Request.EnableBuffering(); // Permite reler o body
-          using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
-          var body = await reader.ReadToEndAsync();
-          context.Request.Body.Position = 0;
-
-          try
-          {
-            using var jsonDoc = JsonDocument.Parse(body);
-            if (jsonDoc.RootElement.TryGetProperty("permissions", out var permsElement) &&
-                permsElement.ValueKind == JsonValueKind.Array)
-            {
-              var perms = permsElement.EnumerateArray().Select(p => p.GetInt32()).ToArray();
-
-              if (perms.Contains(1) || perms.Contains(3))
-              {
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                await context.Response.WriteAsync("Acesso negado: não é permitido atribuir permissões root(1) ou systemResources(3).");
-                return;
-              }
-            }
-          }
-          catch (JsonException)
-          {
-            // Body inválido, deixa passar para o controller lidar com isso
-          }
-        }
+        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+        await context.Response.WriteAsync("Acesso negado: você não possui permissão para este recurso.");
+        return;
       }
 
-      if (path.Contains("/reports"))
+      if (path.StartsWith("/users") && (method == "POST" || method == "PUT"))
       {
-        if (!permissionIds.Contains(4))
+        var bodyPermissions = await GetPermissionsFromBodyAsync(context);
+        if (bodyPermissions.Contains(1) || bodyPermissions.Contains(3))
         {
           context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-          await context.Response.WriteAsync("Acesso negado: você não possui permissão para gerar relatórios.");
+          await context.Response.WriteAsync("Acesso negado: não é permitido atribuir permissões root(1) ou systemResources(3).");
           return;
         }
       }
 
       await _next(context);
     }
+
+    private static int[] GetPermissionIdsFromToken(System.Security.Claims.ClaimsPrincipal principal)
+    {
+      try
+      {
+        var permsClaim = principal.Claims.FirstOrDefault(c => c.Type == "permissions")?.Value;
+        if (permsClaim != null)
+        {
+          var permissions = JsonSerializer.Deserialize<SystemResourceOptionDto[]>(permsClaim);
+          return permissions?.Select(p => p.Id).ToArray() ?? Array.Empty<int>();
+        }
+      }
+      catch { }
+      return Array.Empty<int>();
+    }
+
+    private static async Task<int[]> GetPermissionsFromBodyAsync(HttpContext context)
+    {
+      context.Request.EnableBuffering();
+      using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
+      var body = await reader.ReadToEndAsync();
+      context.Request.Body.Position = 0;
+
+      try
+      {
+        using var jsonDoc = JsonDocument.Parse(body);
+        if (jsonDoc.RootElement.TryGetProperty("permissions", out var permsElement) &&
+            permsElement.ValueKind == JsonValueKind.Array)
+        {
+          return permsElement.EnumerateArray().Select(p => p.GetInt32()).ToArray();
+        }
+      }
+      catch { }
+
+      return Array.Empty<int>();
+    }
   }
 
-  // 🔧 Extensão para facilitar o uso no Program.cs
   public static class ValidateUserPermissionsExtensions
   {
     public static IApplicationBuilder UseValidateUserPermissions(this IApplicationBuilder app)

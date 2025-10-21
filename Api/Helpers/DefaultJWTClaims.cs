@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
+using Api.Dtos;
 using Api.Models;
 
 namespace Api.Helpers
@@ -22,13 +25,17 @@ namespace Api.Helpers
 
       if (user.AccessPermissions != null && user.AccessPermissions.Any())
       {
-        foreach (var permission in user.AccessPermissions)
-        {
-          if (permission.SystemResource != null)
-          {
-            claims.Add(new Claim("permission", permission.SystemResource.Id.ToString()));
-          }
-        }
+        var permissionDtos = user.AccessPermissions
+            .Where(p => p.SystemResource != null)
+            .Select(p => new SystemResourceOptionDto
+            {
+              Id = p.SystemResource!.Id,
+              Name = p.SystemResource!.Name,
+              ExhibitionName = p.SystemResource!.ExhibitionName
+            })
+            .ToArray();
+
+        claims.Add(new Claim("permissions", JsonSerializer.Serialize(permissionDtos)));
       }
 
       return claims.ToArray();
