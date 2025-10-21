@@ -15,6 +15,7 @@ namespace Api.Helpers
         Username = user.Username,
         Email = user.Email,
         FullName = user.FullName,
+        Active = user.Active,
         CreatedAt = user.CreatedAt,
         UpdatedAt = user.UpdatedAt,
         Permissions = user.AccessPermissions?
