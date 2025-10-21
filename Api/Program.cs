@@ -118,6 +118,7 @@ if (app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 
 app.UseRequireAuthorization();
+app.UseValidateUserPermissions();
 
 app.MapControllers();
 app.Run();
