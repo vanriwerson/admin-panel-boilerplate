@@ -34,6 +34,14 @@ namespace Api.Middlewares
       }
 
       var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+
+      if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+      {
+        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+        await context.Response.WriteAsync("Header Authorization ausente ou inválido.");
+        return;
+      }
+
       var token = authHeader.Substring("Bearer ".Length).Trim();
 
       var principal = JsonWebToken.Decode(token);
