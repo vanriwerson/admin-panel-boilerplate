@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,21 +10,18 @@ namespace Api.Services.AuthServices
     public class ExternalTokenService
     {
         private readonly ApiDbContext _context;
-        private readonly string _jwtSecret;
 
         public ExternalTokenService(ApiDbContext context)
         {
             _context = context;
-            _jwtSecret = EnvLoader.GetEnv("JWT_SECRET_KEY");
         }
 
-         public async Task<string?> ExchangeExternalTokenAsync(string externalToken)
+        public async Task<string?> ExchangeExternalTokenAsync(string externalToken)
         {
             ClaimsPrincipal principal;
-
             try
             {
-                principal = JsonWebToken.Decode(externalToken, _jwtSecret);
+                principal = JsonWebToken.Decode(externalToken);
             }
             catch
             {
@@ -38,20 +34,20 @@ namespace Api.Services.AuthServices
             if (emailClaim == null && usernameClaim == null)
                 return null;
 
-            var user = await _context.Users.FirstOrDefaultAsync(u =>
-                u.Email == emailClaim || u.Username == usernameClaim);
+            var user = await _context.Users
+                .Include(u => u.AccessPermissions)
+                .ThenInclude(ap => ap.SystemResource)
+                .FirstOrDefaultAsync(u =>
+                    u.Email == emailClaim || u.Username == usernameClaim);
 
             if (user == null)
                 return null;
 
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
+            var claims = DefaultJWTClaims.Generate(user);
 
-            return JsonWebToken.Create(_jwtSecret, claims, expireMinutes: 120);
+            var token = JsonWebToken.Create(claims, expireMinutes: 120);
+
+            return token;
         }
     }
 }
