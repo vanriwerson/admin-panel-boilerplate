@@ -45,7 +45,7 @@ namespace Api.Services.AuthServices
 
       Console.WriteLine($"[DEBUG] Link de redefinição enviado para {email}: {resetLink}");
 
-      await _createSystemLog.ExecuteAsync(user.Id, LogActionDescribe.NewPasswordRequest(user.Username));
+      await _createSystemLog.ExecuteAsync(LogActionDescribe.NewPasswordRequest(user.Username), user.Id);
     }
 
     public async Task ResetPasswordAsync(string token, string newPassword)
@@ -79,7 +79,7 @@ namespace Api.Services.AuthServices
       _context.Users.Update(user);
       await _context.SaveChangesAsync();
 
-      await _createSystemLog.ExecuteAsync(user.Id, LogActionDescribe.PasswordReset(user.Username));
+      await _createSystemLog.ExecuteAsync(LogActionDescribe.PasswordReset(user.Username), user.Id);
     }
   }
 }

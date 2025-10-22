@@ -32,7 +32,7 @@ namespace Api.Services.AuthServices
             }
 
             var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var usernameClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.UserName)?.Value;
+            var usernameClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
 
             if (emailClaim == null && usernameClaim == null)
                 return null;
@@ -49,7 +49,7 @@ namespace Api.Services.AuthServices
             var claims = DefaultJWTClaims.Generate(user);
             var token = JsonWebToken.Create(claims, expireMinutes: 120);
 
-            await _createSystemLog.ExecuteAsync(user.Id, LogActionDescribe.Login(user.Username));
+            await _createSystemLog.ExecuteAsync(LogActionDescribe.Login(user.Username), user.Id);
 
             return token;
         }
