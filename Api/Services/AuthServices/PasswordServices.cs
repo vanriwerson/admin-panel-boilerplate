@@ -34,7 +34,7 @@ namespace Api.Services.AuthServices
 
       var claims = new[]
       {
-        new System.Security.Claims.Claim("userId", user.Id.ToString()),
+        new System.Security.Claims.Claim("id", user.Id.ToString()),
         new System.Security.Claims.Claim("email", user.Email)
       };
 
@@ -63,7 +63,7 @@ namespace Api.Services.AuthServices
         throw new AppException("Token inválido ou expirado.", (int)HttpStatusCode.Unauthorized);
       }
 
-      var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+      var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
       if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
         throw new AppException("Token inválido.", (int)HttpStatusCode.Unauthorized);

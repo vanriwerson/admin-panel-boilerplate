@@ -32,7 +32,7 @@ namespace Api.Services.AuthServices
             }
 
             var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var usernameClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var usernameClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.UserName)?.Value;
 
             if (emailClaim == null && usernameClaim == null)
                 return null;
