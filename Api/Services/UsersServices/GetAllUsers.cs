@@ -25,8 +25,25 @@ namespace Api.Services.UsersServices
                 .Select(u => UserMapper.MapToUserReadDto(u));
 
             var paginatedUsers = await ApplyPagination.PaginateAsync(query, page, pageSize);
-
             return paginatedUsers;
+        }
+
+        public async Task<IEnumerable<UserLogReadDto>> GetOptionsAsync()
+        {
+            var options = await _userRepo.Query()
+                .AsNoTracking()
+                .Where(u => u.Active)
+                .OrderBy(u => u.FullName)
+                .Select(u => new UserLogReadDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    FullName = u.FullName
+                })
+                .ToListAsync();
+
+            return options;
         }
     }
 }

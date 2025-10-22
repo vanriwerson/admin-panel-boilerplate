@@ -53,6 +53,14 @@ namespace Api.Controllers
             return Ok(allUsers);
         }
 
+        // 🔹 NOVA ROTA: GET: api/users/options
+        [HttpGet("options")]
+        public async Task<IActionResult> GetOptions()
+        {
+            var options = await _getAllUsers.GetOptionsAsync();
+            return Ok(options);
+        }
+
         // GET: api/users/{id}
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
