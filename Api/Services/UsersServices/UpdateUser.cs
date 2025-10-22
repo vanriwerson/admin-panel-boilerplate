@@ -87,7 +87,6 @@ namespace Api.Services.UsersServices
                 await transaction.CommitAsync();
 
                 await _createSystemLog.ExecuteAsync(
-                    userId: user.Id,
                     action: LogActionDescribe.Update("User", user.Id)
                 );
 

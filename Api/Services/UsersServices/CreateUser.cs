@@ -74,7 +74,6 @@ namespace Api.Services.UsersServices
                 await transaction.CommitAsync();
 
                 await _createSystemLog.ExecuteAsync(
-                    userId: user.Id,
                     action: LogActionDescribe.Create("User", user.Id)
                 );
 

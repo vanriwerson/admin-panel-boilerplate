@@ -24,7 +24,6 @@ namespace Api.Services.UsersServices
             if (deleted)
             {
                 await _createSystemLog.ExecuteAsync(
-                    userId: id,
                     action: LogActionDescribe.Delete("User", id)
                 );
             }
