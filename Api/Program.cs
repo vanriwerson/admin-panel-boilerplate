@@ -52,6 +52,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+// --- Registro do helper responsável por extrair o UserId do token ---
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentAuthUser>();
+
+
 // --- Registro automático de Services ---
 var assembly = Assembly.GetExecutingAssembly();
 int servicesRegistrados = 0;
