@@ -1,7 +1,8 @@
 # Generic Login Backend - PostgreSQL + .NET
 
 > Api com fluxo completo de autenticação **JWT**, implementado em **PostgreSQL + .NET**.  
-> Inclui **hash seguro de senhas (BCrypt)**, **emissão e validação de tokens JWT**, e um **repositório genérico** que permite criar CRUDs rapidamente apenas injetando DTOs específicos.
+> Inclui **hash seguro de senhas (BCrypt)**, **emissão e validação de tokens JWT**, **controle customizável de permissões de acesso**,
+> **logs de sistema integrados** e um **repositório genérico** que permite criar CRUDs rapidamente apenas injetando DTOs específicos.
 
 ---
 
@@ -24,10 +25,11 @@ generic-login-dotnet-react/
 │
 ├── Api/                  # Backend .NET
 │   ├── Controllers/      # Controllers da API
-│   ├── Data/             # DbContext e configurações do banco
+│   ├── Data/             # DbContext, configurações do banco e seeders
 │   ├── Dtos/             # Data Transfer Objects
 │   ├── Helpers/          # Helpers utilitários (paginação, snake_case, etc)
 │   ├── Middlewares/      # Validações adicionais
+│   ├── Migrations/       # Estrutura inicial do banco de dados
 │   ├── Models/           # Entidades do banco de dados
 │   ├── Services/         # Lógica de negócios
 │   ├── Program.cs        # Configuração da aplicação
@@ -66,7 +68,7 @@ Vide arquivo `./docker-compose.yml`
 O banco PostgreSQL será exposto na **porta 5432** do host.
 
 ```bash
-docker compose up -d
+docker compose up -d db
 ```
 
 Verifique se o container está rodando:
@@ -74,6 +76,8 @@ Verifique se o container está rodando:
 ```bash
 docker ps
 ```
+
+> Você deverá ver o nome do container `admin-panel-db` no terminal
 
 ---
 
@@ -84,11 +88,19 @@ cd Api
 dotnet ef database update
 ```
 
-> Isso criará a tabela `users` e a tabela `__EFMigrationsHistory`.
+> Isso criará o banco de dados e as tabelas iniciais:
+
+- `access_permissions`
+- `system_logs`
+- `system_resources`
+- `users`
+- `__EFMigrationsHistory`
+
+de acordo com a Migration InitialCreate
 
 ---
 
-### 3. Rodar a API .NET
+### 3. Rodar a API
 
 ```bash
 dotnet run
@@ -124,11 +136,8 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `LoginService`         | Autentica usuários via e-mail ou userName (identifier) / senha, valida com BCrypt e gera JWT                                             |
 | `ExternalTokenService` | (Uso corporativo: Redirecionamento via intranet) Recebe um token externo, valida com o mesmo `JWT_SECRET_KEY` e troca por um JWT interno |
-| `UsersServices`        | CRUD genérico para gerenciamento de usuários                                                                                             |
 
 ---
-
-## 🌐 Endpoints Disponíveis
 
 ### **Autenticação (`/api/auth`)**
 
@@ -176,6 +185,8 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 
 ---
 
+## 🌐 Alguns Endpoints Disponíveis
+
 ### **Usuários (`/api/users`)**
 
 | Método   | Rota                                | Descrição                                                              |
@@ -183,9 +194,21 @@ A Api inclui um **sistema completo de autenticação JWT**, composto pelos helpe
 | `GET`    | `/api/users`                        | Lista todos os usuários                                                |
 | `GET`    | `/api/users/search?key=algumaCoisa` | Lista todos os usuários encontrados na busca (name, fullName ou email) |
 | `GET`    | `/api/users/{id}`                   | Obtém detalhes de um usuário                                           |
+| `GET`    | `/api/users/options`                | Retorna lista resumida (`UserLogReadDto[]`) para selects de relatórios |
 | `POST`   | `/api/users`                        | Cria um novo usuário                                                   |
 | `PUT`    | `/api/users/{id}`                   | Atualiza um usuário existente                                          |
 | `DELETE` | `/api/users/{id}`                   | Remove um usuário                                                      |
+
+---
+
+### **Logs do Sistema (`/api/reports`)**
+
+| Método | Rota           | Descrição                                           |
+| ------ | -------------- | --------------------------------------------------- |
+| `GET`  | `/api/reports` | Retorna logs filtrados por usuário, ação ou período |
+
+> Suporta os queryParams `userId`, `action`, `startDate`, `endDate`, `page` e `pageSize`.
+> Exemplo: http://localhost:<API_PORT>/api/reports?userId=11&startDate=2025-10-22&endDate=2025-10-23
 
 ---
 
@@ -198,17 +221,20 @@ A API já vem integrada com **Swagger**. Para visualizar a documentação dos en
 
 ---
 
-## 🧪 Testando o JWT
+## Controle de Permissões
 
-Envie o token obtido no login no header da requisição:
-
-```
-Authorization: Bearer <token_aqui>
-```
-
-Caso o token esteja expirado ou inválido, a API retornará `401 Unauthorized`.
+O controle de permissões é baseado na entidade `system_resources`, que representa **módulos ou funcionalidades** da api.
+Cada usuário possui uma lista de permissões vinculadas a recursos específicos, determinando quais ações ele pode executar.
 
 ---
+
+## 📜 Logs e Auditoria
+
+Cada ação do tipo CREATE, UPDATE, DELETE ou LOGIN cia um registro em `system_logs`, contendo:
+
+- Id do usuário autenticado (resposável pela ação)
+- Descrição da ação executada
+- Data e hora em que a ação foi executada
 
 ## Sobre o Dev
 
