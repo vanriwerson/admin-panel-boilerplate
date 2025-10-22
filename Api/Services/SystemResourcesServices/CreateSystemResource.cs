@@ -3,6 +3,7 @@ using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
+using Api.Services.SystemLogsServices;
 using System.Net;
 
 namespace Api.Services.SystemResourcesServices
@@ -10,10 +11,12 @@ namespace Api.Services.SystemResourcesServices
   public class CreateSystemResource
   {
     private readonly IGenericRepository<SystemResource> _repo;
+    private readonly CreateSystemLog _createSystemLog;
 
-    public CreateSystemResource(IGenericRepository<SystemResource> repo)
+    public CreateSystemResource(IGenericRepository<SystemResource> repo, CreateSystemLog createSystemLog)
     {
       _repo = repo;
+      _createSystemLog = createSystemLog;
     }
 
     public async Task<SystemResourceReadDto> ExecuteAsync(SystemResourceCreateDto dto)
@@ -31,6 +34,10 @@ namespace Api.Services.SystemResourcesServices
       };
 
       var created = await _repo.CreateAsync(entity);
+
+      await _createSystemLog.ExecuteAsync(
+          action: LogActionDescribe.Create("SystemResource", entity.Id)
+      );
 
       return new SystemResourceReadDto
       {

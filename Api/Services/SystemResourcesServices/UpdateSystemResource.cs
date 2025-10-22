@@ -3,6 +3,7 @@ using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
+using Api.Services.SystemLogsServices;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
@@ -11,10 +12,12 @@ namespace Api.Services.SystemResourcesServices
   public class UpdateSystemResource
   {
     private readonly IGenericRepository<SystemResource> _repo;
+    private readonly CreateSystemLog _createSystemLog;
 
-    public UpdateSystemResource(IGenericRepository<SystemResource> repo)
+    public UpdateSystemResource(IGenericRepository<SystemResource> repo, CreateSystemLog createSystemLog)
     {
       _repo = repo;
+      _createSystemLog = createSystemLog;
     }
 
     public async Task<SystemResourceReadDto?> ExecuteAsync(int id, SystemResourceUpdateDto dto)
@@ -45,6 +48,10 @@ namespace Api.Services.SystemResourcesServices
       resource.UpdatedAt = DateTime.UtcNow;
 
       var updated = await _repo.UpdateAsync(resource);
+
+      await _createSystemLog.ExecuteAsync(
+          action: LogActionDescribe.Update("SystemResource", updated.Id)
+      );
 
       return new SystemResourceReadDto
       {

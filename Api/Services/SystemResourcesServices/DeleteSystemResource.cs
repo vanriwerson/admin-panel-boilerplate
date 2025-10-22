@@ -1,6 +1,8 @@
+using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
+using Api.Services.SystemLogsServices;
 using System.Net;
 
 namespace Api.Services.SystemResourcesServices
@@ -8,10 +10,12 @@ namespace Api.Services.SystemResourcesServices
   public class DeleteSystemResource
   {
     private readonly IGenericRepository<SystemResource> _repo;
+    private readonly CreateSystemLog _createSystemLog;
 
-    public DeleteSystemResource(IGenericRepository<SystemResource> repo)
+    public DeleteSystemResource(IGenericRepository<SystemResource> repo, CreateSystemLog createSystemLog)
     {
       _repo = repo;
+      _createSystemLog = createSystemLog;
     }
 
     public async Task<bool> ExecuteAsync(int id)
@@ -23,6 +27,10 @@ namespace Api.Services.SystemResourcesServices
 
       if (!success)
         throw new AppException("Recurso não encontrado.", (int)HttpStatusCode.NotFound);
+
+      await _createSystemLog.ExecuteAsync(
+          action: LogActionDescribe.Delete("SystemResource", id)
+      );
 
       return true;
     }
