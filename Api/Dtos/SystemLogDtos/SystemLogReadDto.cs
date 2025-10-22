@@ -1,4 +1,6 @@
-namespace Api.Dtos.SystemLogDtos
+using Api.Dtos;
+
+namespace Api.Dtos
 {
   public class SystemLogReadDto
   {
@@ -10,6 +12,6 @@ namespace Api.Dtos.SystemLogDtos
 
     public DateTime CreatedAt { get; set; }
 
-    public string? UserName { get; set; }
+    public UserLogReadDto? User { get; set; }
   }
 }
