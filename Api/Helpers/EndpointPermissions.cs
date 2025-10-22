@@ -24,7 +24,7 @@ namespace Api.Helpers
       path = path.ToLower();
       foreach (var rule in Rules)
       {
-        if (path.StartsWith(rule.Key))
+        if (path.Contains(rule.Key))
           return rule.Value;
       }
 
