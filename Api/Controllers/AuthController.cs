@@ -32,11 +32,11 @@ namespace Api.Controllers
     {
       try
       {
-        var token = await _loginService.LoginAsync(request.Identifier, request.Password);
-        if (token == null)
+        var loginResponse = await _loginService.LoginAsync(request.Identifier, request.Password);
+        if (loginResponse == null)
           return Unauthorized(new { message = "Credenciais inválidas." });
 
-        return Ok(new { token });
+        return Ok(loginResponse);
       }
       catch (Exception ex)
       {
@@ -50,11 +50,11 @@ namespace Api.Controllers
     {
       try
       {
-        var newToken = await _externalTokenService.ExchangeExternalTokenAsync(request.ExternalToken);
-        if (newToken == null)
+        var loginResponse = await _externalTokenService.ExchangeExternalTokenAsync(request.ExternalToken);
+        if (loginResponse == null)
           return Unauthorized(new { message = "Não foi possível fazer login por redirecionamento" });
 
-        return Ok(new { token = newToken });
+        return Ok(loginResponse);
       }
       catch (Exception ex)
       {

@@ -1,11 +1,12 @@
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Helpers;
 using Api.Models;
 using Api.Services.SystemLogsServices;
+using Api.Dtos;
+using System.Collections.Generic;
 
 namespace Api.Services.AuthServices
 {
@@ -20,7 +21,7 @@ namespace Api.Services.AuthServices
             _createSystemLog = createSystemLog;
         }
 
-        public async Task<string?> LoginAsync(string identifier, string password)
+        public async Task<LoginResponseDto?> LoginAsync(string identifier, string password)
         {
             var user = await _context.Users
                 .Include(u => u.AccessPermissions)
@@ -38,7 +39,23 @@ namespace Api.Services.AuthServices
                 action: LogActionDescribe.Login(user.Username)
             );
 
-            return token;
+            var allowedResources = user.AccessPermissions
+                .Where(ap => ap.SystemResource != null && ap.SystemResource.Active)
+                .Select(ap => new SystemResourceOptionDto
+                {
+                    Id = ap.SystemResource.Id,
+                    Name = ap.SystemResource.Name,
+                    ExhibitionName = ap.SystemResource.ExhibitionName
+                })
+                .ToList();
+
+            return new LoginResponseDto
+            {
+                Token = token,
+                Username = user.Username,
+                FullName = user.FullName,
+                Permissions = allowedResources
+            };
         }
     }
 }
