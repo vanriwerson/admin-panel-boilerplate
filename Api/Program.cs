@@ -107,18 +107,18 @@ catch (Exception ex)
     throw;
 }
 
-// --- Middleware de exceção ---
-app.UseExceptionHandlerMiddleware();
-
-// --- Habilitar CORS ---
-app.UseCors("FrontendPolicy");
-
 // --- Pipeline HTTP ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// --- Middleware de exceção ---
+app.UseExceptionHandlerMiddleware();
+
+// --- Habilitar CORS ---
+app.UseCors("FrontendPolicy");
 
 // app.UseHttpsRedirection();
 
