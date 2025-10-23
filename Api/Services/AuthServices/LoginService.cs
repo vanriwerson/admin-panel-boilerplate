@@ -39,11 +39,11 @@ namespace Api.Services.AuthServices
                 action: LogActionDescribe.Login(user.Username)
             );
 
-            var allowedResources = user.AccessPermissions
+            var allowedResources = (user.AccessPermissions ?? new List<AccessPermission>())
                 .Where(ap => ap.SystemResource != null && ap.SystemResource.Active)
                 .Select(ap => new SystemResourceOptionDto
                 {
-                    Id = ap.SystemResource.Id,
+                    Id = ap.SystemResource!.Id,
                     Name = ap.SystemResource.Name,
                     ExhibitionName = ap.SystemResource.ExhibitionName
                 })
