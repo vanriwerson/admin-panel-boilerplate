@@ -13,6 +13,6 @@ namespace Api.Dtos
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public List<AccessPermissionReadDto> Permissions { get; set; } = new();
+    public List<SystemResourceOptionDto> Permissions { get; set; } = new();
   }
 }

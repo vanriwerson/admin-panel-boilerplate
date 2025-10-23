@@ -18,22 +18,16 @@ namespace Api.Helpers
         Active = user.Active,
         CreatedAt = user.CreatedAt,
         UpdatedAt = user.UpdatedAt,
+
         Permissions = user.AccessPermissions?
-              .Select(ap => new AccessPermissionReadDto
-              {
-                Id = ap.Id,
-                UserId = ap.UserId,
-                SystemResourceId = ap.SystemResourceId,
-                SystemResource = ap.SystemResource != null
-                      ? new SystemResourceOptionDto
-                      {
-                        Id = ap.SystemResource.Id,
-                        Name = ap.SystemResource.Name,
-                        ExhibitionName = ap.SystemResource.ExhibitionName
-                      }
-                      : null
-              })
-              .ToList() ?? new List<AccessPermissionReadDto>()
+            .Where(ap => ap.SystemResource != null && ap.SystemResource.Active)
+            .Select(ap => new SystemResourceOptionDto
+            {
+              Id = ap.SystemResource!.Id,
+              Name = ap.SystemResource.Name,
+              ExhibitionName = ap.SystemResource.ExhibitionName
+            })
+            .ToList() ?? new List<SystemResourceOptionDto>()
       };
     }
   }
