@@ -6,6 +6,7 @@ export type { MenuItem } from './MenuItem';
 export type { PasswordResetPayload } from './authInterfaces/PasswordResetPayload';
 export type { SystemLog } from './reportsInterfaces/SystemLog';
 export type { SystemLogFiltersPayload } from './reportsInterfaces/SystemLogFiltersPayload';
+export type { SystemResource } from './SystemResource';
 export type { UserFormValues } from './userInterfaces/UserFormValues';
 export type { UserRead } from './userInterfaces/UserRead';
 export type { UsersPagination } from './userInterfaces/UsersPagination';
