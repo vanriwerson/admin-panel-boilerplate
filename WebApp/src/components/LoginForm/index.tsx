@@ -1,41 +1,36 @@
 import { useState } from 'react';
 import { TextField, Button, Box, Alert } from '@mui/material';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import type { LoginPayload } from '../types';
-import api from '../api';
+import { useAuth } from '../../hooks';
+import { getErrorMessage } from '../../helpers';
+import type { LoginPayload } from '../../interfaces';
 
-const LoginForm = () => {
+export default function LoginForm() {
   const [form, setForm] = useState<LoginPayload>({
     identifier: '',
     password: '',
   });
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const { handleLogin } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      const response = await api.post('/auth/login', form);
-
-      const { token } = response.data;
-      localStorage.setItem('token', token);
-
+      await handleLogin(form);
       navigate('/dashboard');
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else {
-        setError('Erro ao tentar logar. Tente novamente.');
-      }
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -48,6 +43,7 @@ const LoginForm = () => {
       sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
     >
       {error && <Alert severity="error">{error}</Alert>}
+
       <TextField
         label="Username ou Email"
         name="identifier"
@@ -55,6 +51,7 @@ const LoginForm = () => {
         onChange={handleChange}
         required
       />
+
       <TextField
         label="Senha"
         type="password"
@@ -63,6 +60,7 @@ const LoginForm = () => {
         onChange={handleChange}
         required
       />
+
       <Button
         type="submit"
         variant="contained"
@@ -73,6 +71,4 @@ const LoginForm = () => {
       </Button>
     </Box>
   );
-};
-
-export default LoginForm;
+}
