@@ -1,27 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
-import type { UserCreateDto, UserReadDto } from '../types';
+import type { UserFormValues, UserRead } from '../../interfaces';
+import { mapSystemResourcesToFormValue } from '../../helpers';
 
 interface Props {
-  onSubmit: (user: UserCreateDto) => void;
-  user?: UserReadDto;
+  onSubmit: (user: UserFormValues) => void;
+  user?: UserRead;
 }
 
 export default function UserForm({ onSubmit, user }: Props) {
-  const [form, setForm] = useState<UserCreateDto>({
+  const [form, setForm] = useState<UserFormValues>({
     username: '',
     email: '',
     password: '',
     fullName: '',
+    permissions: [],
   });
 
   useEffect(() => {
     if (user) {
       setForm({
+        id: user.id,
         username: user.username,
         email: user.email,
         password: '',
         fullName: user.fullName,
+        permissions: mapSystemResourcesToFormValue(user.permissions),
       });
     }
   }, [user]);
