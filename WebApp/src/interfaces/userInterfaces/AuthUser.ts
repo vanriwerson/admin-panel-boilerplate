@@ -1,6 +1,7 @@
+import type { SystemResource } from '../SystemResource';
+
 export interface AuthUser {
-  id: number;
   username: string;
-  email: string;
   fullName: string;
+  permissions: SystemResource[];
 }

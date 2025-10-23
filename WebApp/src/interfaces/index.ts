@@ -1,9 +1,11 @@
-export type { ExternalLoginPayload } from './loginInterfaces/ExternalLoginPayload';
-export type { LoginPayload } from './loginInterfaces/LoginPayload';
-export type { LoginResponse } from './loginInterfaces/LoginResponse';
+export type { AuthUser } from './userInterfaces/AuthUser';
+export type { ExternalLoginPayload } from './authInterfaces/ExternalLoginPayload';
+export type { LoginPayload } from './authInterfaces/LoginPayload';
+export type { LoginResponse } from './authInterfaces/LoginResponse';
+export type { MenuItem } from './MenuItem';
+export type { PasswordResetPayload } from './authInterfaces/PasswordResetPayload';
 export type { SystemLog } from './reportsInterfaces/SystemLog';
 export type { SystemLogFiltersPayload } from './reportsInterfaces/SystemLogFiltersPayload';
-export type { AuthUser } from './userInterfaces/AuthUser';
 export type { UserFormValues } from './userInterfaces/UserFormValues';
 export type { UserRead } from './userInterfaces/UserRead';
 export type { UsersPagination } from './userInterfaces/UsersPagination';
