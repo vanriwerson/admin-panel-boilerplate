@@ -1,3 +1,4 @@
+export type { AuthContextType } from './contextsInterfaces/AuthContextType';
 export type { AuthUser } from './userInterfaces/AuthUser';
 export type { ExternalLoginPayload } from './authInterfaces/ExternalLoginPayload';
 export type { LoginPayload } from './authInterfaces/LoginPayload';

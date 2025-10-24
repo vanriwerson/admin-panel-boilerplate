@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, type ReactNode } from 'react';
 import type {
+  AuthContextType,
   AuthUser,
   ExternalLoginPayload,
   LoginPayload,
@@ -12,16 +13,6 @@ import {
   requestPasswordReset,
   resetPassword,
 } from '../services';
-
-interface AuthContextType {
-  token: string | null;
-  authUser: AuthUser | null;
-  handleLogin: (payload: LoginPayload) => Promise<void>;
-  handleExternalLogin: (payload: ExternalLoginPayload) => Promise<void>;
-  handlePasswordResetRequest: (email: string) => Promise<string>;
-  handlePasswordReset: (payload: PasswordResetPayload) => Promise<string>;
-  handleLogout: () => void;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
