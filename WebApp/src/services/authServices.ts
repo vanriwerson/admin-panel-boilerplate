@@ -3,7 +3,7 @@ import type {
   LoginPayload,
   LoginResponse,
   ExternalLoginPayload,
-  ResetPasswordPayload,
+  PasswordResetPayload,
 } from '../interfaces';
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -24,7 +24,7 @@ export async function requestPasswordReset(email: string): Promise<string> {
 }
 
 export async function resetPassword(
-  payload: ResetPasswordPayload
+  payload: PasswordResetPayload
 ): Promise<string> {
   const { data } = await api.post('/auth/password/reset', payload);
   return data.message;
