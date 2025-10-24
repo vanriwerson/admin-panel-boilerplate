@@ -12,7 +12,7 @@ import {
 const publicRoutes = [
   { path: '/', element: <Login /> },
   { path: '/login', element: <Login /> },
-  { path: '/reset-password', element: <PasswordReset /> },
+  { path: '/password-reset', element: <PasswordReset /> },
 ];
 
 const privateRoutes = [

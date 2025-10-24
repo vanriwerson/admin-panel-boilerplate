@@ -41,7 +41,7 @@ namespace Api.Services.AuthServices
       var token = JsonWebToken.Create(claims, expireMinutes: 15);
 
       var webAppUrl = EnvLoader.GetEnv("WEB_APP_URL");
-      var resetLink = $"{webAppUrl.TrimEnd('/')}/reset-password?token={token}";
+      var resetLink = $"{webAppUrl.TrimEnd('/')}/password-reset?token={token}";
 
       Console.WriteLine($"[DEBUG] Link de redefinição enviado para {email}: {resetLink}");
 
