@@ -1,6 +1,5 @@
 import api from '../../api';
-import type { UserRead } from '../../interfaces';
 
-export async function deleteUser(user: UserRead) {
-  await api.delete(`/users/${user.id}`);
+export async function deleteUser(id: string) {
+  await api.delete(`/users/${id}`);
 }
