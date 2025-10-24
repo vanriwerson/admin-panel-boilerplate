@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { mapSystemResourcesToFormValue } from '../../helpers';
+import { useSystemResources } from '../../hooks';
+import SystemResourceSelect from '../SystemResourcesSelect';
 
 interface Props {
   onSubmit: (user: UserFormValues) => void;
@@ -16,6 +18,12 @@ export default function UserForm({ onSubmit, user }: Props) {
     fullName: '',
     permissions: [],
   });
+
+  const { fetchSystemResources } = useSystemResources();
+
+  useEffect(() => {
+    fetchSystemResources();
+  }, [fetchSystemResources]);
 
   useEffect(() => {
     if (user) {
@@ -61,6 +69,7 @@ export default function UserForm({ onSubmit, user }: Props) {
         required
         fullWidth
       />
+
       <TextField
         label="Usuário"
         name="username"
@@ -69,6 +78,7 @@ export default function UserForm({ onSubmit, user }: Props) {
         required
         sx={{ flexGrow: 1 }}
       />
+
       <TextField
         label="E-mail"
         name="email"
@@ -77,15 +87,22 @@ export default function UserForm({ onSubmit, user }: Props) {
         required
         sx={{ flexGrow: 1 }}
       />
+
       <TextField
         label="Senha"
         name="password"
         type="password"
         value={form.password}
         onChange={handleChange}
-        required
+        required={!user}
         sx={{ flexGrow: 1 }}
       />
+
+      <SystemResourceSelect
+        value={form.permissions}
+        onChange={(permissions) => setForm({ ...form, permissions })}
+      />
+
       <Button variant="contained" type="submit">
         {user ? 'Atualizar' : 'Cadastrar'}
       </Button>
