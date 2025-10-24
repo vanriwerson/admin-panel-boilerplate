@@ -6,6 +6,6 @@ export interface UserRead {
   email: string;
   fullName: string;
   permissions?: SystemResource[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
