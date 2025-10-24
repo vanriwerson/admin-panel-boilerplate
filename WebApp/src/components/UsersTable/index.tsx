@@ -12,63 +12,41 @@ import {
   Typography,
   Box,
   TextField,
-  InputAdornment,
 } from '@mui/material';
 import { Edit, Delete, Search } from '@mui/icons-material';
-import api from '../api';
-import type { UserReadDto, UsersPagination } from '../types';
 
-interface UserTableProps {
-  onEdit: (user: UserReadDto) => void;
-  onDelete?: (user: UserReadDto) => void;
+import type { UserRead } from '../../interfaces';
+import { useUsers } from '../../hooks';
+
+interface UsersTableProps {
+  onEdit: (user: UserRead) => void;
+  onDelete?: (id: number) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
-  const [users, setUsers] = useState<UserReadDto[]>([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState(false);
+export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
+  const { users, pagination, loading, fetchUsers, setPagination } = useUsers();
   const [searchKey, setSearchKey] = useState('');
 
-  const fetchUsers = async (
-    pageNumber = 1,
-    pageSize = 10,
-    key: string = ''
-  ) => {
-    try {
-      setLoading(true);
-      const endpoint = key
-        ? `/users/search?key=${encodeURIComponent(
-            key
-          )}&page=${pageNumber}&pageSize=${pageSize}`
-        : `/users?page=${pageNumber}&pageSize=${pageSize}`;
+  useEffect(() => {
+    fetchUsers(pagination.page, pagination.pageSize, searchKey);
+  }, [fetchUsers, pagination.page, pagination.pageSize, searchKey]);
 
-      const response = await api.get<UsersPagination>(endpoint);
-      setUsers(response.data.data);
-      setTotalItems(response.data.totalItems);
-    } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleChangePage = (_: unknown, newPage: number) => {
+    setPagination((prev) => ({ ...prev, page: newPage + 1 }));
   };
 
-  useEffect(() => {
-    fetchUsers(page + 1, rowsPerPage, searchKey);
-  }, [page, rowsPerPage, searchKey]);
-
-  const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
-
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setPage(0);
+    setPagination({
+      ...pagination,
+      page: 1,
+      pageSize: parseInt(e.target.value, 10),
+    });
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setPage(0);
-    fetchUsers(1, rowsPerPage, searchKey);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    fetchUsers(1, pagination.pageSize, searchKey);
   };
 
   return (
@@ -88,12 +66,10 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
             placeholder="Buscar usuário..."
             value={searchKey}
             onChange={(e) => setSearchKey(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Search />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: <Search />,
+              },
             }}
           />
         </form>
@@ -112,7 +88,6 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
               <TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
             {loading ? (
               <TableRow>
@@ -121,7 +96,7 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
                 </TableCell>
               </TableRow>
             ) : users.length > 0 ? (
-              users.map((user) => (
+              users.map((user: UserRead) => (
                 <TableRow key={user.id} hover>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.username}</TableCell>
@@ -137,7 +112,10 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
                     <IconButton color="primary" onClick={() => onEdit(user)}>
                       <Edit />
                     </IconButton>
-                    <IconButton color="error" onClick={() => onDelete?.(user)}>
+                    <IconButton
+                      color="error"
+                      onClick={() => onDelete?.(user.id)}
+                    >
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -157,10 +135,10 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
       <Box display="flex" justifyContent="flex-end">
         <TablePagination
           component="div"
-          count={totalItems}
-          page={page}
+          count={pagination.totalItems}
+          page={pagination.page - 1}
           onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
+          rowsPerPage={pagination.pageSize}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Itens por página:"
           rowsPerPageOptions={[5, 10, 25]}
@@ -168,6 +146,4 @@ const UserTable: React.FC<UserTableProps> = ({ onEdit, onDelete }) => {
       </Box>
     </Paper>
   );
-};
-
-export default UserTable;
+}
