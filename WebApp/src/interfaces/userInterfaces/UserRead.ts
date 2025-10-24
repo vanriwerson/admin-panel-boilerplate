@@ -1,4 +1,4 @@
-import type { SystemResource } from '../SystemResource';
+import type { SystemResource } from '../systemResourcesInterfaces/SystemResource';
 
 export interface UserRead {
   id: number;
