@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleAuthData = (data: LoginResponse) => {
     const userData: AuthUser = {
+      id: data.id,
       username: data.username,
       fullName: data.fullName,
       permissions: data.permissions,

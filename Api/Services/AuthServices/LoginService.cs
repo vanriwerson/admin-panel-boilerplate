@@ -52,6 +52,7 @@ namespace Api.Services.AuthServices
             return new LoginResponseDto
             {
                 Token = token,
+                Id = user.Id,
                 Username = user.Username,
                 FullName = user.FullName,
                 Permissions = allowedResources
