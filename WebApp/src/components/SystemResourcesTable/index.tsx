@@ -66,7 +66,9 @@ export default function SystemResourcesTable({
         alignItems="center"
         mb={2}
       >
-        <Typography variant="h6">Recursos do sistema</Typography>
+        <Typography variant="h6" mr={2}>
+          Recursos do sistema
+        </Typography>
 
         <form onSubmit={handleSearchSubmit}>
           <TextField
