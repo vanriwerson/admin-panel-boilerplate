@@ -28,7 +28,7 @@ export default function LoginForm() {
 
     try {
       await handleLogin(form);
-      navigate('/dashboard');
+      navigate('/profile');
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
