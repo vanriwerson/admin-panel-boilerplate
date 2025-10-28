@@ -5,7 +5,7 @@ export interface UserRead {
   username: string;
   email: string;
   fullName: string;
-  permissions?: SystemResource[];
+  permissions: SystemResource[];
   createdAt: Date;
   updatedAt: Date;
 }
