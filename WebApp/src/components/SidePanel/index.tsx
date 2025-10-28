@@ -11,6 +11,8 @@ import {
 import AuthUserDisplay from '../AuthUserDisplay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { menuItems } from '../../helpers';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '../../hooks';
 
 interface SidePanelProps {
   open: boolean;
@@ -25,6 +27,8 @@ export default function SidePanel({
   onClose,
   onNavigate,
 }: SidePanelProps) {
+  const { handleLogout } = useAuth();
+
   return (
     <Drawer
       variant="persistent"
@@ -51,6 +55,17 @@ export default function SidePanel({
               </ListItemButton>
             </ListItem>
           ))}
+          <ListItemButton
+            onClick={() => {
+              handleLogout();
+              onNavigate('/login');
+            }}
+          >
+            <ListItemIcon>
+              <FontAwesomeIcon icon={faSignOutAlt} />
+            </ListItemIcon>
+            <ListItemText primary="Sair" />
+          </ListItemButton>
         </List>
       </Box>
     </Drawer>
