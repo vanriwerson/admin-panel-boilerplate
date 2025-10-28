@@ -4,6 +4,7 @@ import type { UserFormValues, UserRead } from '../../interfaces';
 import { mapSystemResourcesToFormValue } from '../../helpers';
 import { useAuth, useSystemResources } from '../../hooks';
 import SystemResourceSelect from '../SystemResourcesSelect';
+import { canEditPassword } from '../../permissions/rules';
 
 interface Props {
   onSubmit: (user: UserFormValues) => void;
@@ -23,8 +24,8 @@ export default function UserForm({ onSubmit, user }: Props) {
 
   const { fetchSystemResources } = useSystemResources();
 
-  const showPasswordField =
-    authUser?.username === 'root' || authUser?.username === user?.username;
+  let showPasswordField = false;
+  if (authUser != null) showPasswordField = canEditPassword(authUser, user);
 
   useEffect(() => {
     fetchSystemResources();
