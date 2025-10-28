@@ -6,6 +6,7 @@ import {
   updateUser,
   deleteUser,
   listUsersForSelect,
+  listUserById,
 } from '../services';
 import { getErrorMessage } from '../helpers';
 
@@ -95,6 +96,15 @@ export function useUsers() {
     }
   }, []);
 
+  const fetchUserById = useCallback(async (id: number) => {
+    try {
+      return await listUserById(id);
+    } catch (err) {
+      console.error('Erro ao buscar usuário:', err);
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
@@ -109,6 +119,7 @@ export function useUsers() {
     editUser,
     removeUser,
     fetchUsersForSelect,
+    fetchUserById,
     setPagination,
   };
 }

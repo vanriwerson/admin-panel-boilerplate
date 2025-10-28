@@ -14,6 +14,10 @@ export { updateSystemResource } from './systemResourcesServices/updateSystemReso
 export { deleteSystemResource } from './systemResourcesServices/deleteSystemResource';
 
 export { createUser } from './usersServices/createUser';
-export { listUsers, listUsersForSelect } from './usersServices/listUsers';
+export {
+  listUsers,
+  listUserById,
+  listUsersForSelect,
+} from './usersServices/listUsers';
 export { updateUser } from './usersServices/updateUser';
 export { deleteUser } from './usersServices/deleteUser';

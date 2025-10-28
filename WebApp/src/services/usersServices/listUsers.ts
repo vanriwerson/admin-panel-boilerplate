@@ -20,3 +20,8 @@ export async function listUsersForSelect() {
   const { data } = await api.get<UserRead[]>('/users/options');
   return data;
 }
+
+export async function listUserById(id: number) {
+  const { data } = await api.get<UserRead>(`/users/${id}`);
+  return data;
+}
