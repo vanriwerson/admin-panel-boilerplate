@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Container, Typography, Modal, Box, Button } from '@mui/material';
-import { UserForm, UsersTable } from '../../components';
+import { Container, Typography } from '@mui/material';
+import { UserEditionModal, UserForm, UsersTable } from '../../components';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { useUsers } from '../../hooks';
 
@@ -49,7 +49,7 @@ export default function Users() {
     }
   }
 
-  function handleEdit(user: UserRead) {
+  function handleOpenEditionModal(user: UserRead) {
     setEditingUser(user);
     setOpen(true);
   }
@@ -71,32 +71,14 @@ export default function Users() {
 
       <UserForm onSubmit={handleCreate} />
 
-      <UsersTable onEdit={handleEdit} onDelete={handleDelete} />
+      <UsersTable onEdit={handleOpenEditionModal} onDelete={handleDelete} />
 
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <Box
-          sx={{
-            bgcolor: 'background.paper',
-            p: 4,
-            borderRadius: 2,
-            m: 'auto',
-            mt: '10%',
-            width: 400,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Editar Usuário
-          </Typography>
-
-          {editingUser && (
-            <UserForm user={editingUser} onSubmit={handleUpdate} />
-          )}
-
-          <Box display="flex" justifyContent="flex-end" mt={2}>
-            <Button onClick={() => setOpen(false)}>Fechar</Button>
-          </Box>
-        </Box>
-      </Modal>
+      <UserEditionModal
+        open={open}
+        user={editingUser}
+        onClose={() => setOpen(false)}
+        onSubmit={handleUpdate}
+      />
     </Container>
   );
 }
