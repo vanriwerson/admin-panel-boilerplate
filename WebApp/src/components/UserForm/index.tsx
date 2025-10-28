@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { mapSystemResourcesToFormValue } from '../../helpers';
-import { useSystemResources } from '../../hooks';
+import { useAuth, useSystemResources } from '../../hooks';
 import SystemResourceSelect from '../SystemResourcesSelect';
 
 interface Props {
@@ -19,7 +19,12 @@ export default function UserForm({ onSubmit, user }: Props) {
     permissions: [],
   });
 
+  const { authUser } = useAuth();
+
   const { fetchSystemResources } = useSystemResources();
+
+  const showPasswordField =
+    authUser?.username === 'root' || authUser?.username === user?.username;
 
   useEffect(() => {
     fetchSystemResources();
@@ -88,15 +93,17 @@ export default function UserForm({ onSubmit, user }: Props) {
         sx={{ flexGrow: 1 }}
       />
 
-      <TextField
-        label="Senha"
-        name="password"
-        type="password"
-        value={form.password}
-        onChange={handleChange}
-        required={!user}
-        sx={{ flexGrow: 1 }}
-      />
+      {showPasswordField && (
+        <TextField
+          label="Senha"
+          name="password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+          required={!user}
+          sx={{ flexGrow: 1 }}
+        />
+      )}
 
       <SystemResourceSelect
         value={form.permissions}
