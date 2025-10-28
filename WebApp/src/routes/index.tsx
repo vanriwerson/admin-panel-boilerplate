@@ -1,12 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
 import {
-  Dashboard,
   Login,
   PasswordReset,
-  Users,
-  Resources,
+  Profile,
   Reports,
+  Resources,
+  Users,
 } from '../pages';
 
 const publicRoutes = [
@@ -16,7 +16,7 @@ const publicRoutes = [
 ];
 
 const privateRoutes = [
-  { path: '/dashboard', element: <Dashboard /> },
+  { path: '/profile', element: <Profile /> },
   { path: '/users', element: <Users /> },
   { path: '/resources', element: <Resources /> },
   { path: '/reports', element: <Reports /> },
