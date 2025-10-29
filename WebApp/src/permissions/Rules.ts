@@ -10,7 +10,7 @@ function getUserPermissions(authUser: EvalPermissions): Set<string> {
   return new Set(authUser.permissions.map((p) => p.name));
 }
 
-function isRootUser(authUser: EvalPermissions): boolean {
+export function isRootUser(authUser: EvalPermissions): boolean {
   return getUserPermissions(authUser).has(PermissionsMap.ROOT);
 }
 

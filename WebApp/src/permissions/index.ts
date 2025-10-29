@@ -3,6 +3,7 @@ export {
   canEditPassword,
   canEditPermissions,
   filterAssignablePermissions,
-} from './rules';
+} from './Rules';
+export { filterMenuByPermissions } from './MenuVisibility';
 export { PermissionsMap } from './PermissionsMap';
 export type { PermissionName } from './PermissionsMap';
