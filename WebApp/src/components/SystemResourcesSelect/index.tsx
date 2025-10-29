@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   FormControl,
   InputLabel,
@@ -12,6 +12,7 @@ import {
   Box,
 } from '@mui/material';
 import { useSystemResources } from '../../hooks';
+import type { SystemResource } from '../../interfaces';
 
 interface Props {
   value: number[];
@@ -19,11 +20,16 @@ interface Props {
 }
 
 export default function SystemResourceSelect({ value, onChange }: Props) {
-  const { resources, fetchSystemResources, loading } = useSystemResources();
+  const { fetchSystemResourcesForSelect, loading } = useSystemResources();
+  const [options, setOptions] = useState<SystemResource[]>([]);
 
   useEffect(() => {
-    fetchSystemResources();
-  }, [fetchSystemResources]);
+    fetchSystemResourcesForSelect()
+      .then((data) => setOptions(data))
+      .catch((err) =>
+        console.error('Erro ao carregar opções de permissões:', err)
+      );
+  }, [fetchSystemResourcesForSelect]);
 
   function handleChange(event: SelectChangeEvent<string[]>) {
     const { value } = event.target;
@@ -35,13 +41,13 @@ export default function SystemResourceSelect({ value, onChange }: Props) {
   }
 
   const selectedNames = useMemo(() => {
-    if (!resources.length) return [];
-    return resources
+    if (!options.length) return [];
+    return options
       .filter((r) => value.includes(r.id!))
       .map((r) => r.exhibitionName);
-  }, [resources, value]);
+  }, [options, value]);
 
-  if (loading && !resources.length) {
+  if (loading && !options.length) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" p={2}>
         <CircularProgress size={24} />
@@ -59,7 +65,7 @@ export default function SystemResourceSelect({ value, onChange }: Props) {
         input={<OutlinedInput label="Permissões" />}
         renderValue={() => selectedNames.join(', ')}
       >
-        {resources.map((resource) => (
+        {options.map((resource) => (
           <MenuItem key={resource.id} value={String(resource.id)}>
             <Checkbox checked={value.includes(resource.id!)} />
             <ListItemText primary={resource.exhibitionName} />
