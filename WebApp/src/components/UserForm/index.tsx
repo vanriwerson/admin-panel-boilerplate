@@ -4,7 +4,7 @@ import type { UserFormValues, UserRead } from '../../interfaces';
 import { mapSystemResourcesToFormValue } from '../../helpers';
 import { useAuth } from '../../hooks';
 import SystemResourceSelect from '../SystemResourcesSelect';
-import { canEditPassword, canEditPermissions } from '../../permissions/rules';
+import { canEditPassword, canEditPermissions } from '../../permissions/Rules';
 
 interface Props {
   onSubmit: (user: UserFormValues) => void;
