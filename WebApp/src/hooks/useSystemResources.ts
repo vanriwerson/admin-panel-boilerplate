@@ -39,7 +39,7 @@ export function useSystemResources() {
     [pagination.page, pagination.pageSize]
   );
 
-  const create = useCallback(
+  const addSystemResource = useCallback(
     async (resource: SystemResource) => {
       try {
         await createSystemResource(resource);
@@ -51,7 +51,7 @@ export function useSystemResources() {
     [fetchSystemResources]
   );
 
-  const update = useCallback(
+  const editSystemResource = useCallback(
     async (resource: SystemResource) => {
       try {
         await updateSystemResource(resource);
@@ -63,7 +63,7 @@ export function useSystemResources() {
     [fetchSystemResources]
   );
 
-  const remove = useCallback(
+  const removeSystemResource = useCallback(
     async (id: string) => {
       try {
         await deleteSystemResource(id);
@@ -75,7 +75,7 @@ export function useSystemResources() {
     [fetchSystemResources]
   );
 
-  const fetchOptions = useCallback(async () => {
+  const fetchSystemResourcesForSelect = useCallback(async () => {
     try {
       const data = await listSystemResourcesForSelect();
       return data;
@@ -89,11 +89,11 @@ export function useSystemResources() {
     resources,
     pagination,
     loading,
-    setPagination,
     fetchSystemResources,
-    create,
-    update,
-    remove,
-    fetchOptions,
+    addSystemResource,
+    editSystemResource,
+    removeSystemResource,
+    fetchSystemResourcesForSelect,
+    setPagination,
   };
 }

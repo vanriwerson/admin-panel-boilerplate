@@ -9,8 +9,13 @@ import {
 } from '../../components';
 
 export default function Resources() {
-  const { fetchSystemResources, create, update, remove, pagination } =
-    useSystemResources();
+  const {
+    fetchSystemResources,
+    addSystemResource,
+    editSystemResource,
+    removeSystemResource,
+    pagination,
+  } = useSystemResources();
 
   const [editingResource, setEditingResource] = useState<SystemResource | null>(
     null
@@ -19,7 +24,7 @@ export default function Resources() {
 
   async function handleCreate(resource: SystemResource) {
     try {
-      await create(resource);
+      await addSystemResource(resource);
       alert('✅ Recurso criado com sucesso!');
       fetchSystemResources(pagination.page, pagination.pageSize); // atualiza tabela
     } catch (err) {
@@ -31,7 +36,7 @@ export default function Resources() {
   async function handleUpdate(resource: SystemResource) {
     if (!editingResource) return;
     try {
-      await update({ ...editingResource, ...resource });
+      await editSystemResource({ ...editingResource, ...resource });
       alert('✅ Recurso atualizado com sucesso!');
       setOpen(false);
       fetchSystemResources(pagination.page, pagination.pageSize);
@@ -48,7 +53,7 @@ export default function Resources() {
     if (!confirmDelete) return;
 
     try {
-      await remove(id.toString());
+      await removeSystemResource(id.toString());
       alert('🗑️ Recurso excluído com sucesso!');
       fetchSystemResources(pagination.page, pagination.pageSize);
     } catch (err) {
