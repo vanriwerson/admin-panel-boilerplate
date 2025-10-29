@@ -10,9 +10,9 @@ import {
 } from '@mui/material';
 import AuthUserDisplay from '../AuthUserDisplay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { menuItems } from '../../helpers';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../hooks';
+import { filterMenuByPermissions } from '../../permissions/MenuVisibility'; // ✅ novo helper centralizado
 
 interface SidePanelProps {
   open: boolean;
@@ -27,7 +27,10 @@ export default function SidePanel({
   onClose,
   onNavigate,
 }: SidePanelProps) {
-  const { handleLogout } = useAuth();
+  const { authUser, handleLogout } = useAuth();
+
+  // ✅ Filtra os itens do menu de acordo com as permissões do usuário logado
+  const filteredMenu = filterMenuByPermissions(authUser);
 
   return (
     <Drawer
@@ -44,8 +47,9 @@ export default function SidePanel({
       <Toolbar />
       <Box sx={{ overflow: 'auto' }}>
         <AuthUserDisplay />
+
         <List>
-          {menuItems.map((item) => (
+          {filteredMenu.map((item) => (
             <ListItem key={item.label} disablePadding>
               <ListItemButton onClick={() => onNavigate(item.route)}>
                 <ListItemIcon>
@@ -55,6 +59,7 @@ export default function SidePanel({
               </ListItemButton>
             </ListItem>
           ))}
+
           <ListItemButton
             onClick={() => {
               handleLogout();

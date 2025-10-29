@@ -12,7 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useSystemResources, useAuth } from '../../hooks';
-import { filterAssignablePermissions } from '../../permissions/rules';
+import { filterAssignablePermissions } from '../../permissions/Rules';
 import type { SystemResource } from '../../interfaces';
 import type { SelectChangeEvent } from '@mui/material';
 

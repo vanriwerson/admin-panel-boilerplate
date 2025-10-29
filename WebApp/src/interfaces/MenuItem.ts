@@ -4,4 +4,5 @@ export interface MenuItem {
   label: string;
   route: string;
   icon: IconDefinition;
+  permission?: string;
 }
