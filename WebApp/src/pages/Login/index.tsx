@@ -1,9 +1,58 @@
-import { useState } from 'react';
-import { Box, Typography, Paper, Link } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Link, CircularProgress } from '@mui/material';
 import { LoginForm, PasswordResetRequestModal } from '../../components';
+import { useAuth } from '../../hooks';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [openResetModal, setOpenResetModal] = useState(false);
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
+
+  const { token, handleExternalLogin } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const urlToken = searchParams.get('token');
+
+    async function tryExternalLogin() {
+      if (urlToken) {
+        try {
+          await handleExternalLogin({ externalToken: urlToken });
+          navigate('/profile', { replace: true });
+          return;
+        } catch (error) {
+          console.error('Erro no login externo:', error);
+        }
+      }
+
+      if (token) {
+        navigate('/profile', { replace: true });
+        return;
+      }
+
+      setIsCheckingToken(false);
+    }
+
+    void tryExternalLogin();
+  }, [location.search, token, handleExternalLogin, navigate]);
+
+  if (isCheckingToken) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#f5f5f5',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
