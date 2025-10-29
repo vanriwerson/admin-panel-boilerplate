@@ -11,5 +11,6 @@ export type { SystemLogsPagination } from './systemLogsInterfaces/SystemLogsPagi
 export type { SystemResource } from './systemResourcesInterfaces/SystemResource';
 export type { SystemResourcesPagination } from './systemResourcesInterfaces/SystemResourcesPagination';
 export type { UserFormValues } from './userInterfaces/UserFormValues';
+export type { UserOption } from './userInterfaces/UserOption';
 export type { UserRead } from './userInterfaces/UserRead';
 export type { UsersPagination } from './userInterfaces/UsersPagination';
