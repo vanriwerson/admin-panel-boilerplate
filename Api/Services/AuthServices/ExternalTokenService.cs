@@ -3,7 +3,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Api.Data;
+using Api.Dtos;
 using Api.Helpers;
+using Api.Models;
 using Api.Services.SystemLogsServices;
 
 namespace Api.Services.AuthServices
@@ -19,7 +21,7 @@ namespace Api.Services.AuthServices
             _createSystemLog = createSystemLog;
         }
 
-        public async Task<string?> ExchangeExternalTokenAsync(string externalToken)
+        public async Task<LoginResponseDto?> ExchangeExternalTokenAsync(string externalToken)
         {
             ClaimsPrincipal principal;
             try
@@ -40,8 +42,7 @@ namespace Api.Services.AuthServices
             var user = await _context.Users
                 .Include(u => u.AccessPermissions)
                 .ThenInclude(ap => ap.SystemResource)
-                .FirstOrDefaultAsync(u =>
-                    u.Email == emailClaim || u.Username == usernameClaim);
+                .FirstOrDefaultAsync(u => u.Email == emailClaim || u.Username == usernameClaim);
 
             if (user == null)
                 return null;
@@ -49,9 +50,29 @@ namespace Api.Services.AuthServices
             var claims = DefaultJWTClaims.Generate(user);
             var token = JsonWebToken.Create(claims, expireMinutes: 120);
 
-            await _createSystemLog.ExecuteAsync(LogActionDescribe.Login(user.Username), user.Id);
+            await _createSystemLog.ExecuteAsync(
+                userId: user.Id,
+                action: LogActionDescribe.Login(user.Username)
+            );
 
-            return token;
+            var allowedResources = (user.AccessPermissions ?? new List<AccessPermission>())
+                .Where(ap => ap.SystemResource != null && ap.SystemResource.Active)
+                .Select(ap => new SystemResourceOptionDto
+                {
+                    Id = ap.SystemResource!.Id,
+                    Name = ap.SystemResource.Name,
+                    ExhibitionName = ap.SystemResource.ExhibitionName
+                })
+                .ToList();
+
+            return new LoginResponseDto
+            {
+                Token = token,
+                Id = user.Id,
+                Username = user.Username,
+                FullName = user.FullName,
+                Permissions = allowedResources
+            };
         }
     }
 }
