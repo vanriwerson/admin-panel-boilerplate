@@ -1,6 +1,8 @@
-import { Modal, Box, Typography } from '@mui/material';
+import { Modal, Box, Typography, Button } from '@mui/material';
 import type { SystemResource } from '../../interfaces';
 import SystemResourceForm from '../SystemResourceForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   open: boolean;
@@ -29,6 +31,12 @@ export default function SystemResourceEditionModal({
           width: 400,
         }}
       >
+        <Box display="flex" justifyContent="flex-end">
+          <Button onClick={onClose}>
+            <FontAwesomeIcon icon={faClose} />
+          </Button>
+        </Box>
+
         <Typography variant="h6" gutterBottom>
           Editar Recurso
         </Typography>
