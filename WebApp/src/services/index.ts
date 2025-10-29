@@ -5,6 +5,8 @@ export {
   resetPassword,
 } from './authServices';
 
+export { getLogReports } from './systemLogsServices';
+
 export { createSystemResource } from './systemResourcesServices/createSystemResource';
 export {
   listSystemResources,
