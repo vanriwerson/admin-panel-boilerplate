@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { mapSystemResourcesToFormValue } from '../../helpers';
-import { useAuth, useSystemResources } from '../../hooks';
+import { useAuth } from '../../hooks';
 import SystemResourceSelect from '../SystemResourcesSelect';
-import { canEditPassword } from '../../permissions/rules';
+import { canEditPassword, canEditPermissions } from '../../permissions/rules';
 
 interface Props {
   onSubmit: (user: UserFormValues) => void;
@@ -22,14 +22,8 @@ export default function UserForm({ onSubmit, user }: Props) {
 
   const { authUser } = useAuth();
 
-  const { fetchSystemResources } = useSystemResources();
-
-  let showPasswordField = false;
-  if (authUser != null) showPasswordField = canEditPassword(authUser, user);
-
-  useEffect(() => {
-    fetchSystemResources();
-  }, [fetchSystemResources]);
+  const showPasswordField = authUser && canEditPassword(authUser, user);
+  const canEditPerms = authUser && canEditPermissions(authUser, user);
 
   useEffect(() => {
     if (user) {
@@ -109,6 +103,7 @@ export default function UserForm({ onSubmit, user }: Props) {
       <SystemResourceSelect
         value={form.permissions}
         onChange={(permissions) => setForm({ ...form, permissions })}
+        readOnly={!canEditPerms}
       />
 
       <Button variant="contained" type="submit">

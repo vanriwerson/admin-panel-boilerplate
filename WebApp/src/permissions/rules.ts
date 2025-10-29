@@ -16,7 +16,7 @@ function isRootUser(authUser: EvalPermissions): boolean {
 
 export function hasPermission(
   authUser: EvalPermissions,
-  permissionName: PermissionName
+  permissionName: string
 ): boolean {
   const permissions = getUserPermissions(authUser);
   return isRootUser(authUser) || permissions.has(permissionName);
@@ -35,4 +35,30 @@ export function canEditPassword(
   if (isRootUser(authUser)) return true;
   if (isUserTeam && !isTargetRoot) return true;
   return Boolean(isEditingSelf);
+}
+
+export function canEditPermissions(
+  authUser: AuthUser,
+  targetUser?: UserRead
+): boolean {
+  const authPermissions = getUserPermissions(authUser);
+  const isUserTeam = authPermissions.has(PermissionsMap.USERS);
+  const isTargetRoot =
+    targetUser && getUserPermissions(targetUser).has(PermissionsMap.ROOT);
+
+  if (isRootUser(authUser)) return true;
+  if (isUserTeam && !isTargetRoot) return true;
+
+  return false;
+}
+
+export function filterAssignablePermissions(
+  authUser: AuthUser,
+  allPermissions: SystemResource[]
+): SystemResource[] {
+  if (isRootUser(authUser)) return allPermissions;
+  const isUserTeam = getUserPermissions(authUser).has(PermissionsMap.USERS);
+  if (isUserTeam)
+    return allPermissions.filter((p) => p.name !== PermissionsMap.ROOT);
+  return [];
 }

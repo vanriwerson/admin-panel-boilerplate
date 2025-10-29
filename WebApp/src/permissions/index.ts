@@ -1,3 +1,8 @@
-export { hasPermission, canEditPassword } from './rules';
+export {
+  hasPermission,
+  canEditPassword,
+  canEditPermissions,
+  filterAssignablePermissions,
+} from './rules';
 export { PermissionsMap } from './PermissionsMap';
 export type { PermissionName } from './PermissionsMap';
