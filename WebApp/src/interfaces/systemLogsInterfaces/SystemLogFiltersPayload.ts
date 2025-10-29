@@ -1,6 +1,8 @@
 export interface SystemLogFiltersPayload {
+  startDate?: string;
+  endDate?: string;
   userId?: number;
   action?: string;
-  startDate?: Date;
-  endDate?: Date;
+  page?: number;
+  pageSize?: number;
 }
