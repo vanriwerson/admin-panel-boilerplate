@@ -1,7 +1,8 @@
-# Generic Login Frontend - React + Vite + MaterialUI
+# Admin Pannel BoilerPlate Frontend - React + Vite + MaterialUI
 
 > Frontend em **React** com **Vite** e **TypeScript**, integrado com a API .NET deste projeto.  
-> Inclui **fluxo de login JWT**, **painel administrativo para usuários**, formulários de cadastro/edição e lista paginada de usuários com opção de busca.
+> Fornece um painel administrativo moderno, seguro e escalável, permitindo gerenciamento de **usuários com controle de permissões de acesso** e também o gerenciamento de **recursos do sistema**, além de permitir **auditoria** das ações executadas.
+> Inclui um **fluxo completo de autenticação via JWT**, **recuperação de senha** e **rotas protegidas** contra acesso indevido.
 
 ---
 
@@ -24,12 +25,16 @@ generic-login-dotnet-react/
 ├── WebApp/
 │   ├── public/                # Arquivos estáticos
 │   ├── src/
-│   │   ├── api/               # Instância Axios configurada com baseURL e headers
+│   │   ├── api/               # Instância Axios configurada com baseURL, headers e interceptors JWT
 │   │   ├── components/        # Componentes reutilizáveis (UserTable, UserForm, LoginForm)
-│   │   ├── hooks/             # Hooks personalizados (useAuth)
-│   │   ├── pages/             # Páginas (Dashboard, Login)
-│   │   ├── types/             # Tipagens TypeScript (UserReadDto, LoginPayload, etc)
-│   │   ├── App.tsx            # Configuração das rotas e layout principal
+│   │   ├── contexts/          # Configuração do ContextApi
+│   │   ├── helpers/           # Funções auxiliares
+│   │   ├── hooks/             # Hooks personalizados
+│   │   ├── interfaces/        # Contratos de Tipagem TypeScript
+│   │   ├── pages/             # Páginas principais da aplicação
+│   │   ├── permissions/       # Regras do role based access control (RBAC)
+│   │   ├── routes/            # Configuração das rotas
+│   │   ├── App.tsx            # Configuração do layout principal
 │   │   └── main.tsx           # Entrada do React e renderização do App
 │   ├── tsconfig.json          # Configuração TypeScript
 │   └── package.json           # Dependências e scripts do projeto
@@ -41,26 +46,43 @@ generic-login-dotnet-react/
 
 ## Funcionalidades
 
-- **Login JWT**
+##### - Login
 
-  - Campo para `identifier` e `password`.
-  - Autenticação via API `/auth/login`.
-  - Armazena token no `localStorage` e configura cabeçalho `Authorization` para todas as requisições.
+- Permite autenticação utilizando `username` ou `email` (`identifier`) e `password`.
+- Disponibiliza autenticação por redirecionamento enviando `token` via url (desde que utilizando o mesmo `JWT_SECRET_KEY`).
+- Armazena token no `localStorage` e configura cabeçalho `Authorization` para todas as requisições.
 
-- **Painel Administrativo**
+##### - Perfil
 
-  - Lista paginada de usuários (`UserTable`), integrada com a API.
-  - Criação e edição de usuários via `UserForm`.
-  - Exclusão de usuários diretamente da tabela.
-  - Pesquisa de usuários com filtro (`/users/search?key=`).
+- Exibe as informações do usuário logado, permitindo edição (de acordo com RBAC).
 
-- **Formulários Reutilizáveis**
+##### - Gerenciamento de Usuários
 
-  - `UserForm` é utilizado tanto para criação quanto para edição, com modal para edição.
+- Listagem paginada e pesquisável de usuários.
+- Formulário de `Criação de usuários`.
+- `Edição e exclusão` de usuários diretamente da tabela.
+- `Controle de permissões` por recurso do sistema.
+- Exibição e edição condicionais com base nas regras RBAC.
 
-- **Controle de Estados**
-  - `useAuth` gerencia token, login, logout e mantém cabeçalho de autorização configurado.
-  - Loading states e mensagens de erro exibidas dinamicamente.
+##### - Recursos de Sistema (System Resources)
+
+- Listagem paginada e pesquisável de recursos de sistema.
+- Formulário de `Criação de recursos de sistema`.
+- `Edição e exclusão` de recursos do sistema diretamente da tabela.
+- Integração com a gestão de usuários (cada usuário tem uma lista `permissions`, baseada nos recursos do sistema que ele deve acessar).
+
+##### - Relatórios de Auditoria (System Logs)
+
+- Listagem paginada e filtrável dos logs de sistema.
+- Geração de relatórios com filtros cumulativos por:
+  - Período (início e fim)
+  - Usuário específico
+  - Ação executada (`create`, `update`, `delete`, `login`, `senha`)
+
+##### - Hooks Personalizados
+
+- `useAuth` gerencia token, login, logout e mantém cabeçalho de autorização configurado.
+- `useUsers`, `useSystemResources` e `useReports` fazem a abstração entre a camada services e a UI, persistindo dados para exibição, ações CRUD e paginação.
 
 ---
 
@@ -75,55 +97,40 @@ npm install
 
 ### 2. Configurar base URL da API
 
-No arquivo `src/api/index.ts`:
+- Crie um arquivo `WebApp/.env` e nele defina VITE_API_BASE_URL com a url de sua api.
+  > Essa variável será utilizada pelo arquivo `src/api/index.ts` para configurar a instância do axios.
 
-```ts
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: 'http://localhost:5209/api', // Altere para a URL da sua API
-});
-
-export default api;
-```
-
-### 3. Rodar o frontend
+### 3. Rodar a aplicação
 
 ```bash
 npm run dev
 ```
 
-- A aplicação estará disponível em `http://localhost:5173`.
+> A aplicação estará disponível em `http://localhost:5173`.
 
 ---
 
 ## Estrutura de Rotas
 
-- `/login` → Página de login com formulário JWT.
-- `/dashboard` → Painel administrativo com:
-  - Lista de usuários paginada e pesquisável.
-  - Botões de editar e excluir usuários.
-  - Formulário para criação de novos usuários.
+| Rota            | Descrição                                                |
+| --------------- | -------------------------------------------------------- |
+| `/login`        | Tela de autenticação                                     |
+| `/profile`      | Informações do usuário logado                            |
+| `/unauthorized` | Redirecionamento em caso de acesso à rota não autorizada |
+| `/users`        | Painel de gestão de usuários                             |
+| `/resources`    | Página de gerenciamento de recursos do sistema           |
+| `/reports`      | Relatórios de auditoria filtráveis e paginados           |
 
 ---
 
 ## Integração com API
 
-- Todos os endpoints de usuários e autenticação são consumidos via **Axios**.
+- Todos os endpoints da aplicação são consumidos via instância configurada do **Axios**.
 - Token JWT é enviado automaticamente no header `Authorization: Bearer <token>` após login.
-- Requisições de CRUD:
-
-| Método | Endpoint             | Função            |
-| ------ | -------------------- | ----------------- |
-| POST   | `/auth/login`        | Autenticação JWT  |
-| GET    | `/users`             | Listar usuários   |
-| GET    | `/users/search?key=` | Buscar usuários   |
-| POST   | `/users`             | Criar usuário     |
-| PUT    | `/users/{id}`        | Atualizar usuário |
-| DELETE | `/users/{id}`        | Remover usuário   |
+- Todas as chamadas à api são gerenciadas pela camada `services`.
 
 ---
 
-## Sobre o Dev
+## Sobre o Desenvolvedor
 
-[Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um profissional apaixonado por tecnologia. Desenvolvedor full-stack proficiente no uso de React com MaterialUI no front-end e NodeJS com Express no back-end. Possui experiência no uso de bancos de dados relacionais e não-relacionais, além de conhecer outras tecnologias como Golang, Java, Docker, entre outras, tornando-o dinâmico e apto a solucionar quaisquer problemas de modo eficiente.
+[Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um **desenvolvedor full-stack** apaixonado por tecnologia e boas práticas de engenharia de software. Proficiente no uso de **React+MaterialUI** no front-end e **NodeJS+Express** no back-end, além de conhecer outras tecnologias como `Golang`, `Java`, `Docker`, entre outras. Possui experiência no uso de bancos de dados relacionais e não-relacionais, o que o torna um profissional dinâmico e apto a criar soluções escaláveis, seguras e bem estruturadas.
