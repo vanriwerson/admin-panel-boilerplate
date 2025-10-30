@@ -1,4 +1,4 @@
-# Generic Login Backend - PostgreSQL + .NET
+# Admin Pannel BoilerPlate Backend - PostgreSQL + .NET
 
 > Api com fluxo completo de autenticação **JWT**, implementado em **PostgreSQL + .NET**.  
 > Inclui **hash seguro de senhas (BCrypt)**, **emissão e validação de tokens JWT**, **controle customizável de permissões de acesso**,
