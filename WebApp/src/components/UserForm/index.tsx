@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, FormHelperText } from '@mui/material';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { mapSystemResourcesToFormValue } from '../../helpers';
 import { useAuth } from '../../hooks';
@@ -20,6 +20,7 @@ export default function UserForm({ onSubmit, user }: Props) {
     permissions: [],
   });
 
+  const [error, setError] = useState('');
   const { authUser } = useAuth();
 
   const showPasswordField = authUser && canEditPassword(authUser, user);
@@ -42,8 +43,18 @@ export default function UserForm({ onSubmit, user }: Props) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  function handlePermissionsChange(permissions: number[]) {
+    setForm({ ...form, permissions });
+    if (permissions.length > 0) setError('');
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (form.permissions.length === 0) {
+      setError('É necessário conceder ao menos uma permissão.');
+      return;
+    }
+    setError('');
     onSubmit(form);
   }
 
@@ -100,11 +111,14 @@ export default function UserForm({ onSubmit, user }: Props) {
         />
       )}
 
-      <SystemResourceSelect
-        value={form.permissions}
-        onChange={(permissions) => setForm({ ...form, permissions })}
-        readOnly={!canEditPerms}
-      />
+      <Box sx={{ width: '100%' }}>
+        <SystemResourceSelect
+          value={form.permissions}
+          onChange={handlePermissionsChange}
+          readOnly={!canEditPerms}
+        />
+        {error && <FormHelperText error>{error}</FormHelperText>}
+      </Box>
 
       <Button variant="contained" type="submit">
         {user ? 'Atualizar' : 'Cadastrar'}
