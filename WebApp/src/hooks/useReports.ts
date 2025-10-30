@@ -20,14 +20,21 @@ export function useReports() {
   const [filters, setFilters] = useState<SystemLogFiltersPayload>({});
 
   const fetchReports = useCallback(
-    async (params?: SystemLogFiltersPayload) => {
+    async (
+      overrides?: Partial<SystemLogFiltersPayload> & {
+        page?: number;
+        pageSize?: number;
+      }
+    ) => {
       setLoading(true);
       setError(null);
 
       try {
         const payload: SystemLogFiltersPayload = {
           ...filters,
-          ...params,
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          ...overrides,
         };
 
         const data: SystemLogsPagination = await getLogReports(payload);
@@ -46,12 +53,13 @@ export function useReports() {
         setLoading(false);
       }
     },
-    [filters]
+    [filters, pagination.page, pagination.pageSize]
   );
 
   const setReportFilters = useCallback(
     (newFilters: SystemLogFiltersPayload) => {
       setFilters(newFilters);
+      setPagination((prev) => ({ ...prev, page: 1 }));
     },
     []
   );

@@ -20,25 +20,21 @@ interface ReportsTableProps {
 }
 
 export default function ReportsTable({ filters }: ReportsTableProps) {
-  const {
-    logs,
-    pagination,
-    loading,
-    fetchReports,
-    setPagination,
-    setReportFilters,
-  } = useReports();
+  const { logs, pagination, setPagination, setReportFilters } = useReports();
 
   useEffect(() => {
-    setReportFilters({ ...filters, page: 1, pageSize: pagination.pageSize });
-  }, [filters, setReportFilters, pagination.pageSize]);
-
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+    setReportFilters({
+      ...filters,
+      page: 1,
+      pageSize: pagination.pageSize,
+    });
+  }, [filters, pagination.pageSize, setReportFilters]);
 
   const handleChangePage = (_: unknown, newPage: number) => {
-    setPagination((prev) => ({ ...prev, page: newPage + 1 }));
+    setPagination((prev) => ({
+      ...prev,
+      page: newPage + 1,
+    }));
   };
 
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,13 +67,7 @@ export default function ReportsTable({ filters }: ReportsTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  Carregando...
-                </TableCell>
-              </TableRow>
-            ) : logs.length > 0 ? (
+            {logs.length > 0 ? (
               logs.map((log: SystemLog) => (
                 <TableRow key={log.id} hover>
                   <TableCell>{log.id}</TableCell>
