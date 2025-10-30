@@ -1,18 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Checkbox,
-  ListItemText,
-  CircularProgress,
-  Box,
-  TextField,
-} from '@mui/material';
+import { Autocomplete, CircularProgress, TextField, Box } from '@mui/material';
 import { useUsers } from '../../hooks';
-import type { SelectChangeEvent } from '@mui/material';
 import type { UserOption } from '../../interfaces';
 
 interface Props {
@@ -28,7 +16,6 @@ export default function UsersSelect({
 }: Props) {
   const { fetchUsersForSelect, loading } = useUsers();
   const [options, setOptions] = useState<UserOption[]>([]);
-  const [searchKey, setSearchKey] = useState('');
 
   useEffect(() => {
     async function loadOptions() {
@@ -38,26 +25,10 @@ export default function UsersSelect({
     loadOptions();
   }, [fetchUsersForSelect]);
 
-  const filteredOptions = useMemo(() => {
-    if (!searchKey) return options;
-    return options.filter((u) =>
-      u.fullName.toLowerCase().includes(searchKey.toLowerCase())
-    );
-  }, [options, searchKey]);
-
-  const selectedNames = useMemo(() => {
-    if (!options.length) return [];
-    return options.filter((u) => value.includes(u.id!)).map((u) => u.fullName);
-  }, [options, value]);
-
-  function handleChange(event: SelectChangeEvent<string[]>) {
-    const { value } = event.target;
-    const newValue =
-      typeof value === 'string'
-        ? value.split(',').map(Number)
-        : value.map(Number);
-    onChange(newValue);
-  }
+  const selectedUser = useMemo(
+    () => options.find((u) => u.id === value[0]),
+    [options, value]
+  );
 
   if (loading && !options.length) {
     return (
@@ -70,41 +41,33 @@ export default function UsersSelect({
   if (readOnly) {
     return (
       <TextField
-        label="Usuários"
-        value={selectedNames.join(', ') || 'Nenhum usuário selecionado'}
-        slotProps={{ input: { readOnly: true } }}
+        label="Usuário"
+        value={selectedUser?.fullName || 'Nenhum usuário selecionado'}
+        slotProps={{ inputLabel: { shrink: true } }}
         fullWidth
       />
     );
   }
 
   return (
-    <FormControl fullWidth>
-      <InputLabel>Usuários</InputLabel>
-      <Select<string[]>
-        value={value.map(String)}
-        onChange={handleChange}
-        input={<OutlinedInput label="Usuários" />}
-        renderValue={() => selectedNames.join(', ')}
-        MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
-      >
-        <Box px={2} py={1}>
-          <TextField
-            size="small"
-            placeholder="Buscar usuário..."
-            fullWidth
-            value={searchKey}
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
-        </Box>
-
-        {filteredOptions.map((user) => (
-          <MenuItem key={user.id} value={String(user.id)}>
-            <Checkbox checked={value.includes(user.id!)} />
-            <ListItemText primary={user.fullName} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Autocomplete
+      options={options}
+      value={selectedUser || null}
+      getOptionLabel={(option) => option.fullName}
+      isOptionEqualToValue={(opt, val) => opt.id === val.id}
+      onChange={(_, newValue) => onChange(newValue ? [newValue.id!] : [])}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Usuário"
+          placeholder="Buscar usuário..."
+        />
+      )}
+      fullWidth
+      loading={loading}
+      loadingText="Carregando usuários..."
+      noOptionsText="Nenhum usuário encontrado"
+      slotProps={{ listbox: { style: { maxHeight: 300, overflow: 'auto' } } }}
+    />
   );
 }
