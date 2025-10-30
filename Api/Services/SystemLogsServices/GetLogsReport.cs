@@ -40,7 +40,10 @@ namespace Api.Services.SystemLogsServices
         query = query.Where(sl => sl.CreatedAt >= startDate.Value);
 
       if (endDate.HasValue)
-        query = query.Where(sl => sl.CreatedAt <= endDate.Value);
+      {
+        var endOfDay = endDate.Value.Date.AddDays(1);
+        query = query.Where(sl => sl.CreatedAt < endOfDay);
+      }
 
       query = query.OrderByDescending(sl => sl.CreatedAt);
 
