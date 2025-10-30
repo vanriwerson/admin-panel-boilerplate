@@ -1,6 +1,9 @@
 # Admin Panel BoilerPlate
 
-> Boilerplate de painel administrativo full-stack com **backend em .NET 8 + PostgreSQL** e **frontend em React + Vite + TypeScript**, incluindo **autenticação JWT**, **CRUD de usuários** e integração completa entre frontend e backend.
+> Modelo de painel administrativo full-stack com **backend em .NET 8 + PostgreSQL** e
+> **frontend em React + Vite + TypeScript**, incluindo **autenticação JWT**, **CRUD de usuários**,
+> **CRUD de recursos do sistema**, **controle de permissões RBAC**, **proteção de rotas** e
+> **auditoria de sistema** com integração completa entre frontend e backend.
 
 ---
 
@@ -51,9 +54,13 @@ admin-panel-boilerplate/
 │   ├── src/
 │   │   ├── api/
 │   │   ├── components/
+│   │   ├── contexts/
+│   │   ├── helpers/
 │   │   ├── hooks/
+│   │   ├── interfaces/
 │   │   ├── pages/
-│   │   ├── types/
+│   │   ├── permissions/
+│   │   ├── routes/
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── tsconfig.json
@@ -102,9 +109,9 @@ echo "JWT_SECRET_KEY=$(openssl rand -base64 64)"
 docker compose up -d
 ```
 
+- PostgreSQL: exposto em `localhost:5432`
 - Backend: exposto em `http://localhost:5209`
 - Frontend: exposto em `http://localhost:5173`
-- PostgreSQL: exposto em `localhost:5432`
 
 ### 4. Aplicar migrations no banco (caso use container para backend)
 
@@ -113,11 +120,19 @@ cd Api
 dotnet ef database update
 ```
 
-> Isso criará as tabelas iniciais no PostgreSQL.
+> Isso criará as tabelas iniciais no PostgreSQL, definidas pela migration InitialCreate.
 
 ---
 
 ## Rodando Localmente sem Docker (opcional)
+
+### Banco de dados
+
+Configure sua conexão postgre localmente ou suba somente o banco de dados via docker com:
+
+```bash
+docker compose up db
+```
 
 ### Backend
 
@@ -136,33 +151,22 @@ npm run dev
 
 ---
 
-## Endpoints da API
+## Documentação detalhada
 
-- `/api/auth/login` → Login JWT
-- `/api/auth/external` → Login via token externo
-- `/api/users` → CRUD de usuários
+> Você pode encontrar informações mais completas sobre a aplicação acessando a documentação específica:
 
-> Para documentação completa, abra Swagger em: `http://localhost:<API_PORT>/swagger/`
-
----
-
-## Frontend
-
-- `/login` → Login JWT
-- `/dashboard` → Painel de usuários com listagem, criação, edição e exclusão
-
-> O token JWT é enviado automaticamente em todas as requisições Axios após login.
+- [Backend](./Api/README.md)
+- [Frontend](./WebApp/README.md)
 
 ---
 
 ## Observações
 
 - Todas as variáveis de ambiente são obrigatórias.
-- Logs do backend indicam se a conexão com o banco foi bem-sucedida.
-- É possível acessar tanto frontend quanto backend via browser ou ferramentas como Postman.
+- Logs de inicialização da api indicam se a conexão com o banco foi bem-sucedida.
 
 ---
 
 ## Sobre o Desenvolvedor
 
-[Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um profissional apaixonado por tecnologia. Desenvolvedor full-stack proficiente no uso de React com MaterialUI no front-end e NodeJS com Express no back-end. Possui experiência no uso de bancos de dados relacionais e não-relacionais, além de conhecer outras tecnologias como Golang, Java, Docker, entre outras, tornando-o dinâmico e apto a solucionar quaisquer problemas de modo eficiente.
+[Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um **desenvolvedor full-stack** apaixonado por tecnologia e boas práticas de engenharia de software. Proficiente no uso de **React+MaterialUI** no front-end e **NodeJS+Express** no back-end, além de conhecer outras tecnologias como `Golang`, `Java`, `Docker`, entre outras. Possui experiência no uso de bancos de dados relacionais e não-relacionais, o que o torna um profissional dinâmico e apto a criar soluções escaláveis, seguras e bem estruturadas.
