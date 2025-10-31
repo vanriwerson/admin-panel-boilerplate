@@ -18,6 +18,7 @@ namespace Api.Services.SystemResourcesServices
     public async Task<PaginatedResult<SystemResourceReadDto>> ExecuteAsync(string searchKey, int page = 1, int pageSize = 10)
     {
       var query = _repo.Query().Where(r =>
+          r.Active &&
           EF.Functions.ILike(r.Name, $"%{searchKey}%") ||
           EF.Functions.ILike(r.ExhibitionName, $"%{searchKey}%")
       );
