@@ -21,10 +21,12 @@ namespace Api.Services.UsersServices
                 .Include(u => u.AccessPermissions)
                 .ThenInclude(ap => ap.SystemResource)
                 .Where(u =>
-                    u.Active &&
+                    u.Active == true &&
+                    (
                     EF.Functions.ILike(u.Username, $"%{searchKey}%") ||
                     EF.Functions.ILike(u.Email, $"%{searchKey}%") ||
-                    EF.Functions.ILike(u.FullName, $"%{searchKey}%") && u.Active)
+                    EF.Functions.ILike(u.FullName, $"%{searchKey}%")
+                    ))
                 .OrderBy(u => u.FullName)
                 .Select(u => UserMapper.MapToUserReadDto(u));
 

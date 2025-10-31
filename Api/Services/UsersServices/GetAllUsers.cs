@@ -32,7 +32,6 @@ namespace Api.Services.UsersServices
         {
             var options = await _userRepo.Query()
                 .AsNoTracking()
-                .Where(u => u.Active)
                 .OrderBy(u => u.FullName)
                 .Select(u => new UserLogReadDto
                 {

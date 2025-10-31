@@ -18,10 +18,10 @@ namespace Api.Services.SystemResourcesServices
     public async Task<PaginatedResult<SystemResourceReadDto>> ExecuteAsync(string searchKey, int page = 1, int pageSize = 10)
     {
       var query = _repo.Query().Where(r =>
-          r.Active &&
+          r.Active == true && (
           EF.Functions.ILike(r.Name, $"%{searchKey}%") ||
           EF.Functions.ILike(r.ExhibitionName, $"%{searchKey}%")
-      );
+      ));
 
       var paginatedResources = await ApplyPagination.PaginateAsync(query, page, pageSize);
 
