@@ -26,9 +26,7 @@ namespace Api.Services.SystemResourcesServices
       ValidateEntity.HasExpectedProperties<SystemResourceUpdateDto>(dto);
       ValidateEntity.HasExpectedValues<SystemResourceUpdateDto>(dto);
 
-      var resource = await _repo.GetByIdAsync(id);
-      if (resource == null)
-        return null;
+      var resource = await ValidateEntity.EnsureEntityExistsAsync(_repo, id, "SystemResource");
 
       if (!string.IsNullOrWhiteSpace(dto.Name) || !string.IsNullOrWhiteSpace(dto.ExhibitionName))
       {
@@ -36,8 +34,7 @@ namespace Api.Services.SystemResourcesServices
             .AnyAsync(r =>
                 r.Id != id &&
                 ((dto.Name != null && r.Name == dto.Name) ||
-                 (dto.ExhibitionName != null && r.ExhibitionName == dto.ExhibitionName))
-            );
+                 (dto.ExhibitionName != null && r.ExhibitionName == dto.ExhibitionName)));
 
         if (isDuplicate)
           throw new AppException("Já existe um recurso com o mesmo nome ou nome de exibição.", (int)HttpStatusCode.Conflict);
@@ -50,9 +47,7 @@ namespace Api.Services.SystemResourcesServices
 
       var updated = await _repo.UpdateAsync(resource);
 
-      await _createSystemLog.ExecuteAsync(
-          action: LogActionDescribe.Update("SystemResource", updated.Id)
-      );
+      await _createSystemLog.ExecuteAsync(LogActionDescribe.Update("SystemResource", updated.Id));
 
       return new SystemResourceReadDto
       {
