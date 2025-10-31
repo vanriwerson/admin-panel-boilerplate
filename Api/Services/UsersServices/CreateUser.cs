@@ -14,17 +14,20 @@ namespace Api.Services.UsersServices
     public class CreateUser
     {
         private readonly IGenericRepository<User> _userRepo;
+        private readonly IGenericRepository<SystemResource> _resourceRepo;
         private readonly ApiDbContext _context;
         private readonly CreateAccessPermission _createAccessPermission;
         private readonly CreateSystemLog _createSystemLog;
 
         public CreateUser(
             IGenericRepository<User> userRepo,
+            IGenericRepository<SystemResource> resourceRepo,
             CreateAccessPermission createAccessPermission,
             ApiDbContext context,
             CreateSystemLog createSystemLog)
         {
             _userRepo = userRepo;
+            _resourceRepo = resourceRepo;
             _context = context;
             _createAccessPermission = createAccessPermission;
             _createSystemLog = createSystemLog;
@@ -38,9 +41,7 @@ namespace Api.Services.UsersServices
             if (dto.Permissions == null || !dto.Permissions.Any())
                 throw new AppException("O usuário precisa ter pelo menos uma permissão.");
 
-
             using var transaction = await _context.Database.BeginTransactionAsync();
-
             try
             {
                 var user = new User
@@ -59,27 +60,22 @@ namespace Api.Services.UsersServices
                 await _userRepo.CreateAsync(user);
                 await _context.SaveChangesAsync();
 
-                if (dto.Permissions != null && dto.Permissions.Any())
+                foreach (var resourceId in dto.Permissions)
                 {
-                    foreach (var resourceId in dto.Permissions)
+                    await ValidateEntity.EnsureEntityExistsAsync(_resourceRepo, resourceId, "Recurso do sistema");
+
+                    var permissionDto = new AccessPermissionCreateDto
                     {
-                        var permissionDto = new AccessPermissionCreateDto
-                        {
-                            UserId = user.Id,
-                            SystemResourceId = resourceId
-                        };
-
-                        await _createAccessPermission.ExecuteAsync(permissionDto);
-                    }
-
-                    await _context.SaveChangesAsync();
+                        UserId = user.Id,
+                        SystemResourceId = resourceId
+                    };
+                    await _createAccessPermission.ExecuteAsync(permissionDto);
                 }
 
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                await _createSystemLog.ExecuteAsync(
-                    action: LogActionDescribe.Create("User", user.Id)
-                );
+                await _createSystemLog.ExecuteAsync(LogActionDescribe.Create("User", user.Id));
 
                 var createdUser = await _userRepo.Query()
                     .Include(u => u.AccessPermissions)

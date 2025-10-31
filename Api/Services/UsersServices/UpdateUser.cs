@@ -5,6 +5,7 @@ using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
 using Api.Services;
+using Api.Validations;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
@@ -13,6 +14,7 @@ namespace Api.Services.UsersServices
     public class UpdateUser
     {
         private readonly IGenericRepository<User> _userRepo;
+        private readonly IGenericRepository<SystemResource> _resourceRepo;
         private readonly ApiDbContext _context;
         private readonly DeleteAccessPermissions _deleteAccessPermissions;
         private readonly CreateAccessPermission _createAccessPermission;
@@ -20,12 +22,14 @@ namespace Api.Services.UsersServices
 
         public UpdateUser(
             IGenericRepository<User> userRepo,
+            IGenericRepository<SystemResource> resourceRepo,
             DeleteAccessPermissions deleteAccessPermissions,
             CreateAccessPermission createAccessPermission,
             ApiDbContext context,
             CreateSystemLog createSystemLog)
         {
             _userRepo = userRepo;
+            _resourceRepo = resourceRepo;
             _deleteAccessPermissions = deleteAccessPermissions;
             _createAccessPermission = createAccessPermission;
             _context = context;
@@ -34,8 +38,10 @@ namespace Api.Services.UsersServices
 
         public async Task<UserReadDto?> ExecuteAsync(int id, UserUpdateDto dto)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            ValidateEntity.HasExpectedProperties<UserUpdateDto>(dto);
+            ValidateEntity.HasExpectedValues<UserUpdateDto>(dto);
 
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var user = await _userRepo.Query()
@@ -71,23 +77,26 @@ namespace Api.Services.UsersServices
                 {
                     foreach (var resourceId in dto.Permissions)
                     {
+                        await ValidateEntity.EnsureEntityExistsAsync(_resourceRepo, resourceId, "Recurso do sistema");
+
                         var permissionDto = new AccessPermissionCreateDto
                         {
                             UserId = user.Id,
                             SystemResourceId = resourceId
                         };
-
                         await _createAccessPermission.ExecuteAsync(permissionDto);
                     }
+                }
+                else
+                {
+                    throw new AppException("O usuário precisa ter pelo menos uma permissão.");
                 }
 
                 await _userRepo.UpdateAsync(user);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                await _createSystemLog.ExecuteAsync(
-                    action: LogActionDescribe.Update("User", user.Id)
-                );
+                await _createSystemLog.ExecuteAsync(LogActionDescribe.Update("User", user.Id));
 
                 var updatedUser = await _userRepo.Query()
                     .Include(u => u.AccessPermissions)
