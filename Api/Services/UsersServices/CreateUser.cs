@@ -1,13 +1,13 @@
-using System.Net;
-using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Dtos;
 using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
-using Api.Services.AccessPermissionsServices;
-using Api.Services.SystemLogsServices;
+using Api.Services;
+using Api.Validations;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Api.Services.UsersServices
 {
@@ -32,8 +32,12 @@ namespace Api.Services.UsersServices
 
         public async Task<UserReadDto> ExecuteAsync(UserCreateDto dto)
         {
-            if (!ValidateEntity.HasValidProperties<UserCreateDto>(dto))
-                throw new AppException("A requisição não possui os campos esperados.", (int)HttpStatusCode.BadRequest);
+            ValidateEntity.HasExpectedProperties<UserCreateDto>(dto);
+            ValidateEntity.HasExpectedValues<UserCreateDto>(dto);
+
+            if (dto.Permissions == null || !dto.Permissions.Any())
+                throw new AppException("O usuário precisa ter pelo menos uma permissão.");
+
 
             using var transaction = await _context.Database.BeginTransactionAsync();
 

@@ -1,6 +1,6 @@
 using Api.Dtos;
 using Api.Helpers;
-using Api.Services.SystemLogsServices;
+using Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers

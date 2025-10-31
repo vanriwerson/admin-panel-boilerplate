@@ -2,7 +2,7 @@ using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
-using Api.Services.SystemLogsServices;
+using Api.Services;
 using System.Net;
 
 namespace Api.Services.SystemResourcesServices

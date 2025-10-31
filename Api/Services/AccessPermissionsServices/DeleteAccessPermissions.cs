@@ -3,7 +3,7 @@ using Api.Interfaces;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Services.AccessPermissionsServices
+namespace Api.Services
 {
   public class DeleteAccessPermissions
   {

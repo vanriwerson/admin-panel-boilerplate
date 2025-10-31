@@ -2,7 +2,7 @@ using Api.Helpers;
 using Api.Interfaces;
 using Api.Models;
 
-namespace Api.Services.SystemLogsServices
+namespace Api.Services
 {
   public class CreateSystemLog
   {

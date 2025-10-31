@@ -1,8 +1,7 @@
-using System.Threading.Tasks;
 using Api.Helpers;
 using Api.Interfaces;
 using Api.Models;
-using Api.Services.SystemLogsServices;
+using Api.Services;
 
 namespace Api.Services.UsersServices
 {

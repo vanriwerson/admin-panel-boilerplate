@@ -3,7 +3,8 @@ using Api.Helpers;
 using Api.Interfaces;
 using Api.Middlewares;
 using Api.Models;
-using Api.Services.SystemLogsServices;
+using Api.Services;
+using Api.Validations;
 using System.Net;
 
 namespace Api.Services.SystemResourcesServices
@@ -21,8 +22,8 @@ namespace Api.Services.SystemResourcesServices
 
     public async Task<SystemResourceReadDto> ExecuteAsync(SystemResourceCreateDto dto)
     {
-      if (!ValidateEntity.HasValidProperties<SystemResourceCreateDto>(dto))
-        throw new AppException("A requisição não possui os campos esperados.", (int)HttpStatusCode.BadRequest);
+      ValidateEntity.HasExpectedProperties<SystemResourceCreateDto>(dto);
+      ValidateEntity.HasExpectedValues<SystemResourceCreateDto>(dto);
 
       var entity = new SystemResource
       {

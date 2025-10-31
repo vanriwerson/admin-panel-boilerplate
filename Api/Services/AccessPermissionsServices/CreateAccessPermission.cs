@@ -1,35 +1,32 @@
 using Api.Interfaces;
 using Api.Models;
 using Api.Dtos;
-using Api.Middlewares;
-using Microsoft.EntityFrameworkCore;
+using Api.Validations;
 using System.Net;
+using System.Threading.Tasks;
 
-namespace Api.Services.AccessPermissionsServices
+namespace Api.Services
 {
   public class CreateAccessPermission
   {
     private readonly IGenericRepository<AccessPermission> _permissionRepo;
     private readonly IGenericRepository<SystemResource> _resourceRepo;
+    private readonly IGenericRepository<User> _userRepo;
 
     public CreateAccessPermission(
         IGenericRepository<AccessPermission> permissionRepo,
-        IGenericRepository<SystemResource> resourceRepo)
+        IGenericRepository<SystemResource> resourceRepo,
+        IGenericRepository<User> userRepo)
     {
       _permissionRepo = permissionRepo;
       _resourceRepo = resourceRepo;
+      _userRepo = userRepo;
     }
 
     public async Task ExecuteAsync(AccessPermissionCreateDto dto)
     {
-      if (dto.UserId <= 0 || dto.SystemResourceId <= 0)
-        throw new AppException("Usuário ou recurso inválido.", (int)HttpStatusCode.BadRequest);
-
-      var resourceExists = await _resourceRepo.Query()
-          .AnyAsync(r => r.Id == dto.SystemResourceId);
-
-      if (!resourceExists)
-        throw new AppException("Recurso não cadastrado.", (int)HttpStatusCode.NotFound);
+      await ValidateEntity.EnsureEntityExistsAsync(_userRepo, dto.UserId, "Usuário");
+      await ValidateEntity.EnsureEntityExistsAsync(_resourceRepo, dto.SystemResourceId, "Recurso do sistema");
 
       var permission = new AccessPermission
       {

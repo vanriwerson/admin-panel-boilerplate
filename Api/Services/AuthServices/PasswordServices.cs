@@ -1,13 +1,13 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
 using Api.Data;
 using Api.Middlewares;
 using Api.Models;
 using Api.Helpers;
-using Api.Services.SystemLogsServices;
+using Api.Services;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Api.Services.AuthServices
 {
