@@ -19,6 +19,7 @@ namespace Api.Services.SystemResourcesServices
     {
       var query = _repo.Query()
           .AsNoTracking()
+          .Where(r => r.Active)
           .OrderBy(r => r.Id)
           .Select(r => new SystemResourceReadDto
           {
