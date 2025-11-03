@@ -1,4 +1,3 @@
-// src/helpers/menuItems.ts
 import {
   faChartBar,
   faCogs,

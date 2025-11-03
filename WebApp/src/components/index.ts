@@ -1,5 +1,6 @@
 export { default as ActionsSelect } from './ActionsSelect';
 export { default as LoginForm } from './LoginForm';
+export { default as PageTitle } from './PageTitle';
 export { default as PasswordResetRequestModal } from './PasswordResetRequestModal';
 export { default as ReportsTable } from './ReportsTable';
 export { default as SidePanel } from './SidePanel';
