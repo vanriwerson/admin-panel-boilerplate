@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import type { SystemResource } from '../../interfaces';
+import { cleanStates } from '../../helpers';
 
 interface Props {
   onSubmit: (resource: SystemResource) => void;
@@ -8,10 +9,7 @@ interface Props {
 }
 
 export default function SystemResourceForm({ onSubmit, resource }: Props) {
-  const [form, setForm] = useState<SystemResource>({
-    name: '',
-    exhibitionName: '',
-  });
+  const [form, setForm] = useState(cleanStates.systemResource);
 
   useEffect(() => {
     if (resource) {
@@ -30,6 +28,7 @@ export default function SystemResourceForm({ onSubmit, resource }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onSubmit(form);
+    setForm(cleanStates.systemResource);
   }
 
   return (

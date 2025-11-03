@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, TextField, Button, FormHelperText } from '@mui/material';
 import type { UserFormValues, UserRead } from '../../interfaces';
-import { mapSystemResourcesToFormValue } from '../../helpers';
+import { cleanStates, mapSystemResourcesToFormValue } from '../../helpers';
 import { useAuth } from '../../hooks';
 import SystemResourceSelect from '../SystemResourcesSelect';
 import { canEditPassword, canEditPermissions } from '../../permissions/Rules';
@@ -12,13 +12,7 @@ interface Props {
 }
 
 export default function UserForm({ onSubmit, user }: Props) {
-  const [form, setForm] = useState<UserFormValues>({
-    username: '',
-    email: '',
-    password: '',
-    fullName: '',
-    permissions: [],
-  });
+  const [form, setForm] = useState(cleanStates.userForm);
 
   const [error, setError] = useState('');
   const { authUser } = useAuth();
@@ -56,6 +50,7 @@ export default function UserForm({ onSubmit, user }: Props) {
     }
     setError('');
     onSubmit(form);
+    setForm(cleanStates.userForm);
   }
 
   return (
