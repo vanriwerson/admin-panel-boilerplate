@@ -17,7 +17,10 @@
     "@fortawesome/react-fontawesome": "^3.1.0",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
+    "@mui/x-date-pickers": "^8.16.0",
+    "@mui/x-date-pickers-pro": "^8.16.0",
     "axios": "^1.12.2",
+    "date-fns": "^4.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4"
