@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import type { SystemResource } from '../../interfaces';
 import { useSystemResources } from '../../hooks';
 import {
   SystemResourceForm,
   SystemResourcesTable,
   SystemResourceEditionModal,
+  PageTitle,
 } from '../../components';
+import { PermissionsMap } from '../../permissions';
 
 export default function Resources() {
   const {
@@ -78,9 +80,10 @@ export default function Resources() {
         textAlign: 'center',
       }}
     >
-      <Typography variant="h5" gutterBottom>
-        Gerenciamento de Recursos
-      </Typography>
+      <PageTitle
+        icon={PermissionsMap.RESOURCES}
+        title="Gerenciamento de Recursos"
+      />
 
       <SystemResourceForm onSubmit={handleCreate} />
 

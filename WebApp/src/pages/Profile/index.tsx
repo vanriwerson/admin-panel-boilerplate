@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  Container,
-  Typography,
-  Box,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
-import { UserForm } from '../../components';
+import { Container, Box, CircularProgress, Alert } from '@mui/material';
+import { PageTitle, UserForm } from '../../components';
 import { useAuth, useUsers } from '../../hooks';
 import type { UserFormValues, UserRead } from '../../interfaces';
 
@@ -64,9 +58,7 @@ export default function Profile() {
         textAlign: 'center',
       }}
     >
-      <Typography variant="h5" gutterBottom>
-        Meu Perfil
-      </Typography>
+      <PageTitle icon="profile" title="Meu Perfil" />
 
       <UserForm user={userData} onSubmit={handleSubmit} />
     </Container>

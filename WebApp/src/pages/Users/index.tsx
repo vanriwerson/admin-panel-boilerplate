@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import { Container, Typography } from '@mui/material';
-import { UserEditionModal, UserForm, UsersTable } from '../../components';
+import { Container } from '@mui/material';
+import {
+  PageTitle,
+  UserEditionModal,
+  UserForm,
+  UsersTable,
+} from '../../components';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { useUsers } from '../../hooks';
+import { PermissionsMap } from '../../permissions';
 
 export default function Users() {
   const { fetchUsers, addUser, editUser, removeUser } = useUsers();
@@ -65,9 +71,10 @@ export default function Users() {
         textAlign: 'center',
       }}
     >
-      <Typography variant="h5" gutterBottom>
-        Gerenciamento de Usuários
-      </Typography>
+      <PageTitle
+        icon={PermissionsMap.USERS}
+        title="Gerenciamento de Usuários"
+      />
 
       <UserForm onSubmit={handleCreate} />
 

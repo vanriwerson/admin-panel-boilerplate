@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Button } from '@mui/material';
+import { Box, Paper, Button } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { ActionsSelect, ReportsTable, UsersSelect } from '../../components';
+import {
+  ActionsSelect,
+  PageTitle,
+  ReportsTable,
+  UsersSelect,
+} from '../../components';
 import { ptBR } from 'date-fns/locale';
+import { PermissionsMap } from '../../permissions';
 
 export default function Reports() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -38,9 +44,7 @@ export default function Reports() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
       <Box p={3}>
-        <Typography variant="h4" gutterBottom>
-          Relatórios de Logs
-        </Typography>
+        <PageTitle icon={PermissionsMap.REPORTS} title="Relatórios de Logs" />
 
         <Paper sx={{ p: 3, mb: 4 }}>
           <Box
