@@ -1,7 +1,11 @@
 import { Avatar, Box, Typography } from '@mui/material';
 import { useAuth } from '../../hooks';
 
-export default function AuthUserDisplay() {
+interface AuthUserDisplayProps {
+  collapsed?: boolean;
+}
+
+export default function AuthUserDisplay(collapsed: AuthUserDisplayProps) {
   const { authUser } = useAuth();
   const firstName = authUser?.fullName.split(' ')[0];
 
@@ -13,6 +17,8 @@ export default function AuthUserDisplay() {
         gap: 2,
         p: 2,
         borderBottom: '1px solid rgba(0,0,0,0.1)',
+        opacity: collapsed.collapsed ? 0 : 1,
+        transition: 'opacity 0.3s',
       }}
     >
       <Avatar sx={{ bgcolor: 'primary.main' }}>
