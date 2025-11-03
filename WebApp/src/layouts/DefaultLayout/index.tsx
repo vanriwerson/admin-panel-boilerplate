@@ -15,13 +15,9 @@ export default function DefaultLayout() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <SidePanel
-        open={open}
-        onClose={() => setOpen(false)}
-        onNavigate={handleNavigate}
-      />
+      <SidePanel open={open} onNavigate={handleNavigate} />
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar>
           <IconButton onClick={() => setOpen(!open)}>
             <FontAwesomeIcon icon={faBars} />

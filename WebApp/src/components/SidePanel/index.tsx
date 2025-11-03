@@ -8,23 +8,26 @@ import {
   ListItemText,
   Tooltip,
 } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import AuthUserDisplay from '../AuthUserDisplay';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../hooks';
-import { filterMenuByPermissions } from '../../permissions/MenuVisibility';
+import { filterMenuByPermissions } from '../../permissions';
 
 interface SidePanelProps {
   open: boolean;
-  onToggle: () => void;
   onNavigate: (route: string) => void;
 }
 
-const drawerWidth = 260;
-const collapsedWidth = 52;
+const DRAWER_OPEN = 260;
+const DRAWER_CLOSED = 52;
 
 export default function SidePanel({ open, onNavigate }: SidePanelProps) {
   const { authUser, handleLogout } = useAuth();
+  const location = useLocation();
+
+  const drawerWidth = open ? DRAWER_OPEN : DRAWER_CLOSED;
 
   const filteredMenu = filterMenuByPermissions(authUser);
 
@@ -33,7 +36,7 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
       variant="permanent"
       open={open}
       sx={{
-        width: open ? drawerWidth : collapsedWidth,
+        width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
         transition: (theme) =>
@@ -42,12 +45,13 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
             duration: theme.transitions.duration.enteringScreen,
           }),
         '& .MuiDrawer-paper': {
-          width: open ? drawerWidth : collapsedWidth,
+          width: drawerWidth,
           transition: (theme) =>
             theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.enteringScreen,
             }),
+          overflowX: 'hidden',
         },
       }}
     >
@@ -55,30 +59,42 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
         <AuthUserDisplay collapsed={!open} />
 
         <List>
-          {filteredMenu.map((item) => (
-            <ListItem key={item.label} disablePadding>
-              <Tooltip
-                title={item.label}
-                placement="right"
-                arrow
-                disableHoverListener={open}
-              >
-                <ListItemButton onClick={() => onNavigate(item.route)}>
-                  <ListItemIcon>
-                    <FontAwesomeIcon icon={item.icon} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
+          {filteredMenu.map((item) => {
+            const isActive = location.pathname === item.route;
+
+            return (
+              <ListItem key={item.label} disablePadding>
+                <Tooltip
+                  title={item.label}
+                  placement="right"
+                  arrow
+                  disableHoverListener={open}
+                >
+                  <ListItemButton
+                    onClick={() => onNavigate(item.route)}
                     sx={{
-                      opacity: open ? 1 : 0,
-                      transition: 'opacity 0.3s',
-                      whiteSpace: 'nowrap',
+                      backgroundColor: isActive
+                        ? 'rgba(25, 210, 50, 0.6)'
+                        : 'transparent',
+                      '&:hover': { backgroundColor: 'rgba(25, 210, 50, 0.6)' },
                     }}
-                  />
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
-          ))}
+                  >
+                    <ListItemIcon>
+                      <FontAwesomeIcon icon={item.icon} />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      sx={{
+                        opacity: open ? 1 : 0,
+                        transition: 'opacity 0.3s',
+                        whiteSpace: 'nowrap',
+                      }}
+                    />
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+            );
+          })}
 
           <ListItem disablePadding>
             <Tooltip
