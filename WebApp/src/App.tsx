@@ -1,38 +1,16 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Box, IconButton, Toolbar } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { SidePanel } from './components';
+import { RouterProvider } from 'react-router-dom';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import router from './routes';
+import theme from './theme';
+import { AuthProvider } from './contexts';
 
-const App: React.FC = () => {
-  const [open, setOpen] = useState(true);
-  const navigate = useNavigate();
-
-  const handleNavigate = (route: string) => {
-    navigate(route); // navegação do react-router
-  };
-
+export default function App() {
   return (
-    <Box sx={{ display: 'flex' }}>
-      <SidePanel
-        open={open}
-        onClose={() => setOpen(false)}
-        onNavigate={handleNavigate}
-      />
-
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Toolbar>
-          <IconButton onClick={() => setOpen(!open)}>
-            <FontAwesomeIcon icon={faBars} />
-          </IconButton>
-        </Toolbar>
-
-        {/* Aqui é renderizado o conteúdo da rota */}
-        <Outlet />
-      </Box>
-    </Box>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ThemeProvider>
   );
-};
-
-export default App;
+}

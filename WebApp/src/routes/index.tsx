@@ -1,6 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import App from '../App';
-import ProtectedRoute from '../routes/ProtectedRoute';
+import ProtectedRoute from './ProtectedRoute';
 import {
   Login,
   PasswordReset,
@@ -11,16 +10,15 @@ import {
   Users,
 } from '../pages';
 import { PermissionsMap } from '../permissions/PermissionsMap';
+import { CleanLayout, DefaultLayout } from '../layouts';
 
 const publicRoutes = [
-  { path: '/', element: <Login /> },
   { path: '/login', element: <Login /> },
   { path: '/password-reset', element: <PasswordReset /> },
 ];
 
 const privateRoutes = [
   { path: '/profile', element: <Profile /> },
-  { path: '/unauthorized', element: <UnauthorizedAccess /> },
   {
     path: '/users',
     element: <Users />,
@@ -48,10 +46,17 @@ const protectedRoutes = privateRoutes.map((route) => ({
 }));
 
 const router = createBrowserRouter([
-  ...publicRoutes,
   {
-    path: '/', // layout com SidePanel
-    element: <App />,
+    element: <CleanLayout />,
+    children: [
+      { path: '/', element: <Login /> },
+      ...publicRoutes,
+      { path: '/unauthorized', element: <UnauthorizedAccess /> },
+    ],
+  },
+
+  {
+    element: <DefaultLayout />,
     children: protectedRoutes,
   },
 ]);
