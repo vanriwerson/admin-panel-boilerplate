@@ -1,4 +1,3 @@
-using System.Reflection;
 using Api.Data;
 using Api.Helpers;
 using Api.Interfaces;
@@ -6,6 +5,8 @@ using Api.Middlewares;
 using Api.Repositories;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using Resend;
+using System.Reflection;
 
 Env.Load();
 
@@ -31,6 +32,15 @@ builder.WebHost.ConfigureKestrel(options =>
 var connectionString =
     $"Host={dbHost};Port={dbPort};Username={dbUser};Password={dbPassword};Database={dbName}";
 builder.Services.AddDbContext<ApiDbContext>(options => options.UseNpgsql(connectionString));
+
+// --- Configurar Resend ---
+var resendApiKey = EnvLoader.GetEnv("RESEND_API_KEY");
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(options =>
+{
+    options.ApiToken = resendApiKey;
+});
+builder.Services.AddTransient<ResendClient>();
 
 // --- Registrar repositório genérico ---
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

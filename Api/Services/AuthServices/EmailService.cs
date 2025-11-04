@@ -16,7 +16,7 @@ namespace Api.Services
     {
       await _resendClient.EmailSendAsync(new EmailMessage
       {
-        From = "Suporte <no-reply@admin-panel.com>",
+        From = "Suporte <onboarding@resend.dev>", // Precisa ser um e-mail válido cadastrado no Resend
         To = toEmail,
         Subject = "Redefinição de senha",
         HtmlBody = $@"
