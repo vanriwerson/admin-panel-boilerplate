@@ -1,5 +1,12 @@
-import { useState } from 'react';
-import { TextField, Button, Box, Alert } from '@mui/material';
+import { useState, useEffect } from 'react';
+import {
+  TextField,
+  Button,
+  Box,
+  Alert,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks';
 import { getErrorMessage } from '../../helpers';
@@ -11,14 +18,27 @@ export default function LoginForm() {
     password: '',
   });
 
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { handleLogin } = useAuth();
 
+  useEffect(() => {
+    const savedIdentifier = localStorage.getItem('identifier');
+    if (savedIdentifier) {
+      setForm((prev) => ({ ...prev, identifier: savedIdentifier }));
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRememberMe(e.target.checked);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,6 +48,13 @@ export default function LoginForm() {
 
     try {
       await handleLogin(form);
+
+      if (rememberMe) {
+        localStorage.setItem('identifier', form.identifier);
+      } else {
+        localStorage.removeItem('identifier');
+      }
+
       navigate('/profile');
     } catch (err) {
       setError(getErrorMessage(err));
@@ -59,6 +86,17 @@ export default function LoginForm() {
         value={form.password}
         onChange={handleChange}
         required
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={rememberMe}
+            onChange={handleCheckboxChange}
+            color="primary"
+          />
+        }
+        label="Lembre de mim 🎶"
       />
 
       <Button
