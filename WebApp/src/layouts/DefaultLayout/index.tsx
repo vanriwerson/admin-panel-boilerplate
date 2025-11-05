@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { Box, IconButton, Toolbar } from '@mui/material';
+import { Box, IconButton, Toolbar, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { SidePanel } from '../../components';
 import { useThemeMode } from '../../hooks';
+import { Bedtime, Sunny } from '@mui/icons-material';
 
 export default function DefaultLayout() {
   const [open, setOpen] = useState(true);
@@ -25,12 +26,16 @@ export default function DefaultLayout() {
             <FontAwesomeIcon icon={faBars} />
           </IconButton>
 
-          <IconButton onClick={toggleTheme}>
-            <FontAwesomeIcon
-              icon={mode === 'light' ? faMoon : faSun}
-              size="sm"
-            />
-          </IconButton>
+          <Tooltip
+            title={
+              mode === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'
+            }
+            arrow
+          >
+            <IconButton onClick={toggleTheme} color="inherit">
+              {mode === 'light' ? <Bedtime /> : <Sunny />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
 
         <Outlet />
