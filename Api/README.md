@@ -14,6 +14,7 @@
 - [**BCrypt**](https://www.nuget.org/packages/BCrypt.Net-Next/): Biblioteca utilizada para hash e verificação de senhas com o algoritmo bcrypt, garantindo maior segurança no armazenamento de credenciais.
 - [**JSON Web Token (JWT)**](https://jwt.io/introduction/): Padrão aberto para autenticação e troca segura de informações entre cliente e servidor.
 - [**Swagger**](https://swagger.io/docs/): Conjunto de ferramentas para documentação e testes interativos de APIs REST.
+- [**Resend**](https://resend.com/docs/send-with-dotnet): Serviço de envio de e-mails transacionais simples e moderno, utilizado para redefinição de senha.
 - [**Docker Compose**](https://docs.docker.com/compose/): Ferramenta para definir e gerenciar múltiplos containers Docker de forma simples e declarativa.
 
 ---
@@ -218,6 +219,14 @@ A API já vem integrada com **Swagger**. Para visualizar a documentação dos en
 
 - Abra no navegador: `http://localhost:<API_PORT>/swagger/`
 - Todos os endpoints disponíveis serão listados com detalhes de parâmetros, respostas e exemplos.
+
+---
+
+### Redefinição de Senha por Email (Resend)
+
+Para utilizar esse serviço, é **obrigatório** configurar as variáveis de ambiente `RESEND_API_KEY` e `RESEND_FROM_EMAIL`.
+
+> _⚠️ Cadastre um domínio próprio no [painel administrativo da Resend](https://resend.com/domains) para liberar envios em produção._
 
 ---
 
