@@ -1,3 +1,4 @@
+using Api.Helpers;
 using Resend;
 using System.Threading.Tasks;
 
@@ -14,9 +15,11 @@ namespace Api.Services
 
     public async Task SendPasswordResetEmailAsync(string toEmail, string resetLink)
     {
+      var fromEmail = EnvLoader.GetEnv("RESEND_FROM_EMAIL");
+
       await _resendClient.EmailSendAsync(new EmailMessage
       {
-        From = "Suporte <onboarding@resend.dev>", // Precisa ser um e-mail válido cadastrado no Resend
+        From = $"Suporte <{fromEmail}>",
         To = toEmail,
         Subject = "Redefinição de senha",
         HtmlBody = $@"
