@@ -31,6 +31,7 @@ export default function PasswordResetRequestModal({
     let timer: number;
     if (success) {
       timer = setTimeout(() => {
+        (document.activeElement as HTMLElement)?.blur();
         onClose();
         setEmail('');
         setConfirmEmail('');
