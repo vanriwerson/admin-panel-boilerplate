@@ -74,7 +74,6 @@ export default function PasswordReset() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
       }}
     >
       <Paper

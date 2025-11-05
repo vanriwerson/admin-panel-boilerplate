@@ -46,7 +46,6 @@ export default function Login() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: '#f5f5f5',
         }}
       >
         <CircularProgress />
@@ -72,7 +71,7 @@ export default function Login() {
           borderRadius: 2,
         }}
       >
-        <Typography variant="h5" align="center" gutterBottom>
+        <Typography mb={2} variant="h5" align="center" gutterBottom>
           Faça login no sistema
         </Typography>
 

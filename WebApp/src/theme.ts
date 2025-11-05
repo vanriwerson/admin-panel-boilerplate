@@ -13,7 +13,7 @@ export const defineTheme = (mode: 'light' | 'dark') =>
           }
         : {
             // 🌙 Cores do modo escuro
-            primary: { main: '#90caf9' },
+            primary: { main: '#b6f990ff' },
             background: { default: '#121212', paper: '#1e1e1e' },
             text: { primary: '#fff', secondary: '#ccc' },
           }),
