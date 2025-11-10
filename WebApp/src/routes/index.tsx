@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import {
   Login,
+  NotFound,
   PasswordReset,
   Profile,
   Reports,
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
       { path: '/', element: <Login /> },
       ...publicRoutes,
       { path: '/unauthorized', element: <UnauthorizedAccess /> },
+      { path: '*', element: <NotFound /> },
     ],
   },
 
