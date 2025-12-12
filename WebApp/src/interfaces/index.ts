@@ -1,4 +1,4 @@
-export type { AuthContextType } from './contextsInterfaces/AuthContextType';
+export type { AuthContextProps } from './contextsInterfaces/AuthContextProps';
 export type { AuthUser } from './userInterfaces/AuthUser';
 export type { ExternalLoginPayload } from './authInterfaces/ExternalLoginPayload';
 export type { LoginPayload } from './authInterfaces/LoginPayload';
@@ -11,6 +11,8 @@ export type { SystemLogFiltersPayload } from './systemLogsInterfaces/SystemLogFi
 export type { SystemLogsPagination } from './systemLogsInterfaces/SystemLogsPagination';
 export type { SystemResource } from './systemResourcesInterfaces/SystemResource';
 export type { SystemResourcesPagination } from './systemResourcesInterfaces/SystemResourcesPagination';
+export type { ThemeContextProps } from './contextsInterfaces/ThemeContextProps';
+export type { UsersContextProps } from './contextsInterfaces/UsersContextProps';
 export type { UserFormValues } from './userInterfaces/UserFormValues';
 export type { UserOption } from './userInterfaces/UserOption';
 export type { UserRead } from './userInterfaces/UserRead';

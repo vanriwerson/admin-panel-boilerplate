@@ -1,120 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { UserRead, UserFormValues } from '../interfaces';
-import {
-  listUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-  listUsersForSelect,
-  listUserById,
-} from '../services';
-import { cleanStates, getErrorMessage } from '../helpers';
+import { useContext } from 'react';
+import { UsersContext } from '../contexts';
 
 export function useUsers() {
-  const [users, setUsers] = useState<UserRead[]>([]);
-  const [pagination, setPagination] = useState(cleanStates.tablePagination);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const context = useContext(UsersContext);
 
-  const fetchUsers = useCallback(
-    async (
-      page = pagination.page,
-      pageSize = pagination.pageSize,
-      searchKey = ''
-    ) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await listUsers(page, pageSize, searchKey);
-        setUsers(response.data);
-        setPagination({
-          totalItems: response.totalItems,
-          page: response.page,
-          pageSize: response.pageSize,
-          totalPages: response.totalPages,
-        });
-      } catch (err) {
-        setError(getErrorMessage(err));
-        console.error('Erro ao listar usuários:', err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [pagination.page, pagination.pageSize]
-  );
+  if (!context) {
+    throw new Error('useUsers deve ser usado dentro de <UsersProvider>');
+  }
 
-  const addUser = useCallback(
-    async (user: UserFormValues) => {
-      setLoading(true);
-      try {
-        await createUser(user);
-        await fetchUsers();
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchUsers]
-  );
-
-  const editUser = useCallback(
-    async (user: UserFormValues) => {
-      setLoading(true);
-      try {
-        await updateUser(user);
-        await fetchUsers();
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchUsers]
-  );
-
-  const removeUser = useCallback(
-    async (id: number) => {
-      setLoading(true);
-      try {
-        await deleteUser(id.toString());
-        await fetchUsers();
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchUsers]
-  );
-
-  const fetchUsersForSelect = useCallback(async () => {
-    try {
-      return await listUsersForSelect();
-    } catch (err) {
-      console.error('Erro ao buscar usuários para select:', err);
-      return [];
-    }
-  }, []);
-
-  const fetchUserById = useCallback(async (id: number) => {
-    try {
-      return await listUserById(id);
-    } catch (err) {
-      console.error('Erro ao buscar usuário:', err);
-      return null;
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
-  return {
-    users,
-    pagination,
-    loading,
-    error,
-    fetchUsers,
-    addUser,
-    editUser,
-    removeUser,
-    fetchUsersForSelect,
-    fetchUserById,
-    setPagination,
-  };
+  return context;
 }
