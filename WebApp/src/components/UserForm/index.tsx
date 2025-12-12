@@ -115,9 +115,19 @@ export default function UserForm({ onSubmit, user }: Props) {
         {error && <FormHelperText error>{error}</FormHelperText>}
       </Box>
 
-      <Button variant="contained" type="submit">
-        {user ? 'Atualizar' : 'Cadastrar'}
-      </Button>
+      <Box display="flex" width="100%" gap={2} justifyContent="center">
+        <Button variant="contained" type="submit">
+          {user ? 'Atualizar' : 'Cadastrar'}
+        </Button>
+
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setForm(cleanStates.userForm)}
+        >
+          Limpar
+        </Button>
+      </Box>
     </Box>
   );
 }

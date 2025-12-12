@@ -39,9 +39,9 @@ export default function SystemResourceForm({ onSubmit, resource }: Props) {
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        mb: 2,
+        marginBottom: 4,
         width: '100%',
-        maxWidth: 400,
+        maxWidth: 480,
       }}
     >
       <TextField
@@ -60,9 +60,20 @@ export default function SystemResourceForm({ onSubmit, resource }: Props) {
         required
         fullWidth
       />
-      <Button variant="contained" type="submit">
-        {resource ? 'Atualizar' : 'Cadastrar'}
-      </Button>
+
+      <Box display="flex" width="100%" gap={2} justifyContent="center">
+        <Button variant="contained" type="submit">
+          {resource ? 'Atualizar' : 'Cadastrar'}
+        </Button>
+
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setForm(cleanStates.systemResource)}
+        >
+          Limpar
+        </Button>
+      </Box>
     </Box>
   );
 }
