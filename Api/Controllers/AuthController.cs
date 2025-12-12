@@ -38,9 +38,9 @@ namespace Api.Controllers
 
         return Ok(loginResponse);
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        return StatusCode(500, new { message = "Erro ao processar login.", details = ex.Message });
+        return StatusCode(500, new { message = "Erro ao processar login." });
       }
     }
 
@@ -56,9 +56,9 @@ namespace Api.Controllers
 
         return Ok(loginResponse);
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        return StatusCode(500, new { message = "Erro ao processar token externo.", details = ex.Message });
+        return StatusCode(500, new { message = "Erro ao processar token externo." });
       }
     }
 
@@ -75,9 +75,9 @@ namespace Api.Controllers
       {
         return StatusCode(ex.StatusCode, new { message = ex.Message });
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        return StatusCode(500, new { message = "Erro ao processar solicitação de redefinição de senha.", details = ex.Message });
+        return StatusCode(500, new { message = "Erro ao processar solicitação de redefinição de senha." });
       }
     }
 
@@ -94,9 +94,9 @@ namespace Api.Controllers
       {
         return StatusCode(ex.StatusCode, new { message = ex.Message });
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        return StatusCode(500, new { message = "Erro ao redefinir senha.", details = ex.Message });
+        return StatusCode(500, new { message = "Erro ao redefinir senha." });
       }
     }
   }

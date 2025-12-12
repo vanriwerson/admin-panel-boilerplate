@@ -23,7 +23,7 @@ namespace Api.Middlewares
         context.Response.StatusCode = ex.StatusCode;
         context.Response.ContentType = "application/json";
 
-        var result = JsonSerializer.Serialize(new { error = ex.Message });
+        var result = JsonSerializer.Serialize(new { message = ex.Message });
         await context.Response.WriteAsync(result);
       }
       catch (Exception)
@@ -31,7 +31,7 @@ namespace Api.Middlewares
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         context.Response.ContentType = "application/json";
 
-        var result = JsonSerializer.Serialize(new { error = "Ocorreu um erro inesperado." });
+        var result = JsonSerializer.Serialize(new { message = "Ocorreu um erro inesperado." });
         await context.Response.WriteAsync(result);
       }
     }

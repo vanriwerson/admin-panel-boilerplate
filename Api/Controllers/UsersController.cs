@@ -36,11 +36,11 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserCreateDto dto)
         {
-            if (dto == null) return BadRequest("Payload inválido.");
+            if (dto == null) return BadRequest(new { message = "Payload inválido." });
 
             var created = await _createUser.ExecuteAsync(dto);
             if (created == null)
-                return BadRequest("Falha ao criar usuário.");
+                return BadRequest(new { message = "Falha ao criar usuário." });
 
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
@@ -66,7 +66,7 @@ namespace Api.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _getUserById.ExecuteAsync(id);
-            if (user == null) return NotFound();
+            if (user == null) return NotFound(new { message = "Usuário não encontrado." });
             return Ok(user);
         }
 
@@ -74,10 +74,10 @@ namespace Api.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto)
         {
-            if (dto == null) return BadRequest("Payload inválido.");
+            if (dto == null) return BadRequest(new { message = "Payload inválido." });
 
             var updated = await _updateUser.ExecuteAsync(id, dto);
-            if (updated == null) return NotFound();
+            if (updated == null) return NotFound(new { message = "Usuário não encontrado." });
 
             return Ok(updated);
         }
@@ -87,7 +87,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _deleteUser.ExecuteAsync(id);
-            if (!deleted) return NotFound();
+            if (!deleted) return NotFound(new { message = "Usuário não encontrado." });
             return NoContent();
         }
 
@@ -96,7 +96,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Search([FromQuery] string key, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (string.IsNullOrWhiteSpace(key))
-                return BadRequest("A chave de pesquisa é obrigatória.");
+                return BadRequest(new { message = "A chave de pesquisa é obrigatória." });
 
             var usersFound = await _searchUsers.ExecuteAsync(key, page, pageSize);
             return Ok(usersFound);
