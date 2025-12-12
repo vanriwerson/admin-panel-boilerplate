@@ -12,6 +12,7 @@ import {
 } from '../pages';
 import { PermissionsMap } from '../permissions/PermissionsMap';
 import { CleanLayout, DefaultLayout } from '../layouts';
+import { UsersProvider } from '../contexts';
 
 const publicRoutes = [
   { path: '/login', element: <Login /> },
@@ -19,10 +20,21 @@ const publicRoutes = [
 ];
 
 const privateRoutes = [
-  { path: '/profile', element: <Profile /> },
+  {
+    path: '/profile',
+    element: (
+      <UsersProvider>
+        <Profile />
+      </UsersProvider>
+    ),
+  },
   {
     path: '/users',
-    element: <Users />,
+    element: (
+      <UsersProvider>
+        <Users />
+      </UsersProvider>
+    ),
     requiredPermission: PermissionsMap.USERS,
   },
   {
