@@ -101,7 +101,7 @@ export default function UserForm({ onSubmit, user }: Props) {
           type="password"
           value={form.password}
           onChange={handleChange}
-          required={!user}
+          required
           sx={{ flexGrow: 1 }}
         />
       )}
