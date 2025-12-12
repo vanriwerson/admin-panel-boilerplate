@@ -32,7 +32,7 @@ namespace Api.Services.AuthServices
                 return null;
 
             var claims = DefaultJWTClaims.Generate(user);
-            var token = JsonWebToken.Create(claims, expireMinutes: 120);
+            var token = JsonWebToken.Create(claims);
 
             await _createSystemLog.ExecuteAsync(
                 userId: user.Id,

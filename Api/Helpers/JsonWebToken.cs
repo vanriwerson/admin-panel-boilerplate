@@ -10,7 +10,7 @@ namespace Api.Helpers
     {
         private static readonly string _secretKey = EnvLoader.GetEnv("JWT_SECRET_KEY");
 
-        public static string Create(Claim[] claims, int expireMinutes = 60)
+        public static string Create(Claim[] claims, int expireMinutes = 480)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

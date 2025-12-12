@@ -34,21 +34,24 @@ namespace Api.Services.AuthServices
             }
 
             var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var loginClaim = principal.Claims.FirstOrDefault(c => c.Type == "login")?.Value;
             var usernameClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
 
-            if (emailClaim == null && usernameClaim == null)
+            var username = loginClaim ?? usernameClaim;
+
+            if (emailClaim == null && username == null)
                 return null;
 
             var user = await _context.Users
                 .Include(u => u.AccessPermissions)
                 .ThenInclude(ap => ap.SystemResource)
-                .FirstOrDefaultAsync(u => u.Email == emailClaim || u.Username == usernameClaim);
+                .FirstOrDefaultAsync(u => u.Email == emailClaim || u.Username == username);
 
             if (user == null)
                 return null;
 
             var claims = DefaultJWTClaims.Generate(user);
-            var token = JsonWebToken.Create(claims, expireMinutes: 120);
+            var token = JsonWebToken.Create(claims);
 
             await _createSystemLog.ExecuteAsync(
                 userId: user.Id,
