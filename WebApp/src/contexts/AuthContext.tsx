@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, type ReactNode } from 'react';
 import type {
-  AuthContextType,
+  AuthContextProps,
   AuthUser,
   ExternalLoginPayload,
   LoginPayload,
@@ -14,7 +14,8 @@ import {
   resetPassword,
 } from '../services';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+export default AuthContext;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(
@@ -83,5 +84,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
-export default AuthContext;

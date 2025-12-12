@@ -1,11 +1,7 @@
 import { createContext, useMemo, useState, type ReactNode } from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { defineTheme } from '../theme';
-
-interface ThemeContextProps {
-  mode: 'light' | 'dark';
-  toggleTheme: () => void;
-}
+import type { ThemeContextProps } from '../interfaces';
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 

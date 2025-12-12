@@ -3,7 +3,7 @@ import type { LoginPayload } from '../authInterfaces/LoginPayload';
 import type { PasswordResetPayload } from '../authInterfaces/PasswordResetPayload';
 import type { AuthUser } from '../userInterfaces/AuthUser';
 
-export interface AuthContextType {
+export interface AuthContextProps {
   token: string | null;
   authUser: AuthUser | null;
   handleLogin: (payload: LoginPayload) => Promise<void>;
