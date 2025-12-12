@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { SystemResource, SystemResourcesPagination } from '../interfaces';
+import type { SystemResource } from '../interfaces';
 import {
   createSystemResource,
   updateSystemResource,
@@ -7,16 +7,11 @@ import {
   listSystemResources,
   listSystemResourcesForSelect,
 } from '../services';
+import { cleanStates } from '../helpers';
 
 export function useSystemResources() {
   const [resources, setResources] = useState<SystemResource[]>([]);
-  const [pagination, setPagination] = useState<SystemResourcesPagination>({
-    totalItems: 0,
-    page: 1,
-    pageSize: 10,
-    totalPages: 0,
-    data: [],
-  });
+  const [pagination, setPagination] = useState(cleanStates.tablePagination);
   const [loading, setLoading] = useState(false);
 
   const fetchSystemResources = useCallback(
@@ -27,9 +22,18 @@ export function useSystemResources() {
     ) => {
       try {
         setLoading(true);
-        const data = await listSystemResources(pageNumber, pageSize, searchKey);
-        setResources(data.data);
-        setPagination(data);
+        const response = await listSystemResources(
+          pageNumber,
+          pageSize,
+          searchKey
+        );
+        setResources(response.data);
+        setPagination({
+          totalItems: response.totalItems,
+          page: response.page,
+          pageSize: response.pageSize,
+          totalPages: response.totalPages,
+        });
       } catch (error) {
         console.error('Erro ao buscar recursos do sistema:', error);
       } finally {

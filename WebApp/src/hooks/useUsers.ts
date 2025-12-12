@@ -8,16 +8,11 @@ import {
   listUsersForSelect,
   listUserById,
 } from '../services';
-import { getErrorMessage } from '../helpers';
+import { cleanStates, getErrorMessage } from '../helpers';
 
 export function useUsers() {
   const [users, setUsers] = useState<UserRead[]>([]);
-  const [pagination, setPagination] = useState({
-    totalItems: 0,
-    page: 1,
-    pageSize: 10,
-    totalPages: 1,
-  });
+  const [pagination, setPagination] = useState(cleanStates.tablePagination);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,13 +25,13 @@ export function useUsers() {
       setLoading(true);
       setError(null);
       try {
-        const data = await listUsers(page, pageSize, searchKey);
-        setUsers(data.data);
+        const response = await listUsers(page, pageSize, searchKey);
+        setUsers(response.data);
         setPagination({
-          totalItems: data.totalItems,
-          page: data.page,
-          pageSize: data.pageSize,
-          totalPages: data.totalPages,
+          totalItems: response.totalItems,
+          page: response.page,
+          pageSize: response.pageSize,
+          totalPages: response.totalPages,
         });
       } catch (err) {
         setError(getErrorMessage(err));

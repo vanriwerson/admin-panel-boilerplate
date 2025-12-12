@@ -1,8 +1,13 @@
-import type { SystemResource, UserFormValues } from '../interfaces';
+import type {
+  PaginatedResponse,
+  SystemResource,
+  UserFormValues,
+} from '../interfaces';
 
 interface FormStates {
   userForm: UserFormValues;
   systemResource: SystemResource;
+  tablePagination: Omit<PaginatedResponse<unknown>, 'data'>;
 }
 
 export const cleanStates: FormStates = {
@@ -16,5 +21,11 @@ export const cleanStates: FormStates = {
   systemResource: {
     name: '',
     exhibitionName: '',
+  },
+  tablePagination: {
+    totalItems: 0,
+    page: 1,
+    pageSize: 10,
+    totalPages: 1,
   },
 };
