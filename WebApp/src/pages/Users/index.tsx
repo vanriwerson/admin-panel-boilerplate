@@ -19,7 +19,7 @@ export default function Users() {
     try {
       await addUser(user);
       alert('✅ Usuário cadastrado com sucesso!');
-      fetchUsers(); // atualiza tabela
+      await fetchUsers();
     } catch (err) {
       console.error(err);
       alert('❌ Erro ao cadastrar usuário');
@@ -32,7 +32,7 @@ export default function Users() {
       await editUser({ ...editingUser, ...user });
       alert('✅ Usuário atualizado com sucesso!');
       setOpen(false);
-      fetchUsers();
+      await fetchUsers();
     } catch (err) {
       console.error(err);
       alert('❌ Erro ao atualizar usuário');
@@ -48,7 +48,7 @@ export default function Users() {
     try {
       await removeUser(id);
       alert('🗑️ Usuário excluído com sucesso!');
-      fetchUsers(); // atualiza tabela
+      await fetchUsers();
     } catch (err) {
       console.error(err);
       alert('❌ Erro ao excluir usuário');
