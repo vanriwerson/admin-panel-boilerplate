@@ -1,9 +1,11 @@
 export { default as ActionsSelect } from './ActionsSelect';
+export { default as DashboardDevelopmentTips } from './DashboardDevelopmentTips';
 export { default as LoginForm } from './LoginForm';
 export { default as PageTitle } from './PageTitle';
 export { default as PasswordResetRequestModal } from './PasswordResetRequestModal';
 export { default as ReportsTable } from './ReportsTable';
 export { default as SidePanel } from './SidePanel';
+export { default as StatsCard } from './StatsCard';
 export { default as SystemResourceEditionModal } from './SystemResourceEditionModal';
 export { default as SystemResourceForm } from './SystemResourceForm';
 export { default as SystemResourcesSelect } from './SystemResourcesSelect';

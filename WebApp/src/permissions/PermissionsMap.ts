@@ -4,6 +4,7 @@ export const PermissionsMap = {
   RESOURCES: 'resources',
   REPORTS: 'reports',
   PROFILE: 'profile',
+  DASHBOARD: 'dashboard',
 } as const;
 
 export type PermissionName =
