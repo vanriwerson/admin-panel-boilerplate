@@ -3,7 +3,6 @@ export const PermissionsMap = {
   USERS: 'users',
   RESOURCES: 'resources',
   REPORTS: 'reports',
-  PROFILE: 'profile',
   DASHBOARD: 'dashboard',
 } as const;
 

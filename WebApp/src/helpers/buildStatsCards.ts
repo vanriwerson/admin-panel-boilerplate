@@ -12,17 +12,17 @@ export function buildStatsCards(systemStats: SystemStats) {
   return [
     {
       bg: '#6dc4edff, #215fb0ff',
-      icon: menuItems[2].icon,
+      icon: menuItems[1].icon,
       content: `${usersCount} Usuários Ativos`,
     },
     {
       bg: '#cc2b5e, #753a88',
-      icon: menuItems[3].icon,
+      icon: menuItems[2].icon,
       content: `${systemResourcesCount} Recursos de Sistema`,
     },
     {
       bg: '#734b6d, #42275a',
-      icon: menuItems[4].icon,
+      icon: menuItems[3].icon,
       content: `${monthlyReportsCount} Ações auditadas em ${monthlyReportsCountReference}`,
     },
   ];

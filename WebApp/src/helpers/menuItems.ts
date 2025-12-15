@@ -2,7 +2,6 @@ import {
   faChartBar,
   faChartLine,
   faCogs,
-  faUserAlt,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import type { MenuItem } from '../interfaces';
@@ -13,11 +12,6 @@ export const menuItems: MenuItem[] = [
     label: 'Dashboard',
     icon: faChartLine,
     route: '/dashboard',
-  },
-  {
-    label: 'Perfil',
-    icon: faUserAlt,
-    route: '/profile',
   },
   {
     label: 'Usuários',

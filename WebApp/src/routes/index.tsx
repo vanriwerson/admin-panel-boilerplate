@@ -5,7 +5,6 @@ import {
   Login,
   NotFound,
   PasswordReset,
-  Profile,
   Reports,
   Resources,
   UnauthorizedAccess,
@@ -24,14 +23,6 @@ const privateRoutes = [
   {
     path: '/dashboard',
     element: <DashBoard />,
-  },
-  {
-    path: '/profile',
-    element: (
-      <UsersProvider>
-        <Profile />
-      </UsersProvider>
-    ),
   },
   {
     path: '/users',
