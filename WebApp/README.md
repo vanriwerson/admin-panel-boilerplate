@@ -131,6 +131,184 @@ npm run dev
 
 ---
 
+## 🛠️ Guia para Integrar Novos Endpoints na Interface
+
+Para manter a consistência e facilitar a manutenção, siga estes passos ao integrar novos recursos da API na interface:
+
+### 1. Definir Interfaces TypeScript
+
+- Em `src/interfaces/`, crie tipos para a entidade e payloads.
+- Use nomes descritivos e siga o padrão existente.
+
+```typescript
+// src/interfaces/NewEntity.ts
+export interface NewEntity {
+  id: number;
+  name: string;
+  createdAt: string;
+}
+
+export interface NewEntityCreatePayload {
+  name: string;
+}
+
+export interface NewEntityUpdatePayload {
+  name: string;
+}
+```
+
+### 2. Criar Serviço de API
+
+- Em `src/services/`, crie funções para consumir os endpoints.
+- Use a instância Axios configurada em `src/api/index.ts`.
+
+```typescript
+// src/services/newEntityService.ts
+import api from '../api';
+
+export const getNewEntities = async (params?: any) => {
+  const response = await api.get('/new-entities', { params });
+  return response.data;
+};
+
+export const createNewEntity = async (payload: NewEntityCreatePayload) => {
+  const response = await api.post('/new-entities', payload);
+  return response.data;
+};
+
+export const updateNewEntity = async (
+  id: number,
+  payload: NewEntityUpdatePayload
+) => {
+  const response = await api.put(`/new-entities/${id}`, payload);
+  return response.data;
+};
+
+export const deleteNewEntity = async (id: number) => {
+  await api.delete(`/new-entities/${id}`);
+};
+```
+
+### 3. Implementar Contexto (Context API)
+
+- Em `src/contexts/`, crie `NewEntityContext.tsx`.
+- Siga o padrão de `UsersContext.tsx` ou `SystemResourcesContext.tsx`.
+
+```typescript
+// src/contexts/NewEntityContext.tsx
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { NewEntity } from '../interfaces/NewEntity';
+import * as newEntityService from '../services/newEntityService';
+
+interface NewEntityState {
+  entities: NewEntity[];
+  loading: boolean;
+  error: string | null;
+  pagination: { page: number; pageSize: number; total: number };
+}
+
+const NewEntityContext = createContext<any>(null);
+
+export const useNewEntity = () => {
+  const context = useContext(NewEntityContext);
+  if (!context)
+    throw new Error('useNewEntity must be used within NewEntityProvider');
+  return context;
+};
+
+export const NewEntityProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  // Implementação do reducer e funções CRUD...
+};
+```
+
+### 4. Criar Hook Personalizado
+
+- Em `src/hooks/`, crie `useNewEntity.ts` que usa o contexto.
+
+```typescript
+// src/hooks/useNewEntity.ts
+import { useNewEntity as useNewEntityContext } from '../contexts/NewEntityContext';
+
+export const useNewEntity = () => {
+  return useNewEntityContext();
+};
+```
+
+### 5. Desenvolver Componentes
+
+- Em `src/components/`, crie componentes reutilizáveis.
+- Use Material-UI e siga o padrão existente.
+
+```typescript
+// src/components/NewEntityTable.tsx
+import { DataGrid } from '@mui/x-data-grid';
+import { useNewEntity } from '../hooks/useNewEntity';
+
+export const NewEntityTable: React.FC = () => {
+  const { entities, loading, deleteEntity } = useNewEntity();
+
+  // Implementação da tabela com ações...
+};
+```
+
+### 6. Criar Página
+
+- Em `src/pages/`, crie `NewEntity/index.tsx`.
+- Use layout consistente e integre notificações.
+
+```typescript
+// src/pages/NewEntity/index.tsx
+import { useNewEntity } from '../../hooks/useNewEntity';
+import { NewEntityTable } from '../../components/NewEntityTable';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
+
+export const NewEntity: React.FC = () => {
+  // Implementação com estado, handlers e notificações...
+};
+```
+
+### 7. Configurar Rotas
+
+- Em `src/routes/index.tsx`, adicione a nova rota.
+- Use provider e proteção de permissão.
+
+```typescript
+// src/routes/index.tsx
+import { NewEntityProvider } from '../contexts/NewEntityContext';
+import { NewEntity } from '../pages/NewEntity';
+
+const routes = [
+  // ... outras rotas
+  {
+    path: '/new-entities',
+    element: (
+      <NewEntityProvider>
+        <NewEntity />
+      </NewEntityProvider>
+    ),
+    requiresAuth: true,
+    permission: 'PermissionsMap.NEW_ENTITIES',
+  },
+];
+```
+
+### 8. Adicionar Permissões
+
+- Em `src/permissions/`, defina novas regras RBAC se necessário.
+- Atualize a lógica de permissões conforme requerido.
+
+### Padrões Importantes
+
+- **Context API**: Use para estado global e compartilhamento entre componentes.
+- **Hooks Personalizados**: Abstraem a lógica de negócio da UI.
+- **Notificações**: Use `SnackbarNotification` para feedback de ações.
+- **Confirmações**: Use `ConfirmDialog` para ações destrutivas.
+- **Error Handling**: Trata erros de API e mostra mensagens adequadas.
+
+---
+
 ## Sobre o Desenvolvedor
 
 [Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um **desenvolvedor full-stack** apaixonado por tecnologia e boas práticas de engenharia de software. Proficiente no uso de **React+MaterialUI** no front-end e **NodeJS+Express** no back-end, além de conhecer outras tecnologias como `Golang`, `Java`, `Docker`, entre outras. Possui experiência no uso de bancos de dados relacionais e não-relacionais, o que o torna um profissional dinâmico e apto a criar soluções escaláveis, seguras e bem estruturadas.

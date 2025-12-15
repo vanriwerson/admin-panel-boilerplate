@@ -245,6 +245,152 @@ Cada ação do tipo CREATE, UPDATE, DELETE ou LOGIN cia um registro em `system_l
 - Descrição da ação executada
 - Data e hora em que a ação foi executada
 
+---
+
+## 🛠️ Guia para Adicionar Novos Endpoints
+
+Para manter a consistência e facilitar a manutenção, siga estes passos ao adicionar novos recursos à API:
+
+### 1. Definir a Entidade (Model)
+
+- Crie uma classe em `Models/` representando a entidade do banco.
+- Use anotações EF Core: `[Table("nome_tabela")]`, `[Key]`, `[Required]`, etc.
+
+```csharp
+[Table("new_entities")]
+public class NewEntity
+{
+    [Key]
+    public int Id { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    public string Name { get; set; }
+
+    // Outras propriedades...
+}
+```
+
+### 2. Criar DTOs
+
+- Em `Dtos/NewEntityDtos/`, crie DTOs para operações CRUD.
+- Use validações adequadas.
+
+```csharp
+public class NewEntityCreateDto
+{
+    [Required]
+    [MaxLength(100)]
+    public string Name { get; set; }
+}
+
+public class NewEntityReadDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+```
+
+### 3. Configurar Entity Framework
+
+- Em `Data/Configurations/`, crie `NewEntityConfiguration.cs`.
+- Defina constraints, índices e relacionamentos.
+
+```csharp
+public class NewEntityConfiguration : IEntityTypeConfiguration<NewEntity>
+{
+    public void Configure(EntityTypeBuilder<NewEntity> builder)
+    {
+        builder.HasIndex(e => e.Name).IsUnique();
+    }
+}
+```
+
+- Registre no `ApiDbContext.cs`:
+
+```csharp
+modelBuilder.ApplyConfiguration(new NewEntityConfiguration());
+```
+
+### 4. Criar Migration
+
+```bash
+dotnet ef migrations add AddNewEntity
+dotnet ef database update
+```
+
+### 5. Implementar Serviços
+
+- Em `Services/NewEntityServices/`, crie classes para operações específicas.
+- Use `IGenericRepository<NewEntity>` para operações CRUD.
+
+```csharp
+public class CreateNewEntity
+{
+    private readonly IGenericRepository<NewEntity> _repository;
+
+    public CreateNewEntity(IGenericRepository<NewEntity> repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<NewEntity> Execute(NewEntityCreateDto dto)
+    {
+        var entity = new NewEntity { Name = dto.Name };
+        await _repository.AddAsync(entity);
+        return entity;
+    }
+}
+```
+
+### 6. Criar Controller
+
+- Em `Controllers/`, crie `NewEntityController.cs`.
+- Siga o padrão de respostas padronizadas (JSON com "message" para erros).
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class NewEntityController : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        // Implementação...
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] NewEntityCreateDto dto)
+    {
+        // Implementação com try/catch e logs...
+    }
+}
+```
+
+### 7. Registrar no Program.cs
+
+- Os serviços são registrados automagicamente no Program.cs via injeção de dependência.
+
+```csharp
+    foreach (
+        var type in assembly
+            .GetTypes()
+            .Where(t => t.IsClass && t.Namespace != null && t.Namespace.StartsWith("Api.Services"))
+    )
+    {
+        builder.Services.AddScoped(type);
+        servicesRegistrados++;
+    }
+```
+
+### Padrões Importantes
+
+- **Respostas Padronizadas**: Sempre retorne JSON com chave "message" para erros.
+- **Logs Automáticos**: Use `Logger.LogAction()` para auditoria.
+- **Paginação**: Para listas grandes, use o helper `ApplyPagination`.
+
+---
+
 ## Sobre o Dev
 
 [Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um profissional apaixonado por tecnologia. Desenvolvedor full-stack proficiente no uso de React com MaterialUI no front-end e NodeJS com Express no back-end. Possui experiência no uso de bancos de dados relacionais e não-relacionais, além de conhecer outras tecnologias como Golang, Java, Docker, entre outras, tornando-o dinâmico e apto a solucionar quaisquer problemas de modo eficiente.

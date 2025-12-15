@@ -79,7 +79,7 @@ try
             .Where(t => t.IsClass && t.Namespace != null && t.Namespace.StartsWith("Api.Services"))
     )
     {
-        builder.Services.AddTransient(type);
+        builder.Services.AddScoped(type);
         servicesRegistrados++;
     }
 

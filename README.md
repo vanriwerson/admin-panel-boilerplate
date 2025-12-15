@@ -167,6 +167,95 @@ npm run dev
 
 ---
 
-## Sobre o Desenvolvedor
+## Guia de Desenvolvimento e Evolução do Sistema
 
-[Bruno Riwerson Silva](https://www.linkedin.com/in/bruno-riwerson/) é um **desenvolvedor full-stack** apaixonado por tecnologia e boas práticas de engenharia de software. Proficiente no uso de **React+MaterialUI** no front-end e **NodeJS+Express** no back-end, além de conhecer outras tecnologias como `Golang`, `Java`, `Docker`, entre outras. Possui experiência no uso de bancos de dados relacionais e não-relacionais, o que o torna um profissional dinâmico e apto a criar soluções escaláveis, seguras e bem estruturadas.
+Este projeto segue padrões bem definidos para facilitar a manutenção e adição de novos recursos. Abaixo, um guia passo-a-passo para adicionar novos endpoints à API e integrá-los na interface web.
+
+### Adicionando Novos Recursos à API (.NET)
+
+1. **Definir a Entidade (Model)**:
+
+   - Crie uma classe em `Api/Models/` representando a entidade do banco.
+   - Use anotações `[Table("nome_tabela")]` e `[Key]` para mapeamento EF Core.
+
+2. **Criar DTOs**:
+
+   - Em `Api/Dtos/`, crie DTOs para Create, Update e Read (ex.: `EntityCreateDto`, `EntityUpdateDto`, `EntityReadDto`).
+   - Use validações com `[Required]`, `[MaxLength]`, etc.
+
+3. **Configurar Entity Framework**:
+
+   - Em `Api/Data/Configurations/`, crie `EntityConfiguration.cs` para definir constraints, índices e relacionamentos.
+   - Registre no `ApiDbContext.cs`.
+
+4. **Criar Migration**:
+
+   ```bash
+   cd Api
+   dotnet ef migrations add NomeDaMigration
+   dotnet ef database update
+   ```
+
+5. **Implementar Serviço**:
+
+   - Em `Api/Services/EntityServices/`, crie classes como `CreateEntity.cs`, `GetAllEntities.cs`, etc.
+   - Use injeção do `IGenericRepository<Entity>` para operações CRUD.
+
+6. **Criar Controller**:
+
+   - Em `Api/Controllers/`, crie `EntityController.cs` com endpoints RESTful.
+   - Use `[HttpGet]`, `[HttpPost]`, etc., e retorne IActionResult padronizado.
+   - Aplique middlewares de autorização se necessário.
+
+7. **Atualizar Seeders** (opcional):
+   - Em `Api/Data/DbInitializer.cs`, adicione dados iniciais se necessário.
+
+### Integrando Novos Recursos na Interface Web (React)
+
+1. **Definir Interfaces TypeScript**:
+
+   - Em `WebApp/src/interfaces/`, crie tipos para a entidade e DTOs (ex.: `Entity.ts`, `EntityCreatePayload.ts`).
+
+2. **Criar Serviço de API**:
+
+   - Em `WebApp/src/services/`, crie funções para consumir os endpoints (ex.: `createEntity`, `getEntities`).
+   - Use a instância Axios configurada em `api/index.ts`.
+
+3. **Implementar Contexto (Context API)**:
+
+   - Em `WebApp/src/contexts/`, crie `EntityContext.tsx` seguindo o padrão de `UsersContext.tsx`.
+   - Inclua estados para lista, paginação, loading e error.
+   - Forneça funções CRUD via provider.
+
+4. **Criar Hook Personalizado**:
+
+   - Em `WebApp/src/hooks/`, crie `useEntity.ts` que usa `useContext(EntityContext)`.
+
+5. **Desenvolver Componentes**:
+
+   - Em `WebApp/src/components/`, crie componentes reutilizáveis (ex.: `EntityTable.tsx`, `EntityForm.tsx`, `EntityDialog.tsx`).
+   - Use hooks para estado e notificações (Snackbar).
+
+6. **Criar Página**:
+
+   - Em `WebApp/src/pages/`, crie `Entity/index.tsx` com layout e lógica de CRUD.
+   - Use `ConfirmDialog` para exclusões e `showNotification` para feedback.
+
+7. **Configurar Rotas**:
+
+   - Em `WebApp/src/routes/index.tsx`, adicione a nova rota com provider e proteção de permissão.
+   - Exemplo: `<EntityProvider><Entity /></EntityProvider>`
+
+8. **Adicionar Permissões**:
+   - Em `WebApp/src/permissions/`, defina novas regras RBAC se necessário.
+
+### Padrões Seguidos
+
+- **Backend**: Generic Repository, Dependency Injection, Middleware de Exceção, Logs Automáticos.
+- **Frontend**: Context API para estado global, Hooks para abstração, Componentes Reutilizáveis, Notificações via Snackbar.
+- **Segurança**: JWT, RBAC, Validações Server/Client-side.
+- **UI/UX**: Material-UI, Responsividade, Acessibilidade.
+
+Para mais detalhes, consulte os READMEs específicos da [API](./Api/README.md) e [WebApp](./WebApp/README.md).
+
+---
