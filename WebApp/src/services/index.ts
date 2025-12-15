@@ -15,6 +15,8 @@ export {
 export { updateSystemResource } from './systemResourcesServices/updateSystemResource';
 export { deleteSystemResource } from './systemResourcesServices/deleteSystemResource';
 
+export { getSystemStats } from './systemStatsServices';
+
 export { createUser } from './usersServices/createUser';
 export {
   listUsers,
