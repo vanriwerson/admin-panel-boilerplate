@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Container } from '@mui/material';
 import type { SystemResource } from '../../interfaces';
-import { useSystemResources } from '../../hooks';
+import SystemResourcesContext from '../../contexts/SystemResourcesContext';
 import {
   SystemResourceForm,
   SystemResourcesTable,
@@ -17,7 +17,7 @@ export default function Resources() {
     editSystemResource,
     removeSystemResource,
     pagination,
-  } = useSystemResources();
+  } = useContext(SystemResourcesContext)!;
 
   const [editingResource, setEditingResource] = useState<SystemResource | null>(
     null

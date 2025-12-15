@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useContext } from 'react';
 import {
   FormControl,
   InputLabel,
@@ -11,7 +11,8 @@ import {
   Box,
   TextField,
 } from '@mui/material';
-import { useSystemResources, useAuth } from '../../hooks';
+import { useAuth } from '../../hooks';
+import SystemResourcesContext from '../../contexts/SystemResourcesContext';
 import { filterAssignablePermissions } from '../../permissions/Rules';
 import type { SystemResource } from '../../interfaces';
 import type { SelectChangeEvent } from '@mui/material';
@@ -28,7 +29,9 @@ export default function SystemResourceSelect({
   readOnly = false,
 }: Props) {
   const { authUser } = useAuth();
-  const { fetchSystemResourcesForSelect, loading } = useSystemResources();
+  const { fetchSystemResourcesForSelect, loading } = useContext(
+    SystemResourcesContext
+  )!;
 
   const [options, setOptions] = useState<SystemResource[]>([]);
 

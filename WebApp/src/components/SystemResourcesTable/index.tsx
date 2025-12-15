@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import {
 import { Edit, Delete, Search } from '@mui/icons-material';
 
 import type { SystemResource } from '../../interfaces';
-import { useSystemResources } from '../../hooks';
+import SystemResourcesContext from '../../contexts/SystemResourcesContext';
 
 interface SystemResourcesTableProps {
   onEdit: (resource: SystemResource) => void;
@@ -33,7 +33,7 @@ export default function SystemResourcesTable({
     loading,
     fetchSystemResources,
     setPagination,
-  } = useSystemResources();
+  } = useContext(SystemResourcesContext)!;
   const [searchKey, setSearchKey] = useState('');
 
   useEffect(() => {
@@ -41,20 +41,20 @@ export default function SystemResourcesTable({
   }, [fetchSystemResources, pagination.page, pagination.pageSize, searchKey]);
 
   const handleChangePage = (_: unknown, newPage: number) => {
-    setPagination((prev) => ({ ...prev, page: newPage + 1 }));
+    setPagination((prev: any) => ({ ...prev, page: newPage + 1 }));
   };
 
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPagination({
-      ...pagination,
+    setPagination((prev: any) => ({
+      ...prev,
       page: 1,
       pageSize: parseInt(e.target.value, 10),
-    });
+    }));
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setPagination((prev) => ({ ...prev, page: 1 }));
+    setPagination((prev: any) => ({ ...prev, page: 1 }));
     fetchSystemResources(1, pagination.pageSize, searchKey);
   };
 
@@ -105,7 +105,7 @@ export default function SystemResourcesTable({
                 </TableCell>
               </TableRow>
             ) : resources.length > 0 ? (
-              resources.map((resource) => (
+              resources.map((resource: SystemResource) => (
                 <TableRow key={resource.id} hover>
                   <TableCell>{resource.id}</TableCell>
                   <TableCell>{resource.name}</TableCell>

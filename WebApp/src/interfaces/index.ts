@@ -11,6 +11,7 @@ export type { SystemLogFiltersPayload } from './systemLogsInterfaces/SystemLogFi
 export type { SystemLogsPagination } from './systemLogsInterfaces/SystemLogsPagination';
 export type { SystemResource } from './systemResourcesInterfaces/SystemResource';
 export type { SystemResourcesPagination } from './systemResourcesInterfaces/SystemResourcesPagination';
+export type { SystemResourcesContextProps } from './contextsInterfaces/SystemResourcesContextProps';
 export type { SystemStats } from './SystemStats';
 export type { ThemeContextProps } from './contextsInterfaces/ThemeContextProps';
 export type { UsersContextProps } from './contextsInterfaces/UsersContextProps';

@@ -12,7 +12,7 @@ import {
 } from '../pages';
 import { PermissionsMap } from '../permissions/PermissionsMap';
 import { CleanLayout, DefaultLayout } from '../layouts';
-import { UsersProvider } from '../contexts';
+import { SystemResourcesProvider, UsersProvider } from '../contexts';
 
 const publicRoutes = [
   { path: '/login', element: <Login /> },
@@ -35,7 +35,11 @@ const privateRoutes = [
   },
   {
     path: '/resources',
-    element: <Resources />,
+    element: (
+      <SystemResourcesProvider>
+        <Resources />
+      </SystemResourcesProvider>
+    ),
     requiredPermission: PermissionsMap.RESOURCES,
   },
   {
