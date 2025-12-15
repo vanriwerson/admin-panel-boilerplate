@@ -55,7 +55,7 @@ export default function LoginForm() {
         localStorage.removeItem('identifier');
       }
 
-      navigate('/profile');
+      navigate('/dashboard');
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {

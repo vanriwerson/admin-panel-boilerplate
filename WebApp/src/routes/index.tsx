@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import {
+  DashBoard,
   Login,
   NotFound,
   PasswordReset,
@@ -20,6 +21,10 @@ const publicRoutes = [
 ];
 
 const privateRoutes = [
+  {
+    path: '/dashboard',
+    element: <DashBoard />,
+  },
   {
     path: '/profile',
     element: (
@@ -44,7 +49,11 @@ const privateRoutes = [
   },
   {
     path: '/reports',
-    element: <Reports />,
+    element: (
+      <UsersProvider>
+        <Reports />
+      </UsersProvider>
+    ),
     requiredPermission: PermissionsMap.REPORTS,
   },
 ];

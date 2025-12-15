@@ -1,5 +1,6 @@
 import {
   faChartBar,
+  faChartLine,
   faCogs,
   faUserAlt,
   faUsers,
@@ -8,6 +9,11 @@ import type { MenuItem } from '../interfaces';
 import { PermissionsMap } from '../permissions/PermissionsMap';
 
 export const menuItems: MenuItem[] = [
+  {
+    label: 'Dashboard',
+    icon: faChartLine,
+    route: '/dashboard',
+  },
   {
     label: 'Perfil',
     icon: faUserAlt,

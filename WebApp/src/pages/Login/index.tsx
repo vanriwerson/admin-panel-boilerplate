@@ -20,7 +20,7 @@ export default function Login() {
       if (urlToken) {
         try {
           await handleExternalLogin({ externalToken: urlToken });
-          navigate('/profile', { replace: true });
+          navigate('/dashboard', { replace: true });
           return;
         } catch (error) {
           console.error('Erro no login externo:', error);
@@ -28,7 +28,7 @@ export default function Login() {
       }
 
       if (token) {
-        navigate('/profile', { replace: true });
+        navigate('/dashboard', { replace: true });
         return;
       }
 

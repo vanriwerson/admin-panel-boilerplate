@@ -1,3 +1,4 @@
+export { buildStatsCards } from './buildStatsCards';
 export { cleanStates } from './cleanStates';
 export { getErrorMessage } from './apiErrorHandler';
 export { mapSystemResourcesToFormValue } from './mapSystemResourcesToFormValue';
