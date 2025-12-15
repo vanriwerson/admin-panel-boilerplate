@@ -27,9 +27,11 @@ const privateRoutes = [
   {
     path: '/users',
     element: (
-      <UsersProvider>
-        <Users />
-      </UsersProvider>
+      <SystemResourcesProvider>
+        <UsersProvider>
+          <Users />
+        </UsersProvider>
+      </SystemResourcesProvider>
     ),
     requiredPermission: PermissionsMap.USERS,
   },
