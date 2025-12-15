@@ -5,24 +5,30 @@ import {
   UserEditionModal,
   UserForm,
   UsersTable,
+  ConfirmDialog,
 } from '../../components';
 import type { UserFormValues, UserRead } from '../../interfaces';
-import { useUsers } from '../../hooks';
+import { useUsers, useNotification } from '../../hooks';
 import { PermissionsMap } from '../../permissions';
 
 export default function Users() {
   const { fetchUsers, addUser, editUser, removeUser } = useUsers();
+  const { showNotification } = useNotification();
   const [editingUser, setEditingUser] = useState<UserRead | null>(null);
   const [open, setOpen] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    id: 0,
+  });
 
   async function handleCreate(user: UserFormValues) {
     try {
       await addUser(user);
-      alert('✅ Usuário cadastrado com sucesso!');
+      showNotification('Usuário cadastrado com sucesso!', 'success');
       await fetchUsers();
     } catch (err) {
       console.error(err);
-      alert('❌ Erro ao cadastrar usuário');
+      showNotification('Erro ao cadastrar usuário', 'error');
     }
   }
 
@@ -30,29 +36,34 @@ export default function Users() {
     if (!editingUser) return;
     try {
       await editUser({ ...editingUser, ...user });
-      alert('✅ Usuário atualizado com sucesso!');
+      showNotification('Usuário atualizado com sucesso!', 'success');
       setOpen(false);
       await fetchUsers();
     } catch (err) {
       console.error(err);
-      alert('❌ Erro ao atualizar usuário');
+      showNotification('Erro ao atualizar usuário', 'error');
     }
   }
 
   async function handleDelete(id: number) {
-    const confirmDelete = confirm(
-      `Tem certeza que deseja excluir o usuário selecionado?`
-    );
-    if (!confirmDelete) return;
+    setConfirmDialog({ open: true, id });
+  }
 
+  async function confirmDelete() {
     try {
-      await removeUser(id);
-      alert('🗑️ Usuário excluído com sucesso!');
+      await removeUser(confirmDialog.id);
+      showNotification('Usuário excluído com sucesso!', 'success');
       await fetchUsers();
     } catch (err) {
       console.error(err);
-      alert('❌ Erro ao excluir usuário');
+      showNotification('Erro ao excluir usuário', 'error');
+    } finally {
+      setConfirmDialog({ open: false, id: 0 });
     }
+  }
+
+  function cancelDelete() {
+    setConfirmDialog({ open: false, id: 0 });
   }
 
   function handleOpenEditionModal(user: UserRead) {
@@ -85,6 +96,14 @@ export default function Users() {
         user={editingUser}
         onClose={() => setOpen(false)}
         onSubmit={handleUpdate}
+      />
+
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
       />
     </Container>
   );
