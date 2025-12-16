@@ -74,7 +74,7 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
                     onClick={() => onNavigate(item.route)}
                     sx={{
                       backgroundColor: isActive
-                        ? (theme) => `${theme.palette.secondary.main}`
+                        ? (theme) => `${theme.palette.primary.main}`
                         : 'transparent',
                     }}
                   >

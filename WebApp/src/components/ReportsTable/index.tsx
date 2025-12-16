@@ -95,7 +95,7 @@ export default function ReportsTable({ filters }: ReportsTableProps) {
                   <TableCell align="right">
                     {log.usedPayload && (
                       <IconButton
-                        color="primary"
+                        color="secondary"
                         onClick={() => handleViewDetails(log)}
                         title="Ver detalhes do log"
                       >

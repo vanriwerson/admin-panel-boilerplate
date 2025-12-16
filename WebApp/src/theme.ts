@@ -11,37 +11,33 @@ export const defineTheme = (mode: 'light' | 'dark') =>
               main: '#198a0fff',
               light: '#4caf50',
               dark: '#0d6526',
-              contrastText: '#ffffff',
+              contrastText: '#000',
             },
             secondary: {
               main: '#8340ffff',
               light: '#af71ffff',
               dark: '#7700ffff',
-              contrastText: '#000000',
+              contrastText: '#000',
             },
             success: {
               main: '#4caf50', // Verde sucesso
               light: '#81c784',
               dark: '#388e3c',
-              contrastText: '#ffffff',
             },
             error: {
               main: '#f44336', // Vermelho erro
               light: '#e57373',
               dark: '#d32f2f',
-              contrastText: '#ffffff',
             },
             warning: {
               main: '#ff9800', // Laranja aviso
               light: '#ffb74d',
               dark: '#f57c00',
-              contrastText: '#000000',
             },
             info: {
               main: '#2196f3', // Azul informação
               light: '#64b5f6',
               dark: '#1976d2',
-              contrastText: '#ffffff',
             },
             background: { default: '#f5f5f5', paper: '#fff' },
             text: { primary: '#000', secondary: '#333' },
@@ -49,40 +45,36 @@ export const defineTheme = (mode: 'light' | 'dark') =>
         : {
             // 🌙 Cores do modo escuro
             primary: {
-              main: '#b6f990ff', // Verde claro principal
-              light: '#d4f7b3', // Verde mais claro
-              dark: '#7cb342', // Verde mais escuro
-              contrastText: '#000000',
+              main: '#198a0fff',
+              light: '#4caf50',
+              dark: '#0d6526',
+              contrastText: '#fff',
             },
             secondary: {
               main: '#6f00ffff',
               light: '#9a4dffff',
               dark: '#6b00e6ff',
-              contrastText: '#000000',
+              contrastText: '#fff',
             },
             success: {
               main: '#66bb6a', // Verde sucesso escuro
               light: '#98ee99',
               dark: '#43a047',
-              contrastText: '#000000',
             },
             error: {
               main: '#f44336', // Vermelho erro (igual ao claro)
               light: '#e57373',
               dark: '#d32f2f',
-              contrastText: '#ffffff',
             },
             warning: {
               main: '#ffa726', // Laranja aviso escuro
               light: '#ffb74d',
               dark: '#f57c00',
-              contrastText: '#000000',
             },
             info: {
               main: '#42a5f5', // Azul informação escuro
               light: '#80d6ff',
               dark: '#1976d2',
-              contrastText: '#000000',
             },
             background: { default: '#121212', paper: '#1e1e1e' },
             text: { primary: '#fff', secondary: '#ccc' },

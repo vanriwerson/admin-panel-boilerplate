@@ -16,13 +16,7 @@ export default function PageTitle({ icon, title }: PageTitleProps) {
         mb: 2,
       }}
     >
-      <Typography
-        variant="h4"
-        gutterBottom
-        display="flex"
-        alignItems="center"
-        gap={2}
-      >
+      <Typography variant="h3" display="flex" alignItems="center" gap={2}>
         {icon && <FontAwesomeIcon icon={pageTitleIcons[icon]} size="sm" />}
         {title}
       </Typography>
