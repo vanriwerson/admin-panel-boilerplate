@@ -4,15 +4,16 @@ import {
   PageTitle,
   StatsCard,
 } from '../../components';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import type { SystemStats } from '../../interfaces';
 import { getSystemStats } from '../../services';
 import { buildStatsCards } from '../../helpers';
-import { ThemeContext } from '../../contexts';
+import { useNotification, useThemeMode } from '../../hooks';
 
 export default function DashBoard() {
   const [systemStats, setSystemStats] = useState<SystemStats | null>(null);
-  const { mode } = useContext(ThemeContext)!;
+  const { showNotification } = useNotification();
+  const { mode } = useThemeMode();
 
   useEffect(() => {
     async function fetchStats() {
@@ -21,12 +22,12 @@ export default function DashBoard() {
         setSystemStats(stats);
       } catch (err) {
         console.error(err);
-        alert('❌ Erro ao carregar estatísticas do sistema');
+        showNotification('Erro ao carregar estatísticas do sistema', 'error');
       }
     }
 
     fetchStats();
-  }, []);
+  }, [showNotification]);
 
   const getBg = (originalBg: string) => {
     if (mode === 'dark') {
