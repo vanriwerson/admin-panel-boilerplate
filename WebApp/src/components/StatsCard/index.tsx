@@ -23,6 +23,7 @@ export default function StatsCard({
         justifyContent: 'flex-start',
         p: 2,
         maxWidth: '30%',
+        minWidth: '240px',
         width: '100%',
       }}
     >
