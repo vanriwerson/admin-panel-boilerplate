@@ -74,9 +74,8 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
                     onClick={() => onNavigate(item.route)}
                     sx={{
                       backgroundColor: isActive
-                        ? 'rgba(25, 210, 50, 0.6)'
+                        ? (theme) => `${theme.palette.secondary.main}`
                         : 'transparent',
-                      '&:hover': { backgroundColor: 'rgba(25, 210, 50, 0.6)' },
                     }}
                   >
                     <ListItemIcon>
