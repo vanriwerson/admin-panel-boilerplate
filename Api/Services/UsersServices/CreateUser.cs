@@ -75,7 +75,19 @@ namespace Api.Services.UsersServices
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                await _createSystemLog.ExecuteAsync(LogActionDescribe.Create("User", user.Id));
+                // Serializar o payload para o log (sem senha por segurança)
+                var logData = new
+                {
+                    dto.Username,
+                    dto.Email,
+                    dto.FullName,
+                    dto.Permissions
+                };
+                var payloadData = System.Text.Json.JsonSerializer.Serialize(logData, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                });
+                await _createSystemLog.ExecuteAsync(LogActionDescribe.Create("User", user.Id), data: payloadData);
 
                 var createdUser = await _userRepo.Query()
                     .Include(u => u.AccessPermissions)

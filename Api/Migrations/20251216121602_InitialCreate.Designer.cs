@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20251016185058_InitialCreate")]
+    [Migration("20251216121602_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -76,6 +76,10 @@ namespace Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("UsedPayload")
+                        .HasColumnType("text")
+                        .HasColumnName("used_payload");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")

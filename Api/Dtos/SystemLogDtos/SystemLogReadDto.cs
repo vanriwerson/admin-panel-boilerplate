@@ -10,6 +10,8 @@ namespace Api.Dtos
 
     public string Action { get; set; } = string.Empty;
 
+    public string? UsedPayload { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public UserLogReadDto? User { get; set; }

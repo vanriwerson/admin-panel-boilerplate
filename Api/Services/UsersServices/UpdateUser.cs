@@ -51,6 +51,20 @@ namespace Api.Services.UsersServices
                 if (user == null)
                     return null;
 
+                // Capturar o estado anterior para o log
+                var prevState = new
+                {
+                    user.Id,
+                    user.Username,
+                    user.Email,
+                    user.FullName,
+                    Permissions = user.AccessPermissions.Select(ap => ap.SystemResourceId).ToList()
+                };
+                var prevStateJson = System.Text.Json.JsonSerializer.Serialize(prevState, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                });
+
                 if (!string.IsNullOrWhiteSpace(dto.Email) || !string.IsNullOrWhiteSpace(dto.Username))
                 {
                     bool isDuplicate = await _userRepo.Query()
@@ -96,7 +110,7 @@ namespace Api.Services.UsersServices
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                await _createSystemLog.ExecuteAsync(LogActionDescribe.Update("User", user.Id));
+                await _createSystemLog.ExecuteAsync(LogActionDescribe.Update("User", user.Id), data: prevStateJson);
 
                 var updatedUser = await _userRepo.Query()
                     .Include(u => u.AccessPermissions)

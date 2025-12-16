@@ -18,6 +18,9 @@ namespace Api.Models
     [MaxLength(255)]
     public required string Action { get; set; }
 
+    [Column("used_payload")]
+    public string? UsedPayload { get; set; }
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

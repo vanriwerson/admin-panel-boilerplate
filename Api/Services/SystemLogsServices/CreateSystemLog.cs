@@ -15,7 +15,7 @@ namespace Api.Services
       _currentAuthUser = currentAuthUser;
     }
 
-    public async Task ExecuteAsync(string action, int? userId = null)
+    public async Task ExecuteAsync(string action, int? userId = null, string? data = null)
     {
       var logUserId = userId ?? _currentAuthUser.GetId();
 
@@ -23,12 +23,13 @@ namespace Api.Services
       {
         UserId = logUserId,
         Action = action,
+        UsedPayload = data,
         CreatedAt = DateTime.UtcNow
       };
 
       await _repository.CreateAsync(log);
 
-      Console.WriteLine($"[AUDIT LOG] {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} | user_id: {logUserId} | action: {action}");
+      Console.WriteLine($"[AUDIT LOG] {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} | user_id: {logUserId} | action: {action} | data: {(data != null ? "present" : "null")}");
     }
   }
 }

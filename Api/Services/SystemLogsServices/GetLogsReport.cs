@@ -74,6 +74,7 @@ namespace Api.Services
         Id = sl.Id,
         UserId = sl.UserId,
         Action = sl.Action,
+        UsedPayload = sl.UsedPayload,
         CreatedAt = sl.CreatedAt,
         User = sl.User != null
               ? new UserLogReadDto

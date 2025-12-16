@@ -74,6 +74,10 @@ namespace Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("UsedPayload")
+                        .HasColumnType("text")
+                        .HasColumnName("used_payload");
+
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
                         .HasColumnName("user_id");

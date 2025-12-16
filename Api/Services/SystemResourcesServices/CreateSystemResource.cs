@@ -36,8 +36,13 @@ namespace Api.Services.SystemResourcesServices
 
       var created = await _repo.CreateAsync(entity);
 
+      var payloadData = System.Text.Json.JsonSerializer.Serialize(dto, new System.Text.Json.JsonSerializerOptions
+      {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+      });
       await _createSystemLog.ExecuteAsync(
-          action: LogActionDescribe.Create("SystemResource", entity.Id)
+          action: LogActionDescribe.Create("SystemResource", entity.Id),
+          data: payloadData
       );
 
       return new SystemResourceReadDto
