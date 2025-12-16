@@ -120,12 +120,14 @@ export default function SystemResourcesTable({
                     <IconButton
                       color="primary"
                       onClick={() => onEdit(resource)}
+                      title="Editar recurso"
                     >
                       <Edit />
                     </IconButton>
                     <IconButton
                       color="error"
                       onClick={() => onDelete?.(resource.id!)}
+                      title="Excluir recurso"
                     >
                       <Delete />
                     </IconButton>

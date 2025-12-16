@@ -109,12 +109,17 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
                     {new Date(user.updatedAt).toLocaleString()}
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton color="primary" onClick={() => onEdit(user)}>
+                    <IconButton
+                      color="primary"
+                      onClick={() => onEdit(user)}
+                      title="Editar usuário"
+                    >
                       <Edit />
                     </IconButton>
                     <IconButton
                       color="error"
                       onClick={() => onDelete?.(user.id)}
+                      title="Excluir usuário"
                     >
                       <Delete />
                     </IconButton>
