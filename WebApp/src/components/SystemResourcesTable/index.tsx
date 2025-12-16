@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import {
 import { Edit, Delete, Search } from '@mui/icons-material';
 
 import type { SystemResource } from '../../interfaces';
-import SystemResourcesContext from '../../contexts/SystemResourcesContext';
+import { useSystemResources } from '../../hooks';
 
 interface SystemResourcesTableProps {
   onEdit: (resource: SystemResource) => void;
@@ -33,7 +33,7 @@ export default function SystemResourcesTable({
     loading,
     fetchSystemResources,
     setPagination,
-  } = useContext(SystemResourcesContext)!;
+  } = useSystemResources();
   const [searchKey, setSearchKey] = useState('');
 
   useEffect(() => {
@@ -41,11 +41,14 @@ export default function SystemResourcesTable({
   }, [fetchSystemResources, pagination.page, pagination.pageSize, searchKey]);
 
   const handleChangePage = (_: unknown, newPage: number) => {
-    setPagination((prev: any) => ({ ...prev, page: newPage + 1 }));
+    setPagination((prev) => ({
+      ...prev,
+      page: newPage + 1,
+    }));
   };
 
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPagination((prev: any) => ({
+    setPagination((prev) => ({
       ...prev,
       page: 1,
       pageSize: parseInt(e.target.value, 10),
@@ -54,7 +57,10 @@ export default function SystemResourcesTable({
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setPagination((prev: any) => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({
+      ...prev,
+      page: 1,
+    }));
     fetchSystemResources(1, pagination.pageSize, searchKey);
   };
 
