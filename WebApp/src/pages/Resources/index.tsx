@@ -10,6 +10,7 @@ import {
   PageTitle,
 } from '../../components';
 import { PermissionsMap } from '../../permissions';
+import { getErrorMessage } from '../../helpers';
 
 export default function Resources() {
   const {
@@ -37,7 +38,7 @@ export default function Resources() {
       fetchSystemResources(pagination.page, pagination.pageSize); // atualiza tabela
     } catch (err) {
       console.error(err);
-      showNotification('Erro ao criar recurso', 'error');
+      showNotification(getErrorMessage(err), 'error');
     }
   }
 
@@ -46,11 +47,12 @@ export default function Resources() {
     try {
       await editSystemResource({ ...editingResource, ...resource });
       showNotification('Recurso atualizado com sucesso!', 'success');
-      setOpen(false);
       fetchSystemResources(pagination.page, pagination.pageSize);
     } catch (err) {
       console.error(err);
-      showNotification('Erro ao atualizar recurso', 'error');
+      showNotification(getErrorMessage(err), 'error');
+    } finally {
+      setOpen(false);
     }
   }
 
@@ -65,7 +67,7 @@ export default function Resources() {
       fetchSystemResources(pagination.page, pagination.pageSize);
     } catch (err) {
       console.error(err);
-      showNotification('Erro ao excluir recurso', 'error');
+      showNotification(getErrorMessage(err), 'error');
     } finally {
       setConfirmDialog({ open: false, id: 0 });
     }

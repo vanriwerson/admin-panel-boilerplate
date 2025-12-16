@@ -10,6 +10,7 @@ import {
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { useUsers, useNotification } from '../../hooks';
 import { PermissionsMap } from '../../permissions';
+import { getErrorMessage } from '../../helpers';
 
 export default function Users() {
   const { fetchUsers, addUser, editUser, removeUser } = useUsers();
@@ -27,8 +28,7 @@ export default function Users() {
       showNotification('Usuário cadastrado com sucesso!', 'success');
       await fetchUsers();
     } catch (err) {
-      console.error(err);
-      showNotification('Erro ao cadastrar usuário', 'error');
+      showNotification(getErrorMessage(err), 'error');
     }
   }
 
@@ -37,11 +37,11 @@ export default function Users() {
     try {
       await editUser({ ...editingUser, ...user });
       showNotification('Usuário atualizado com sucesso!', 'success');
-      setOpen(false);
       await fetchUsers();
     } catch (err) {
-      console.error(err);
-      showNotification('Erro ao atualizar usuário', 'error');
+      showNotification(getErrorMessage(err), 'error');
+    } finally {
+      setOpen(false);
     }
   }
 
@@ -55,8 +55,7 @@ export default function Users() {
       showNotification('Usuário excluído com sucesso!', 'success');
       await fetchUsers();
     } catch (err) {
-      console.error(err);
-      showNotification('Erro ao excluir usuário', 'error');
+      showNotification(getErrorMessage(err), 'error');
     } finally {
       setConfirmDialog({ open: false, id: 0 });
     }
