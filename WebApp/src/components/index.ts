@@ -2,6 +2,7 @@ export { default as ActionsSelect } from './ActionsSelect';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as DashboardDevelopmentTips } from './DashboardDevelopmentTips';
 export { default as LoginForm } from './LoginForm';
+export { default as LogDetailsModal } from './LogDetailsModal';
 export { default as PageTitle } from './PageTitle';
 export { default as PasswordResetRequestModal } from './PasswordResetRequestModal';
 export { default as ReportsTable } from './ReportsTable';
