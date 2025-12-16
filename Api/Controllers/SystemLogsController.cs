@@ -24,17 +24,11 @@ namespace Api.Controllers
     public async Task<IActionResult> GetLogs(
         [FromQuery] int? userId = null,
         [FromQuery] string? action = null,
-        [FromQuery] DateTime? startDate = null,
-        [FromQuery] DateTime? endDate = null,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-      if (startDate.HasValue)
-        startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
-
-      if (endDate.HasValue)
-        endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
-
       var logs = await _getLogsReport.ExecuteAsync(userId, action, startDate, endDate, page, pageSize);
 
       return Ok(logs);

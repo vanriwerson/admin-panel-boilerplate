@@ -3,17 +3,12 @@ import { Autocomplete, CircularProgress, TextField, Box } from '@mui/material';
 import { useUsers } from '../../hooks';
 import type { UserOption } from '../../interfaces';
 
-interface Props {
-  value: number[];
-  onChange: (value: number[]) => void;
-  readOnly?: boolean;
+interface UsersSelectProps {
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
 }
 
-export default function UsersSelect({
-  value,
-  onChange,
-  readOnly = false,
-}: Props) {
+export default function UsersSelect({ value, onChange }: UsersSelectProps) {
   const { fetchUsersForSelect, loading } = useUsers();
   const [options, setOptions] = useState<UserOption[]>([]);
 
@@ -26,7 +21,7 @@ export default function UsersSelect({
   }, [fetchUsersForSelect]);
 
   const selectedUser = useMemo(
-    () => options.find((u) => u.id === value[0]),
+    () => options.find((u) => u.id === value),
     [options, value]
   );
 
@@ -38,24 +33,13 @@ export default function UsersSelect({
     );
   }
 
-  if (readOnly) {
-    return (
-      <TextField
-        label="Usuário"
-        value={selectedUser?.fullName || 'Nenhum usuário selecionado'}
-        slotProps={{ inputLabel: { shrink: true } }}
-        fullWidth
-      />
-    );
-  }
-
   return (
     <Autocomplete
       options={options}
       value={selectedUser || null}
       getOptionLabel={(option) => option.fullName}
       isOptionEqualToValue={(opt, val) => opt.id === val.id}
-      onChange={(_, newValue) => onChange(newValue ? [newValue.id!] : [])}
+      onChange={(_, newValue) => onChange(newValue ? newValue.id! : undefined)}
       renderInput={(params) => (
         <TextField
           {...params}

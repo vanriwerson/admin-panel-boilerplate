@@ -10,36 +10,58 @@ import {
   UsersSelect,
 } from '../../components';
 import { ptBR } from 'date-fns/locale';
+import { cleanStates } from '../../helpers';
 import { PermissionsMap } from '../../permissions';
 
 export default function Reports() {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
-  const [selectedAction, setSelectedAction] = useState<string>('');
+  const [filters, setFilters] = useState(cleanStates.logsReportFilters);
   const [error, setError] = useState<string>('');
 
   const today = new Date();
 
   const handleResetFilters = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setSelectedUserIds([]);
-    setSelectedAction('');
+    setFilters(cleanStates.logsReportFilters);
     setError('');
   };
 
   const handleDateChange = (type: 'start' | 'end', value: Date | null) => {
-    const newStart = type === 'start' ? value : startDate;
-    const newEnd = type === 'end' ? value : endDate;
-    setStartDate(newStart);
-    setEndDate(newEnd);
+    if (value) {
+      const utcDate = new Date(
+        Date.UTC(value.getFullYear(), value.getMonth(), value.getDate())
+      );
+      const dateString = utcDate.toISOString().split('T')[0];
+      setFilters((prev) => ({
+        ...prev,
+        [type === 'start' ? 'startDate' : 'endDate']: dateString,
+      }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        [type === 'start' ? 'startDate' : 'endDate']: undefined,
+      }));
+    }
   };
 
-  const startDateString = startDate
-    ? startDate.toISOString().split('T')[0]
-    : '';
-  const endDateString = endDate ? endDate.toISOString().split('T')[0] : '';
+  const handleUserChange = (userId: number | undefined) => {
+    setFilters((prev) => ({
+      ...prev,
+      userId,
+    }));
+  };
+
+  const handleActionChange = (action: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      action,
+    }));
+  };
+
+  const startDate = filters.startDate
+    ? new Date(filters.startDate + 'T00:00:00')
+    : null;
+  const endDate = filters.endDate
+    ? new Date(filters.endDate + 'T00:00:00')
+    : null;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
@@ -87,16 +109,13 @@ export default function Reports() {
             </Box>
 
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 65%' } }}>
-              <UsersSelect
-                value={selectedUserIds}
-                onChange={(val: number[]) => setSelectedUserIds([val[0]])}
-              />
+              <UsersSelect value={filters.userId} onChange={handleUserChange} />
             </Box>
 
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 30%' } }}>
               <ActionsSelect
-                value={selectedAction}
-                onChange={(val) => setSelectedAction(val)}
+                value={filters.action}
+                onChange={handleActionChange}
               />
             </Box>
 
@@ -114,14 +133,7 @@ export default function Reports() {
           </Box>
         </Paper>
 
-        <ReportsTable
-          filters={{
-            startDate: startDateString || undefined,
-            endDate: endDateString || undefined,
-            userId: selectedUserIds[0] || undefined,
-            action: selectedAction || undefined,
-          }}
-        />
+        <ReportsTable filters={filters} />
       </Box>
     </LocalizationProvider>
   );

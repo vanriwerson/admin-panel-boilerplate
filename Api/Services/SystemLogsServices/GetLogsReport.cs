@@ -22,12 +22,33 @@ namespace Api.Services
     public async Task<PaginatedResult<SystemLogReadDto>> ExecuteAsync(
         int? userId = null,
         string? action = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
+        string? startDate = null,
+        string? endDate = null,
         int page = 1,
         int pageSize = 10)
     {
-      ValidateDateRange.EnsureValidPeriod(startDate, endDate);
+      DateTime? startDateTime = null;
+      DateTime? endDateTime = null;
+
+      if (!string.IsNullOrEmpty(startDate))
+      {
+        if (DateTime.TryParse(startDate, out var parsedStart))
+        {
+          // Criar DateTime para o início do dia em UTC
+          startDateTime = DateTime.SpecifyKind(parsedStart.Date, DateTimeKind.Utc);
+        }
+      }
+
+      if (!string.IsNullOrEmpty(endDate))
+      {
+        if (DateTime.TryParse(endDate, out var parsedEnd))
+        {
+          // Criar DateTime para o final do dia em UTC (início do próximo dia)
+          endDateTime = DateTime.SpecifyKind(parsedEnd.Date.AddDays(1), DateTimeKind.Utc);
+        }
+      }
+
+      ValidateDateRange.EnsureValidPeriod(startDateTime, endDateTime);
 
       var query = _logRepo.Query()
           .Include(sl => sl.User)
@@ -40,14 +61,11 @@ namespace Api.Services
         query = query.Where(sl =>
           EF.Functions.Like(sl.Action.ToLower(), $"%{action.ToLower()}%"));
 
-      if (startDate.HasValue)
-        query = query.Where(sl => sl.CreatedAt >= startDate.Value);
+      if (startDateTime.HasValue)
+        query = query.Where(sl => sl.CreatedAt >= startDateTime.Value);
 
-      if (endDate.HasValue)
-      {
-        var endOfDay = endDate.Value.Date.AddDays(1);
-        query = query.Where(sl => sl.CreatedAt < endOfDay);
-      }
+      if (endDateTime.HasValue)
+        query = query.Where(sl => sl.CreatedAt < endDateTime.Value);
 
       query = query.OrderByDescending(sl => sl.CreatedAt);
 
