@@ -24,8 +24,8 @@ namespace Api.Services.SystemStatsServices
 
     public async Task<GeneralSystemStatsDto> ExecuteAsync()
     {
-      var usersCount = await _userRepo.Query().CountAsync();
-      var systemResourcesCount = await _systemResourceRepo.Query().CountAsync();
+      var usersCount = await _userRepo.Query().Where(u => u.Active).CountAsync();
+      var systemResourcesCount = await _systemResourceRepo.Query().Where(r => r.Active).CountAsync();
 
       var currentMonth = DateTime.UtcNow.Month;
       var currentYear = DateTime.UtcNow.Year;
