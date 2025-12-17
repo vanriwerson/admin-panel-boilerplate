@@ -14,6 +14,9 @@ namespace Api.Helpers
         public static string Login(string username)
             => $"user {username} fez login no sistema";
 
+        public static string ExternalLogin(string username)
+            => $"user {username} fez login por redirecionamento no sistema";
+
         public static string NewPasswordRequest(string username)
             => $"user {username} solicitou reset de senha";
 
