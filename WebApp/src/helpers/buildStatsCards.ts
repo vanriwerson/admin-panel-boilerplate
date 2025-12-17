@@ -21,7 +21,7 @@ export function buildStatsCards(systemStats: SystemStats) {
       content: `${systemResourcesCount} Recursos de Sistema`,
     },
     {
-      bg: '#734b6d, #42275a',
+      bg: '#fdc426ff, #e67e22',
       icon: menuItems[3].icon,
       content: `${monthlyReportsCount} Ações auditadas em ${monthlyReportsCountReference}`,
     },

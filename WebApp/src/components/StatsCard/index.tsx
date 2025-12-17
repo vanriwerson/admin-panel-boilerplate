@@ -19,6 +19,7 @@ export default function StatsCard({
       sx={{
         alignItems: 'center',
         background: `linear-gradient(135deg, ${background})`,
+        color: 'white',
         display: 'flex',
         justifyContent: 'flex-start',
         p: 2,
