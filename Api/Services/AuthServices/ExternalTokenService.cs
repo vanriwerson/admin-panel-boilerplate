@@ -30,7 +30,7 @@ namespace Api.Services.AuthServices
             }
             catch
             {
-                return null; // token externo inválido
+                return null;
             }
 
             var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -55,7 +55,7 @@ namespace Api.Services.AuthServices
 
             await _createSystemLog.ExecuteAsync(
                 userId: user.Id,
-                action: LogActionDescribe.Login(user.Username)
+                action: LogActionDescribe.ExternalLogin(user.Username)
             );
 
             var allowedResources = (user.AccessPermissions ?? new List<AccessPermission>())

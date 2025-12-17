@@ -28,8 +28,6 @@ namespace Api.Services
       };
 
       await _repository.CreateAsync(log);
-
-      Console.WriteLine($"[AUDIT LOG] {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} | user_id: {logUserId} | action: {action} | data: {(data != null ? "present" : "null")}");
     }
   }
 }
