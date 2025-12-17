@@ -23,3 +23,8 @@ export async function listSystemResourcesForSelect() {
   const { data } = await api.get<SystemResource[]>('/resources/options');
   return data;
 }
+
+export async function listSystemResourceById(id: number) {
+  const { data } = await api.get<SystemResource>(`/resources/${id}`);
+  return data;
+}
