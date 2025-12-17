@@ -49,6 +49,10 @@ export default function UserForm({ onSubmit, user }: Props) {
       return;
     }
     setError('');
+
+    if (user && (!form.password || form.password.trim() === '')) {
+      delete form.password;
+    }
     onSubmit(form);
     setForm(cleanStates.userForm);
   }
@@ -101,7 +105,7 @@ export default function UserForm({ onSubmit, user }: Props) {
           type="password"
           value={form.password}
           onChange={handleChange}
-          required
+          required={!user}
           sx={{ flexGrow: 1 }}
         />
       )}
