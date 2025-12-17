@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Paper, Link, CircularProgress } from '@mui/material';
 import { LoginForm, PasswordResetRequestModal } from '../../components';
-import { useAuth } from '../../hooks';
+import { useAuth, useNotification } from '../../hooks';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '../../helpers';
 
 export default function Login() {
+  const { showNotification } = useNotification();
   const [openResetModal, setOpenResetModal] = useState(false);
   const [isCheckingToken, setIsCheckingToken] = useState(true);
+  const [isExternalLoginInProgress, setIsExternalLoginInProgress] =
+    useState(false);
+
+  const externalLoginExecutedRef = useRef(false);
 
   const { token, handleExternalLogin } = useAuth();
   const location = useLocation();
@@ -16,38 +22,45 @@ export default function Login() {
     const searchParams = new URLSearchParams(location.search);
     const urlToken = searchParams.get('token');
 
-    async function tryExternalLogin() {
-      if (urlToken) {
-        try {
+    async function processAuthentication() {
+      try {
+        if (urlToken && !externalLoginExecutedRef.current) {
+          externalLoginExecutedRef.current = true;
+          setIsExternalLoginInProgress(true);
+
           await handleExternalLogin({ externalToken: urlToken });
+
           navigate('/dashboard', { replace: true });
           return;
-        } catch (error) {
-          console.error('Erro no login externo:', error);
         }
-      }
 
-      if (token) {
-        navigate('/dashboard', { replace: true });
-        return;
+        if (token) {
+          navigate('/dashboard', { replace: true });
+          return;
+        }
+      } catch (error) {
+        showNotification(getErrorMessage(error), 'error');
+      } finally {
+        setIsCheckingToken(false);
       }
-
-      setIsCheckingToken(false);
     }
 
-    void tryExternalLogin();
-  }, [location.search, token, handleExternalLogin, navigate]);
+    void processAuthentication();
+  }, [location.search, handleExternalLogin, navigate, token, showNotification]);
 
-  if (isCheckingToken) {
+  if (isExternalLoginInProgress || isCheckingToken) {
     return (
       <Box
         sx={{
           height: '100vh',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          gap: 2,
         }}
       >
+        <Typography variant="h4">Redirecionando...</Typography>
         <CircularProgress />
       </Box>
     );

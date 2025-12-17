@@ -1,4 +1,10 @@
-import { createContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import type {
   AuthContextProps,
   AuthUser,
@@ -23,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
-  const handleAuthData = (data: LoginResponse) => {
+  const handleAuthData = useCallback((data: LoginResponse) => {
     const userData: AuthUser = {
       id: data.id,
       username: data.username,
@@ -34,27 +40,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(data.token);
     localStorage.setItem('token', data.token);
     localStorage.setItem('authUser', JSON.stringify(userData));
-  };
+  }, []);
 
-  async function handleLogin(payload: LoginPayload) {
-    const data = await login(payload);
-    handleAuthData(data);
-  }
+  const handleLogin = useCallback(
+    async (payload: LoginPayload) => {
+      const data = await login(payload);
+      handleAuthData(data);
+    },
+    [handleAuthData]
+  );
 
-  async function handleExternalLogin(payload: ExternalLoginPayload) {
-    const data = await externalLogin(payload);
-    handleAuthData(data);
-  }
+  const handleExternalLogin = useCallback(
+    async (payload: ExternalLoginPayload) => {
+      const data = await externalLogin(payload);
+      handleAuthData(data);
+    },
+    [handleAuthData]
+  );
 
-  async function handlePasswordResetRequest(email: string): Promise<string> {
-    return await requestPasswordReset(email);
-  }
+  const handlePasswordResetRequest = useCallback(
+    async (email: string): Promise<string> => {
+      return await requestPasswordReset(email);
+    },
+    []
+  );
 
-  async function handlePasswordReset(
-    payload: PasswordResetPayload
-  ): Promise<string> {
-    return await resetPassword(payload);
-  }
+  const handlePasswordReset = useCallback(
+    async (payload: PasswordResetPayload): Promise<string> => {
+      return await resetPassword(payload);
+    },
+    []
+  );
 
   function handleLogout() {
     localStorage.removeItem('token');
