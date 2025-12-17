@@ -10,6 +10,7 @@ export { getLogReports } from './systemLogsServices';
 export { createSystemResource } from './systemResourcesServices/createSystemResource';
 export {
   listSystemResources,
+  listSystemResourceById,
   listSystemResourcesForSelect,
 } from './systemResourcesServices/listSystemResources';
 export { updateSystemResource } from './systemResourcesServices/updateSystemResource';
