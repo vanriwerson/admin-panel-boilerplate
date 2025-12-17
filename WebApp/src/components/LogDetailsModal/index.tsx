@@ -3,8 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose, faEye } from '@fortawesome/free-solid-svg-icons';
 import type { SystemLog } from '../../interfaces';
 import { useEffect, useState } from 'react';
-import { listUserById, listSystemResourceById } from '../../services';
-import { detectEntityType, getErrorMessage } from '../../helpers';
+import { detectAndFetchEntity, getErrorMessage } from '../../helpers';
 import { useNotification } from '../../hooks';
 
 interface Props {
@@ -35,27 +34,9 @@ export default function LogDetailsModal({ open, log, onClose }: Props) {
     const run = async () => {
       try {
         const payload = JSON.parse(log.usedPayload || '');
-        const entityId = payload.id;
 
-        const entityType = detectEntityType(payload);
-
-        if (!entityType || !entityId) {
-          setEntity(null);
-          return;
-        }
-
-        switch (entityType) {
-          case 'user': {
-            const user = await listUserById(entityId);
-            setEntity(user);
-            break;
-          }
-          case 'systemResource': {
-            const resource = await listSystemResourceById(entityId);
-            setEntity(resource);
-            break;
-          }
-        }
+        const payloadEntity = await detectAndFetchEntity(payload);
+        setEntity(payloadEntity);
       } catch (err) {
         showNotification(getErrorMessage(err), 'warning');
         setEntity(null);
@@ -76,7 +57,7 @@ export default function LogDetailsModal({ open, log, onClose }: Props) {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: { xs: '90%', sm: 600, md: 840 },
-          maxHeight: '80vh',
+          maxHeight: '90vh',
           overflow: 'auto',
         }}
       >
@@ -164,9 +145,7 @@ export default function LogDetailsModal({ open, log, onClose }: Props) {
                     overflow: 'auto',
                   }}
                 >
-                  {typeof entity === 'object' && entity !== null
-                    ? JSON.stringify(entity, null, 2)
-                    : String(entity)}
+                  {JSON.stringify(entity, null, 2)}
                 </Paper>
               </Box>
             ) : null}
