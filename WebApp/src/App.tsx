@@ -4,6 +4,8 @@ import {
   AuthProvider,
   ThemeModeProvider,
   NotificationProvider,
+  PermissionsProvider,
+  SystemResourcesProvider,
 } from './contexts';
 import { SnackbarNotification } from './components';
 
@@ -12,8 +14,12 @@ export default function App() {
     <ThemeModeProvider>
       <NotificationProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
-          <SnackbarNotification />
+          <SystemResourcesProvider>
+            <PermissionsProvider>
+              <RouterProvider router={router} />
+              <SnackbarNotification />
+            </PermissionsProvider>
+          </SystemResourcesProvider>
         </AuthProvider>
       </NotificationProvider>
     </ThemeModeProvider>

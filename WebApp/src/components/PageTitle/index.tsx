@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typography, Box } from '@mui/material';
-import { pageTitleIcons } from '../../helpers';
+import { usePermissions } from '../../hooks';
 
 interface PageTitleProps {
   icon?: string;
@@ -8,6 +8,8 @@ interface PageTitleProps {
 }
 
 export default function PageTitle({ icon, title }: PageTitleProps) {
+  const { pageTitleIcons } = usePermissions();
+
   return (
     <Box
       sx={{
