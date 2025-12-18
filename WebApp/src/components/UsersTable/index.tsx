@@ -85,7 +85,9 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
               <TableCell>Nome completo</TableCell>
               <TableCell>Criado em</TableCell>
               <TableCell>Atualizado em</TableCell>
-              <TableCell align="right">Ações</TableCell>
+              <TableCell sx={{ minWidth: 112 }} align="center">
+                Ações
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -108,7 +110,7 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
                   <TableCell>
                     {new Date(user.updatedAt).toLocaleString()}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell sx={{ minWidth: 112 }} align="center">
                     <IconButton
                       color="primary"
                       onClick={() => onEdit(user)}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, Paper } from '@mui/material';
 import type { SystemResource } from '../../interfaces';
 import { cleanStates } from '../../helpers';
 
@@ -32,7 +32,7 @@ export default function SystemResourceForm({ onSubmit, resource }: Props) {
   }
 
   return (
-    <Box
+    <Paper
       component="form"
       onSubmit={handleSubmit}
       sx={{
@@ -40,8 +40,9 @@ export default function SystemResourceForm({ onSubmit, resource }: Props) {
         flexDirection: 'column',
         gap: 2,
         marginBottom: 4,
+        maxWidth: 500,
+        padding: 2,
         width: '100%',
-        maxWidth: 480,
       }}
     >
       <TextField
@@ -74,6 +75,6 @@ export default function SystemResourceForm({ onSubmit, resource }: Props) {
           Limpar
         </Button>
       </Box>
-    </Box>
+    </Paper>
   );
 }

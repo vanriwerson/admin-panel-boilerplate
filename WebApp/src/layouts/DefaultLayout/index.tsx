@@ -21,7 +21,15 @@ export default function DefaultLayout() {
       <SidePanel open={open} onNavigate={handleNavigate} />
 
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Toolbar
+          sx={{
+            justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 7,
+            bgcolor: 'background.paper',
+          }}
+        >
           <IconButton onClick={() => setOpen(!open)}>
             <FontAwesomeIcon icon={faBars} />
           </IconButton>

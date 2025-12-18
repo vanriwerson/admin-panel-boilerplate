@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, FormHelperText } from '@mui/material';
+import { Box, TextField, Button, FormHelperText, Paper } from '@mui/material';
 import type { UserFormValues, UserRead } from '../../interfaces';
 import { cleanStates, mapSystemResourcesToFormValue } from '../../helpers';
 import { useAuth } from '../../hooks';
@@ -58,7 +58,7 @@ export default function UserForm({ onSubmit, user }: Props) {
   }
 
   return (
-    <Box
+    <Paper
       component="form"
       onSubmit={handleSubmit}
       sx={{
@@ -69,6 +69,7 @@ export default function UserForm({ onSubmit, user }: Props) {
         justifyContent: 'center',
         marginBottom: 4,
         maxWidth: 800,
+        padding: 2,
       }}
     >
       <TextField
@@ -132,6 +133,6 @@ export default function UserForm({ onSubmit, user }: Props) {
           Limpar
         </Button>
       </Box>
-    </Box>
+    </Paper>
   );
 }
