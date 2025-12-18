@@ -4,9 +4,10 @@ import type {
   SystemResource,
   UserFormValues,
 } from '../interfaces';
+import { PERMISSIONS, type ValidPermission } from '../permissions';
 
 interface FormStates {
-  initialPermissionsMap: Record<string, string>;
+  initialPermissionsMap: Record<string, ValidPermission>;
   logsReportFilters: Omit<SystemLogFiltersPayload, 'page' | 'pageSize'>;
   systemResource: SystemResource;
   tablePagination: Omit<PaginatedResponse<unknown>, 'data'>;
@@ -14,13 +15,7 @@ interface FormStates {
 }
 
 export const cleanStates: FormStates = {
-  initialPermissionsMap: {
-    ROOT: 'root',
-    USERS: 'users',
-    RESOURCES: 'resources',
-    REPORTS: 'reports',
-    DASHBOARD: 'dashboard',
-  },
+  initialPermissionsMap: PERMISSIONS,
   logsReportFilters: {
     startDate: undefined,
     endDate: undefined,

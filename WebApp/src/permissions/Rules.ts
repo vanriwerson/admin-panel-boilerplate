@@ -1,22 +1,21 @@
 import type { AuthUser, SystemResource, UserRead } from '../interfaces';
-import { PermissionsMap } from './PermissionsMap';
-
+import { PERMISSIONS, type ValidPermission } from './tokens';
 interface EvalPermissions {
   username: string;
   permissions: SystemResource[];
 }
 
-function getUserPermissions(authUser: EvalPermissions): Set<string> {
-  return new Set(authUser.permissions.map((p) => p.name));
+function getUserPermissions(authUser: EvalPermissions): Set<ValidPermission> {
+  return new Set(authUser.permissions.map((p) => p.name as ValidPermission));
 }
 
 export function isRootUser(authUser: EvalPermissions): boolean {
-  return getUserPermissions(authUser).has(PermissionsMap.ROOT);
+  return getUserPermissions(authUser).has(PERMISSIONS.ROOT);
 }
 
 export function hasPermission(
   authUser: EvalPermissions,
-  permissionName: string
+  permissionName: ValidPermission
 ): boolean {
   const permissions = getUserPermissions(authUser);
   return isRootUser(authUser) || permissions.has(permissionName);
@@ -27,10 +26,10 @@ export function canEditPassword(
   targetUser?: UserRead
 ): boolean {
   const authPermissions = getUserPermissions(authUser);
-  const isUserTeam = authPermissions.has(PermissionsMap.USERS);
+  const isUserTeam = authPermissions.has(PERMISSIONS.USERS);
   const isEditingSelf = targetUser && authUser.username === targetUser.username;
   const isTargetRoot =
-    targetUser && getUserPermissions(targetUser).has(PermissionsMap.ROOT);
+    targetUser && getUserPermissions(targetUser).has(PERMISSIONS.ROOT);
 
   if (isRootUser(authUser)) return true;
   if (isUserTeam && !isTargetRoot) return true;
@@ -42,9 +41,9 @@ export function canEditPermissions(
   targetUser?: UserRead
 ): boolean {
   const authPermissions = getUserPermissions(authUser);
-  const isUserTeam = authPermissions.has(PermissionsMap.USERS);
+  const isUserTeam = authPermissions.has(PERMISSIONS.USERS);
   const isTargetRoot =
-    targetUser && getUserPermissions(targetUser).has(PermissionsMap.ROOT);
+    targetUser && getUserPermissions(targetUser).has(PERMISSIONS.ROOT);
 
   if (isRootUser(authUser)) return true;
   if (isUserTeam && !isTargetRoot) return true;
@@ -57,8 +56,8 @@ export function filterAssignablePermissions(
   allPermissions: SystemResource[]
 ): SystemResource[] {
   if (isRootUser(authUser)) return allPermissions;
-  const isUserTeam = getUserPermissions(authUser).has(PermissionsMap.USERS);
+  const isUserTeam = getUserPermissions(authUser).has(PERMISSIONS.USERS);
   if (isUserTeam)
-    return allPermissions.filter((p) => p.name !== PermissionsMap.ROOT);
+    return allPermissions.filter((p) => p.name !== PERMISSIONS.ROOT);
   return [];
 }

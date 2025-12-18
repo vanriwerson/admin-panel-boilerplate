@@ -4,20 +4,16 @@ import {
   useEffect,
   type ReactNode,
   useCallback,
-  useMemo,
 } from 'react';
 import type {
   AuthUser,
   MenuItem,
   PermissionsContextProps,
 } from '../interfaces';
-import {
-  cleanStates,
-  getPageTitleIcons,
-  menuItems as baseMenuItems,
-} from '../helpers';
+import { cleanStates, getPageTitleIcons, menuItems } from '../helpers';
 import { useSystemResources } from '../hooks';
 import { hasPermission, isRootUser } from '../permissions/Rules';
+import type { ValidPermission } from '../permissions';
 
 const PermissionsContext = createContext<PermissionsContextProps | undefined>(
   undefined
@@ -26,9 +22,9 @@ export default PermissionsContext;
 
 export function PermissionsProvider({ children }: { children: ReactNode }) {
   const { fetchSystemResourcesForSelect } = useSystemResources();
-  const [permissionsMap, setPermissionsMap] = useState<Record<string, string>>(
-    cleanStates.initialPermissionsMap
-  );
+  const [permissionsMap, setPermissionsMap] = useState<
+    Record<string, ValidPermission>
+  >(cleanStates.initialPermissionsMap);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,9 +34,9 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
       const systemResources = await fetchSystemResourcesForSelect();
 
       const map = systemResources.reduce((acc, resource) => {
-        acc[resource.name.toUpperCase()] = resource.name;
+        acc[resource.name.toUpperCase()] = resource.name as ValidPermission;
         return acc;
-      }, {} as Record<string, string>);
+      }, {} as Record<string, ValidPermission>);
 
       setPermissionsMap(map);
       setError(null);
@@ -56,30 +52,16 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     await loadPermissions();
   };
 
-  const menuItems: MenuItem[] = useMemo(() => {
-    return baseMenuItems.map((item) => {
-      if (!item.permission) return item;
-      return {
-        ...item,
-        permission:
-          permissionsMap[item.permission.toUpperCase()] || item.permission,
-      };
-    });
-  }, [permissionsMap]);
-
   const pageTitleIcons = getPageTitleIcons(menuItems);
 
-  const getMenuItemsForUser = useCallback(
-    (authUser: AuthUser | null): MenuItem[] => {
-      return menuItems.filter((item) => {
-        if (!item.permission) return true;
-        if (!authUser) return false;
-        if (isRootUser(authUser)) return true;
-        return hasPermission(authUser, item.permission);
-      });
-    },
-    [menuItems]
-  );
+  const getMenuItemsForUser = (authUser: AuthUser | null): MenuItem[] => {
+    return menuItems.filter((item) => {
+      if (!item.permission) return true;
+      if (!authUser) return false;
+      if (isRootUser(authUser)) return true;
+      return hasPermission(authUser, item.permission);
+    });
+  };
 
   useEffect(() => {
     loadPermissions();

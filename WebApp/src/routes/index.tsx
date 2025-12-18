@@ -10,7 +10,6 @@ import {
   UnauthorizedAccess,
   Users,
 } from '../pages';
-import { PermissionsMap } from '../permissions/PermissionsMap';
 import { CleanLayout, DefaultLayout } from '../layouts';
 import { UsersProvider } from '../contexts';
 
@@ -31,12 +30,12 @@ const privateRoutes = [
         <Users />
       </UsersProvider>
     ),
-    requiredPermission: PermissionsMap.USERS,
+    requiredPermission: 'users',
   },
   {
     path: '/resources',
     element: <Resources />,
-    requiredPermission: PermissionsMap.RESOURCES,
+    requiredPermission: 'resources',
   },
   {
     path: '/reports',
@@ -45,7 +44,7 @@ const privateRoutes = [
         <Reports />
       </UsersProvider>
     ),
-    requiredPermission: PermissionsMap.REPORTS,
+    requiredPermission: 'reports',
   },
 ];
 
