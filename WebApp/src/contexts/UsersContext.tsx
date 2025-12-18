@@ -23,7 +23,6 @@ import {
 import { cleanStates, getErrorMessage } from '../helpers';
 import { useAuth } from '../hooks';
 import { isRootUser } from '../permissions/Rules';
-import { PERMISSIONS } from '../permissions';
 
 const UsersContext = createContext<UsersContextProps | undefined>(undefined);
 export default UsersContext;
@@ -69,9 +68,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     if (showRootUsers) return users;
 
     return users.filter((user) => {
-      return !user.permissions.some(
-        (permission) => permission.name === PERMISSIONS.ROOT
-      );
+      return !isRootUser(user);
     });
   }, [users, showRootUsers]);
 
