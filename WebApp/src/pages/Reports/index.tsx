@@ -11,11 +11,12 @@ import {
 } from '../../components';
 import { ptBR } from 'date-fns/locale';
 import { cleanStates } from '../../helpers';
-import { PermissionsMap } from '../../permissions';
+import { usePermissions } from '../../hooks';
 
 export default function Reports() {
   const [filters, setFilters] = useState(cleanStates.logsReportFilters);
   const [error, setError] = useState<string>('');
+  const { permissionsMap } = usePermissions();
 
   const today = new Date();
 
@@ -66,7 +67,7 @@ export default function Reports() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
       <Box p={3}>
-        <PageTitle icon={PermissionsMap.REPORTS} title="Relatórios de Logs" />
+        <PageTitle icon={permissionsMap.REPORTS} title="Relatórios de Logs" />
 
         <Paper sx={{ p: 3, mb: 4 }}>
           <Box

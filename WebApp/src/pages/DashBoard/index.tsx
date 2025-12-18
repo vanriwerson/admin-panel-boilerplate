@@ -8,11 +8,12 @@ import { useEffect, useState } from 'react';
 import type { SystemStats } from '../../interfaces';
 import { getSystemStats } from '../../services';
 import { buildStatsCards } from '../../helpers';
-import { useNotification, useThemeMode } from '../../hooks';
+import { useNotification, usePermissions, useThemeMode } from '../../hooks';
 
 export default function DashBoard() {
   const [systemStats, setSystemStats] = useState<SystemStats | null>(null);
   const { showNotification } = useNotification();
+  const { pageTitleIcons } = usePermissions();
   const { mode } = useThemeMode();
 
   useEffect(() => {
@@ -36,7 +37,9 @@ export default function DashBoard() {
     return originalBg;
   };
 
-  const statsCards = systemStats ? buildStatsCards(systemStats) : [];
+  const statsCards = systemStats
+    ? buildStatsCards(systemStats, pageTitleIcons)
+    : [];
 
   return (
     <Container

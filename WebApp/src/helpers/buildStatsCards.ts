@@ -1,7 +1,10 @@
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import type { SystemStats } from '../interfaces';
-import { menuItems } from './menuItems';
 
-export function buildStatsCards(systemStats: SystemStats) {
+export function buildStatsCards(
+  systemStats: SystemStats,
+  cardIcon: Record<string, IconDefinition>
+) {
   const {
     usersCount,
     systemResourcesCount,
@@ -12,17 +15,17 @@ export function buildStatsCards(systemStats: SystemStats) {
   return [
     {
       bg: '#6dc4edff, #215fb0ff',
-      icon: menuItems[1].icon,
+      icon: cardIcon.users,
       content: `${usersCount} Usuários Ativos`,
     },
     {
       bg: '#cc2b5e, #753a88',
-      icon: menuItems[2].icon,
+      icon: cardIcon.systemResources,
       content: `${systemResourcesCount} Recursos de Sistema`,
     },
     {
       bg: '#fdc426ff, #e67e22',
-      icon: menuItems[3].icon,
+      icon: cardIcon.reports,
       content: `${monthlyReportsCount} Ações auditadas em ${monthlyReportsCountReference}`,
     },
   ];

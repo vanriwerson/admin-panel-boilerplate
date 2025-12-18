@@ -1,8 +1,12 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { menuItems } from './menuItems';
+import type { MenuItem } from '../interfaces';
 
-export const pageTitleIcons = menuItems.reduce((acc, item) => {
-  const key = item.permission ?? item.route.replace('/', '');
-  acc[key] = item.icon;
-  return acc;
-}, {} as Record<string, IconDefinition>);
+export function getPageTitleIcons(menuItems: MenuItem[]) {
+  const pageTitleIcons = menuItems.reduce((acc, item) => {
+    const key = item.route.replace('/', '');
+    acc[key] = item.icon;
+    return acc;
+  }, {} as Record<string, IconDefinition>);
+
+  return pageTitleIcons;
+}

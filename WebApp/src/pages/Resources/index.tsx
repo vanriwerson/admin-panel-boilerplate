@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Container } from '@mui/material';
 import type { SystemResource } from '../../interfaces';
-import { useNotification, useSystemResources } from '../../hooks';
+import {
+  useNotification,
+  usePermissions,
+  useSystemResources,
+} from '../../hooks';
 import {
   SystemResourceForm,
   SystemResourcesTable,
@@ -9,7 +13,6 @@ import {
   ConfirmDialog,
   PageTitle,
 } from '../../components';
-import { PermissionsMap } from '../../permissions';
 import { getErrorMessage } from '../../helpers';
 
 export default function Resources() {
@@ -21,6 +24,7 @@ export default function Resources() {
     pagination,
   } = useSystemResources();
   const { showNotification } = useNotification();
+  const { permissionsMap } = usePermissions();
 
   const [editingResource, setEditingResource] = useState<SystemResource | null>(
     null
@@ -94,7 +98,7 @@ export default function Resources() {
       }}
     >
       <PageTitle
-        icon={PermissionsMap.RESOURCES}
+        icon={permissionsMap.RESOURCES}
         title="Gerenciamento de Recursos"
       />
 
