@@ -5,6 +5,7 @@ import type { SystemLog } from '../../interfaces';
 import { useEffect, useState } from 'react';
 import { detectAndFetchEntity, getErrorMessage } from '../../helpers';
 import { useNotification } from '../../hooks';
+import JsonWrapper from '../JsonWrapper';
 
 interface Props {
   open: boolean;
@@ -77,77 +78,56 @@ export default function LogDetailsModal({ open, log, onClose }: Props) {
             </IconButton>
           </Box>
 
-          <Box sx={{ mb: 3 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                mb: 2,
-                width: '100%',
-              }}
-            >
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Usuário
-                </Typography>
-                <Typography variant="body1">
-                  {log.user.fullName} ({log.user.username})
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Ação
-                </Typography>
-                <Typography variant="body1">{log.action}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Data/Hora
-                </Typography>
-                <Typography variant="body1">
-                  {new Date(log.createdAt).toLocaleString()}
-                </Typography>
-              </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              justifyContent: 'space-between',
+              mb: 4,
+              width: '100%',
+            }}
+          >
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                Usuário
+              </Typography>
+              <Typography variant="body1">
+                {log.user.fullName} ({log.user.username})
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                Ação
+              </Typography>
+              <Typography variant="body1">{log.action}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                Data/Hora
+              </Typography>
+              <Typography variant="body1">
+                {new Date(log.createdAt).toLocaleString()}
+              </Typography>
             </Box>
           </Box>
 
-          <Box display="flex" width="100%" justifyContent="center" gap={2}>
+          <Box display="flex" width="100%" gap={4}>
             {log.usedPayload && (
-              <Box>
-                <Typography variant="subtitle2">
-                  {log.action.includes('create')
+              <JsonWrapper
+                title={
+                  log.action.includes('create')
                     ? 'Payload Utilizado'
-                    : 'Estado anterior'}
-                </Typography>
-                <Paper
-                  sx={{
-                    p: 2,
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    whiteSpace: 'pre',
-                    overflow: 'auto',
-                  }}
-                >
-                  {formatPayload(log.usedPayload)}
-                </Paper>
-              </Box>
+                    : 'Estado anterior'
+                }
+                jsonContent={formatPayload(log.usedPayload)}
+              />
             )}
 
             {entity ? (
-              <Box>
-                <Typography variant="subtitle2">Estado atual</Typography>
-                <Paper
-                  sx={{
-                    p: 2,
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
-                    whiteSpace: 'pre',
-                    overflow: 'auto',
-                  }}
-                >
-                  {JSON.stringify(entity, null, 2)}
-                </Paper>
-              </Box>
+              <JsonWrapper
+                title="Estado Atual"
+                jsonContent={JSON.stringify(entity, null, 2)}
+              />
             ) : null}
           </Box>
         </Paper>
