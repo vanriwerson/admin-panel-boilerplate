@@ -6,6 +6,7 @@ export type { LoginResponse } from './authInterfaces/LoginResponse';
 export type { MenuItem } from './MenuItem';
 export type { PaginatedResponse } from './PaginatedResponse';
 export type { PasswordResetPayload } from './authInterfaces/PasswordResetPayload';
+export type { PermissionsContextProps } from './contextsInterfaces/PermissionsContextProps';
 export type { SystemLog } from './systemLogsInterfaces/SystemLog';
 export type { SystemLogFiltersPayload } from './systemLogsInterfaces/SystemLogFiltersPayload';
 export type { SystemLogsPagination } from './systemLogsInterfaces/SystemLogsPagination';

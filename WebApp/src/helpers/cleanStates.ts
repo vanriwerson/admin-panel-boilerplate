@@ -6,19 +6,26 @@ import type {
 } from '../interfaces';
 
 interface FormStates {
-  userForm: UserFormValues;
+  initialPermissionsMap: Record<string, string>;
+  logsReportFilters: Omit<SystemLogFiltersPayload, 'page' | 'pageSize'>;
   systemResource: SystemResource;
   tablePagination: Omit<PaginatedResponse<unknown>, 'data'>;
-  logsReportFilters: Omit<SystemLogFiltersPayload, 'page' | 'pageSize'>;
+  userForm: UserFormValues;
 }
 
 export const cleanStates: FormStates = {
-  userForm: {
-    username: '',
-    email: '',
-    fullName: '',
-    password: '',
-    permissions: [],
+  initialPermissionsMap: {
+    ROOT: 'root',
+    USERS: 'users',
+    RESOURCES: 'resources',
+    REPORTS: 'reports',
+    DASHBOARD: 'dashboard',
+  },
+  logsReportFilters: {
+    startDate: undefined,
+    endDate: undefined,
+    userId: undefined,
+    action: '',
   },
   systemResource: {
     name: '',
@@ -30,10 +37,11 @@ export const cleanStates: FormStates = {
     pageSize: 10,
     totalPages: 1,
   },
-  logsReportFilters: {
-    startDate: undefined,
-    endDate: undefined,
-    userId: undefined,
-    action: '',
+  userForm: {
+    username: '',
+    email: '',
+    fullName: '',
+    password: '',
+    permissions: [],
   },
 };

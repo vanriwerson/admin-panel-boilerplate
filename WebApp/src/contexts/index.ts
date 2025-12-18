@@ -1,10 +1,15 @@
-export { default as AuthContext } from './AuthContext';
-export { default as NotificationContext } from './NotificationContext';
-export { default as ThemeContext } from './ThemeContext';
-export { default as UsersContext } from './UsersContext';
-export { default as SystemResourcesContext } from './SystemResourcesContext';
-export { AuthProvider } from './AuthContext';
-export { NotificationProvider } from './NotificationContext';
-export { ThemeModeProvider } from './ThemeContext';
-export { UsersProvider } from './UsersContext';
-export { SystemResourcesProvider } from './SystemResourcesContext';
+export { default as AuthContext, AuthProvider } from './AuthContext';
+export {
+  default as NotificationContext,
+  NotificationProvider,
+} from './NotificationContext';
+export {
+  default as PermissionsContext,
+  PermissionsProvider,
+} from './PermissionsContext';
+export {
+  default as SystemResourcesContext,
+  SystemResourcesProvider,
+} from './SystemResourcesContext';
+export { default as ThemeContext, ThemeModeProvider } from './ThemeContext';
+export { default as UsersContext, UsersProvider } from './UsersContext';
