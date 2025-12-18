@@ -4,6 +4,7 @@ import {
   useEffect,
   useCallback,
   type ReactNode,
+  useMemo,
 } from 'react';
 
 import type {
@@ -18,6 +19,9 @@ import {
   listSystemResourcesForSelect,
 } from '../services';
 import { cleanStates, getErrorMessage } from '../helpers';
+import { useAuth } from '../hooks';
+import { isRootUser } from '../permissions/Rules';
+import { PERMISSIONS } from '../permissions';
 
 const SystemResourcesContext = createContext<
   SystemResourcesContextProps | undefined
@@ -25,10 +29,13 @@ const SystemResourcesContext = createContext<
 export default SystemResourcesContext;
 
 export function SystemResourcesProvider({ children }: { children: ReactNode }) {
+  const { authUser } = useAuth();
   const [resources, setResources] = useState<SystemResource[]>([]);
   const [pagination, setPagination] = useState(cleanStates.tablePagination);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const showRootResource = authUser ? isRootUser(authUser) : false;
 
   const fetchSystemResources = useCallback(
     async (
@@ -58,6 +65,14 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
     },
     [pagination.page, pagination.pageSize]
   );
+
+  const visibleResources = useMemo(() => {
+    if (showRootResource) return resources;
+
+    return resources.filter((resource) => {
+      return resource.name !== PERMISSIONS.ROOT;
+    });
+  }, [resources, showRootResource]);
 
   const addSystemResource = useCallback(
     async (resource: SystemResource) => {
@@ -114,7 +129,7 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
   return (
     <SystemResourcesContext.Provider
       value={{
-        resources,
+        resources: visibleResources,
         pagination,
         loading,
         error,

@@ -12,6 +12,7 @@ import {
 } from '../pages';
 import { CleanLayout, DefaultLayout } from '../layouts';
 import { UsersProvider } from '../contexts';
+import { PERMISSIONS } from '../permissions';
 
 const publicRoutes = [
   { path: '/login', element: <Login /> },
@@ -30,12 +31,12 @@ const privateRoutes = [
         <Users />
       </UsersProvider>
     ),
-    requiredPermission: 'users',
+    requiredPermission: PERMISSIONS.USERS,
   },
   {
     path: '/resources',
     element: <Resources />,
-    requiredPermission: 'resources',
+    requiredPermission: PERMISSIONS.RESOURCES,
   },
   {
     path: '/reports',
@@ -44,7 +45,7 @@ const privateRoutes = [
         <Reports />
       </UsersProvider>
     ),
-    requiredPermission: 'reports',
+    requiredPermission: PERMISSIONS.REPORTS,
   },
 ];
 
