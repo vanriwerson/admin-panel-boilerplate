@@ -17,6 +17,7 @@ import { Edit, Delete, Search } from '@mui/icons-material';
 
 import type { SystemResource } from '../../interfaces';
 import { useSystemResources } from '../../hooks';
+import NoResultsFound from '../NoResultsFound';
 
 interface SystemResourcesTableProps {
   onEdit: (resource: SystemResource) => void;
@@ -137,7 +138,7 @@ export default function SystemResourcesTable({
             ) : (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  Nenhum recurso encontrado
+                  <NoResultsFound entity="recurso" />
                 </TableCell>
               </TableRow>
             )}

@@ -17,6 +17,7 @@ import type { SystemLog, SystemLogFiltersPayload } from '../../interfaces';
 import { useReports } from '../../hooks/useReports';
 import LogDetailsModal from '../LogDetailsModal';
 import { Visibility } from '@mui/icons-material';
+import NoResultsFound from '../NoResultsFound';
 
 interface ReportsTableProps {
   filters: SystemLogFiltersPayload;
@@ -107,7 +108,7 @@ export default function ReportsTable({ filters }: ReportsTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  Nenhum log encontrado
+                  <NoResultsFound entity="log" />
                 </TableCell>
               </TableRow>
             )}

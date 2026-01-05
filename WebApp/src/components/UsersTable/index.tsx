@@ -17,6 +17,7 @@ import { Edit, Delete, Search } from '@mui/icons-material';
 
 import type { UserRead } from '../../interfaces';
 import { useUsers } from '../../hooks';
+import NoResultsFound from '../NoResultsFound';
 
 interface UsersTableProps {
   onEdit: (user: UserRead) => void;
@@ -131,7 +132,7 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  Nenhum usuário encontrado
+                  <NoResultsFound entity="usuário" />
                 </TableCell>
               </TableRow>
             )}
