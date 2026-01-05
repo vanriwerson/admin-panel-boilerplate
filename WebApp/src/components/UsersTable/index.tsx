@@ -80,7 +80,6 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
               <TableCell>Usuário</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Nome completo</TableCell>
@@ -101,7 +100,6 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
             ) : users.length > 0 ? (
               users.map((user: UserRead) => (
                 <TableRow key={user.id} hover>
-                  <TableCell>{user.id}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.fullName}</TableCell>
