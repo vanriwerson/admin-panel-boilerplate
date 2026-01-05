@@ -7,14 +7,14 @@ interface JsonWrapperProps {
 
 export default function JsonWrapper({ title, jsonContent }: JsonWrapperProps) {
   return (
-    <Box>
-      <Typography variant="subtitle1" mb={2}>
+    <Box flexGrow={1}>
+      <Typography variant="subtitle1" mb={1}>
         {title}
       </Typography>
       <Paper
         elevation={7}
         sx={{
-          backgroundColor: '#e7e7e7ff',
+          backgroundColor: '#cececeff',
           color: 'black',
           fontFamily: 'monospace',
           fontSize: '0.8rem',
