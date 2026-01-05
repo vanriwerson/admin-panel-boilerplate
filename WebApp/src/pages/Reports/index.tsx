@@ -69,7 +69,7 @@ export default function Reports() {
       <Box p={3}>
         <PageTitle icon={permissionsMap.REPORTS} title="Relatórios de Logs" />
 
-        <Paper sx={{ p: 3, mb: 4 }}>
+        <Paper sx={{ p: 3, margin: 'auto', mb: 4, maxWidth: 540 }}>
           <Box
             component="form"
             sx={{
@@ -79,7 +79,7 @@ export default function Reports() {
               alignItems: 'flex-end',
             }}
           >
-            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' } }}>
+            <Box sx={{ maxWidth: '48%' }}>
               <DatePicker
                 label="Data inicial"
                 value={startDate}
@@ -94,7 +94,7 @@ export default function Reports() {
               />
             </Box>
 
-            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' } }}>
+            <Box sx={{ maxWidth: '48%' }}>
               <DatePicker
                 label="Data final"
                 value={endDate}
