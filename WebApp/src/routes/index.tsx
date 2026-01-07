@@ -11,7 +11,11 @@ import {
   Users,
 } from '../pages';
 import { CleanLayout, DefaultLayout } from '../layouts';
-import { UsersProvider } from '../contexts';
+import {
+  PermissionsProvider,
+  SystemResourcesProvider,
+  UsersProvider,
+} from '../contexts';
 import { PERMISSIONS } from '../permissions';
 
 const publicRoutes = [
@@ -70,7 +74,13 @@ const router = createBrowserRouter([
   },
 
   {
-    element: <DefaultLayout />,
+    element: (
+      <SystemResourcesProvider>
+        <PermissionsProvider>
+          <DefaultLayout />
+        </PermissionsProvider>
+      </SystemResourcesProvider>
+    ),
     children: protectedRoutes,
   },
 ]);
