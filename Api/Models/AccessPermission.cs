@@ -1,32 +1,16 @@
-using System.ComponentModel.DataAnnotations;
+using Api.Models.Common;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Api.Models
+namespace Api.Models;
+
+[Table("access_permissions")]
+public class AccessPermission : AuditableEntity
 {
-  [Table("access_permissions")]
-  public class AccessPermission
-  {
-    [Key]
-    public int Id { get; set; }
+  public int Id { get; set; }
 
-    [Required]
-    [Column("user_id")]
-    public required int UserId { get; set; }
+  public int UserId { get; set; }
+  public int SystemResourceId { get; set; }
 
-    [Required]
-    [Column("system_resource_id")]
-    public required int SystemResourceId { get; set; }
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-    [ForeignKey(nameof(UserId))]
-    public User? User { get; set; }
-
-    [ForeignKey(nameof(SystemResourceId))]
-    public SystemResource? SystemResource { get; set; }
-  }
+  public User User { get; set; } = null!;
+  public SystemResource SystemResource { get; set; } = null!;
 }
