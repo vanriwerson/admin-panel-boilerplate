@@ -45,12 +45,12 @@ export const defineTheme = (mode: 'light' | 'dark') =>
               dark: '#184ec0',
             },
             background: {
-              default: '#eff1f5',
-              paper: '#ffffff',
+              default: '#cecece',
+              paper: '#e7e7e7',
             },
             text: {
-              primary: '#4c4f69',
-              secondary: '#5c5f77',
+              primary: '#303246',
+              secondary: '#535560',
             },
           }
         : {
