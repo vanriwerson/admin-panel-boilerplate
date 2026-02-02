@@ -60,7 +60,7 @@ namespace Api.Services.AuthServices
 
             var allowedResources = (user.AccessPermissions ?? new List<AccessPermission>())
                 .Where(ap => ap.SystemResource != null && ap.SystemResource.Active)
-                .Select(ap => new SystemResourceOptionDto
+                .Select(ap => new SystemResourceSelectDto
                 {
                     Id = ap.SystemResource!.Id,
                     Name = ap.SystemResource.Name,
