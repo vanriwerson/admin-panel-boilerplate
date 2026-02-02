@@ -2,7 +2,7 @@ using BCrypt.Net;
 
 namespace Api.Helpers
 {
-    public static class PasswordHashing
+    public static class PasswordHash
     {
         public static string Generate(string password)
         {
