@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Api.Models;
 
-[Table("system_logs")]
 public class SystemLog
 {
   public int Id { get; set; }

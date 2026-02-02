@@ -25,8 +25,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                      .IsRequired()
                      .HasMaxLength(120);
 
-              builder.Property(u => u.Password)
-                     .HasColumnName("password")
+              builder.Property(u => u.PasswordHash)
+                     .HasColumnName("password_hash")
                      .IsRequired();
 
               builder.Property(u => u.FullName)

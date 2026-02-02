@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Api.Models;
 
-[Table("system_resources")]
 public class SystemResource : AuditableEntity
 {
   public int Id { get; set; }

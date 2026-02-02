@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Api.Models;
 
-[Table("access_permissions")]
 public class AccessPermission : AuditableEntity
 {
   public int Id { get; set; }
