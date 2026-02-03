@@ -1,6 +1,6 @@
 namespace Api.Auditing;
 
-public static class AuditActionFactory
+public static class SystemLogActionFactory
 {
     public static string Create(string entity, int id)
         => $"create {entity} id: {id}";

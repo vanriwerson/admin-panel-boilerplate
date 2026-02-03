@@ -1,12 +1,16 @@
+using Api.Interfaces.Repositories;
+using Api.Models;
+using Api.Security.Jwt;
+
 namespace Api.Auditing;
 
-public class AuditLogService
+public class SystemLogService
 {
-    private readonly IGenericRepository<SystemLog> _repository;
+    private readonly ISystemLogRepository _repository;
     private readonly CurrentUserContext _currentUser;
 
-    public AuditLogService(
-        IGenericRepository<SystemLog> repository,
+    public SystemLogService(
+        ISystemLogRepository repository,
         CurrentUserContext currentUser
     )
     {
@@ -16,8 +20,8 @@ public class AuditLogService
 
     public async Task RegisterAsync(
         string action,
-        int? userId = null,
-        string? payload = null
+        object? data = null,
+        int? userId = null
     )
     {
         var resolvedUserId = userId ?? _currentUser.GetId();
@@ -26,7 +30,11 @@ public class AuditLogService
         {
             UserId = resolvedUserId,
             Action = action,
-            UsedPayload = payload,
+            Data = data != null
+                ? SystemLogDataSerializer.Serialize(data)
+                : null,
+            GeneratedBy = _currentUser.GetUsername(),
+            IpAddress = _currentUser.GetIpAddress(),
             CreatedAt = DateTime.UtcNow
         };
 
