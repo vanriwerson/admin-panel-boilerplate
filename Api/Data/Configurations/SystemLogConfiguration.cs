@@ -24,8 +24,8 @@ public class SystemLogConfiguration : IEntityTypeConfiguration<SystemLog>
                .IsRequired()
                .HasMaxLength(255);
 
-        builder.Property(sl => sl.PayloadJson)
-               .HasColumnName("payload_json");
+        builder.Property(sl => sl.Data)
+               .HasColumnName("data");
 
         builder.Property(sl => sl.GeneratedBy)
                .HasColumnName("generated_by")
