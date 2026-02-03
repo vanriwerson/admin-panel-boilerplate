@@ -24,6 +24,20 @@ public class CurrentUserContext
         return principal.GetPermissionIds();
     }
 
+    public string? GetIpAddress()
+    {
+        return _httpContextAccessor.HttpContext?
+            .Connection
+            .RemoteIpAddress?
+            .ToString();
+    }
+
+    public string? GetUsername()
+    {
+        var principal = GetPrincipal();
+        return principal.Identity?.Name;
+    }
+
     private ClaimsPrincipal GetPrincipal()
     {
         var httpContext = _httpContextAccessor.HttpContext
