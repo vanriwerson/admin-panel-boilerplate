@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
 
 // --- Registro do helper responsável por extrair o UserId do token ---
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<CurrentAuthUser>();
+builder.Services.AddScoped<Api.Security.Jwt.CurrentUserContext>();
 
 
 // --- Registro automático de Services ---
