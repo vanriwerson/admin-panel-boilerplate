@@ -86,7 +86,7 @@ public class UsersController : ControllerBase
 
         Guard.AgainstMismatchedIds(id, dto.Id);
 
-        var updated = await _updateUserWithAccessGranted.ExecuteAsync(dto);
+        var updated = await _updateUser.ExecuteAsync(dto);
 
         return Ok(updated);
     }
