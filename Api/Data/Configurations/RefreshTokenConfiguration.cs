@@ -41,7 +41,7 @@ namespace Api.Data.Configurations
                 .IsRequired();
 
             builder.HasOne(rt => rt.User)
-                .WithMany() // TODO: RefreshTokens collection não está implementado no User model
+                .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 

@@ -15,4 +15,5 @@ public class User : AuditableEntity
     public bool Active { get; set; } = true;
 
     public ICollection<AccessPermission> AccessPermissions { get; set; } = new List<AccessPermission>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
