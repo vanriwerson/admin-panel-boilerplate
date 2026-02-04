@@ -8,7 +8,7 @@ public interface ISystemLogRepository
 {
     Task CreateAsync(SystemLog log);
 
-    Task<SystemLog?> GetByIdAsync(int id);
+    Task<SystemLogReadDto?> GetByIdAsync(int id);
 
     Task<PagedResult<SystemLogListDto>> GetPagedAsync(
         int? userId,

@@ -1,3 +1,6 @@
+using Api.Helpers.Pagination;
+using Api.Models;
+
 namespace Api.Interfaces.Repositories;
 
 public interface ISystemResourceRepository
@@ -7,9 +10,9 @@ public interface ISystemResourceRepository
     Task<bool> SoftDeleteAsync(int id);
 
     Task<SystemResource?> GetByIdAsync(int id);
-    Task<PagedResult<SystemResource>> GetPagedAsync(int page, int pageSize);
-
-    Task<IEnumerable<SystemResource>> SearchAsync(string term);
+    Task<PagedResult<SystemResource>> GetAllAsync(int page, int pageSize);
+    Task<IEnumerable<SystemResource>> GetForSelectAsync();
+    Task<PagedResult<SystemResource>> SearchAsync(string term, int page, int pageSize);
 
     Task<bool> ExistsByNameAsync(string name);
 }

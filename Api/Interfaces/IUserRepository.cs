@@ -1,3 +1,6 @@
+using Api.Helpers.Pagination;
+using Api.Models;
+
 namespace Api.Interfaces.Repositories;
 
 public interface IUserRepository

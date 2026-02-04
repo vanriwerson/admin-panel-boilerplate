@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 using Api.Security.Jwt;
 
 namespace Api.Security.Jwt;

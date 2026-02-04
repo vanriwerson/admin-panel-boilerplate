@@ -1,3 +1,4 @@
+using Api.Auditing.Services;
 using Api.Data;
 using Api.Middlewares;
 using Api.Models;

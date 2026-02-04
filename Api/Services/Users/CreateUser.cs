@@ -1,3 +1,4 @@
+using Api.Auditing.Services;
 using Api.Dtos;
 using Api.Interfaces.Repositories;
 using Api.Security.Passwords;

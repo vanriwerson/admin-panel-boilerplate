@@ -1,3 +1,4 @@
+using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
 using Api.Helpers;

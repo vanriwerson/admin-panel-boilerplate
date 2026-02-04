@@ -1,4 +1,4 @@
-using Api.Auditing;
+using Api.Auditing.Services;
 using Api.Helpers;
 using Api.Interfaces.Repositories;
 
@@ -7,14 +7,14 @@ namespace Api.Services.Users;
 public class DeleteUser
 {
     private readonly IUserRepository _userRepository;
-    private readonly SystemLogService _systemLog;
+    private readonly CreateSystemLog _createSystemLog;
 
     public DeleteUser(
         IUserRepository userRepository,
-        SystemLogService systemLog)
+        CreateSystemLog createSystemLog)
     {
         _userRepository = userRepository;
-        _systemLog = systemLog;
+        _createSystemLog = createSystemLog;
     }
 
     public async Task<bool> ExecuteAsync(int id)
@@ -25,7 +25,7 @@ public class DeleteUser
 
         if (deleted)
         {
-            await _systemLog.RegisterAsync(
+            await _createSystemLog.ExecuteAsync(
                 action: SystemLogActionFactory.Delete("User", id)
             );
         }
