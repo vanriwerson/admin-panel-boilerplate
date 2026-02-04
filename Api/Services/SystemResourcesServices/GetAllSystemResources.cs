@@ -1,5 +1,5 @@
 using Api.Dtos;
-using Api.Helpers;
+using Api.Helpers.Pagination;
 using Api.Interfaces;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,7 @@ namespace Api.Services.SystemResourcesServices
             _repo = repo;
         }
 
-        public async Task<PaginatedResult<SystemResourceReadDto>> ExecuteAsync(int page = 1, int pageSize = 10)
+        public async Task<PagedResult<SystemResourceReadDto>> ExecuteAsync(int page = 1, int pageSize = 10)
         {
             var query = _repo.Query()
                 .AsNoTracking()
@@ -25,13 +25,10 @@ namespace Api.Services.SystemResourcesServices
                 {
                     Id = r.Id,
                     Name = r.Name,
-                    ExhibitionName = r.ExhibitionName,
-                    Active = r.Active,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt
+                    ExhibitionName = r.ExhibitionName
                 });
 
-            return await ApplyPagination.PaginateAsync(query, page, pageSize);
+            return await PagedResult<SystemResourceReadDto>.CreateAsync(query, page, pageSize);
         }
 
         public async Task<IEnumerable<SystemResourceSelectDto>> GetOptionsAsync()
@@ -42,7 +39,6 @@ namespace Api.Services.SystemResourcesServices
                 .Select(r => new SystemResourceSelectDto
                 {
                     Id = r.Id,
-                    Name = r.Name,
                     ExhibitionName = r.ExhibitionName
                 })
                 .ToListAsync();

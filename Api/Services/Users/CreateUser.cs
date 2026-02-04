@@ -1,6 +1,7 @@
 using Api.Auditing.Services;
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Models;
 using Api.Security.Passwords;
 using Api.Validations;
 
@@ -19,7 +20,7 @@ public class CreateUser
         _validator = validator;
     }
 
-    public async Task<User> ExecuteAsync(CreateUserDto dto)
+    public async Task<User> ExecuteAsync(UserCreateDto dto)
     {
         await _validator.ValidateCreateAsync(dto);
 

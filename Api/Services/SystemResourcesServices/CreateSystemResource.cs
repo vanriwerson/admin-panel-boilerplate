@@ -1,3 +1,4 @@
+using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Dtos;
 using Api.Helpers;
@@ -23,8 +24,8 @@ namespace Api.Services.SystemResourcesServices
 
         public async Task<SystemResourceReadDto> ExecuteAsync(SystemResourceCreateDto dto)
         {
-            ValidateEntity.HasExpectedProperties<SystemResourceCreateDto>(dto);
-            ValidateEntity.HasExpectedValues<SystemResourceCreateDto>(dto);
+            Guard.AgainstNullOrEmpty(dto.Name, nameof(dto.Name));
+            Guard.AgainstNullOrEmpty(dto.ExhibitionName, nameof(dto.ExhibitionName));
 
             var entity = new SystemResource
             {
@@ -42,7 +43,7 @@ namespace Api.Services.SystemResourcesServices
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
             });
             await _createSystemLog.ExecuteAsync(
-                action: LogActionDescribe.Create("SystemResource", entity.Id),
+                action: SystemLogActionFactory.Create("SystemResource", entity.Id),
                 data: payloadData
             );
 
@@ -50,10 +51,7 @@ namespace Api.Services.SystemResourcesServices
             {
                 Id = created.Id,
                 Name = created.Name,
-                ExhibitionName = created.ExhibitionName,
-                Active = created.Active,
-                CreatedAt = created.CreatedAt,
-                UpdatedAt = created.UpdatedAt
+                ExhibitionName = created.ExhibitionName
             };
         }
     }

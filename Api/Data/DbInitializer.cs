@@ -1,5 +1,6 @@
 using Api.Helpers;
 using Api.Models;
+using Api.Security.Passwords;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Data
@@ -31,7 +32,7 @@ namespace Api.Data
 
             foreach (var user in users)
             {
-                user.Password = PasswordHashing.Generate(user.Password);
+                user.Password = PasswordHash.Generate(user.Password);
                 user.CreatedAt = DateTime.UtcNow;
                 user.UpdatedAt = DateTime.UtcNow;
             }
@@ -90,7 +91,7 @@ namespace Api.Data
             {
                 Username = "root",
                 Email = "root@admin.com",
-                Password = PasswordHashing.Generate("root1234"), // trocar para senha segura em produção
+                Password = PasswordHash.Generate("root1234"), // trocar para senha segura em produção
                 FullName = "Administrador",
                 Active = true,
                 CreatedAt = DateTime.UtcNow,
