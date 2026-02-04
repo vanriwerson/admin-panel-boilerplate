@@ -2,27 +2,25 @@ using Api.Interfaces.Repositories;
 using Api.Models;
 using Api.Security.Jwt;
 
-namespace Api.Auditing;
+namespace Api.Auditing.Services;
 
-public class SystemLogService
+public class CreateSystemLog
 {
     private readonly ISystemLogRepository _repository;
     private readonly CurrentUserContext _currentUser;
 
-    public SystemLogService(
+    public CreateSystemLog(
         ISystemLogRepository repository,
-        CurrentUserContext currentUser
-    )
+        CurrentUserContext currentUser)
     {
         _repository = repository;
         _currentUser = currentUser;
     }
 
-    public async Task RegisterAsync(
+    public async Task ExecuteAsync(
         string action,
         object? data = null,
-        int? userId = null
-    )
+        int? userId = null)
     {
         var resolvedUserId = userId ?? _currentUser.GetId();
 

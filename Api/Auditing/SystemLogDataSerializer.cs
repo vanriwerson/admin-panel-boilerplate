@@ -1,3 +1,5 @@
+using Api.Dtos;
+
 namespace Api.Auditing;
 
 public static class SystemLogDataSerializer
