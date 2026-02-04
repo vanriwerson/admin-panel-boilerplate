@@ -4,18 +4,26 @@ namespace Api.Helpers.Pagination;
 
 public class PagedResult<T>
 {
-    public int TotalItems { get; private set; }
-    public int Page { get; private set; }
-    public int PageSize { get; private set; }
+    public int TotalItems { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
 
     public int TotalPages =>
         PageSize > 0
             ? (int)Math.Ceiling((double)TotalItems / PageSize)
             : 0;
 
-    public IReadOnlyList<T> Data { get; private set; } = [];
+    public List<T> Data { get; set; } = [];
 
     private PagedResult() { }
+
+    public PagedResult(int totalItems, int page, int pageSize, IEnumerable<T> data)
+    {
+        TotalItems = totalItems;
+        Page = page;
+        PageSize = pageSize;
+        Data = data.ToList();
+    }
 
     public static async Task<PagedResult<T>> CreateAsync(
         IQueryable<T> query,
@@ -32,12 +40,6 @@ public class PagedResult<T>
             .Take(pageSize)
             .ToListAsync();
 
-        return new PagedResult<T>
-        {
-            TotalItems = totalItems,
-            Page = page,
-            PageSize = pageSize,
-            Data = items
-        };
+        return new PagedResult<T>(totalItems, page, pageSize, items);
     }
 }
