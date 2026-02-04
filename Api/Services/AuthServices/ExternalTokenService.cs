@@ -1,8 +1,10 @@
+using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
 using Api.Helpers;
 using Api.Models;
+using Api.Security.Jwt;
 using Api.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -27,7 +29,7 @@ namespace Api.Services.AuthServices
             ClaimsPrincipal principal;
             try
             {
-                principal = JsonWebToken.Decode(externalToken);
+                principal = JwtService.Validate(externalToken);
             }
             catch
             {
@@ -51,12 +53,12 @@ namespace Api.Services.AuthServices
             if (user == null)
                 return null;
 
-            var claims = DefaultJWTClaims.Generate(user);
-            var token = JsonWebToken.Create(claims);
+            var claims = JwtClaimsFactory.FromUser(user);
+            var token = JwtService.Create(claims);
 
             await _createSystemLog.ExecuteAsync(
                 userId: user.Id,
-                action: LogActionDescribe.ExternalLogin(user.Username)
+                action: SystemLogActionFactory.ExternalLogin(user.Username)
             );
 
             var allowedResources = (user.AccessPermissions ?? new List<AccessPermission>())
@@ -64,7 +66,6 @@ namespace Api.Services.AuthServices
                 .Select(ap => new SystemResourceSelectDto
                 {
                     Id = ap.SystemResource!.Id,
-                    Name = ap.SystemResource.Name,
                     ExhibitionName = ap.SystemResource.ExhibitionName
                 })
                 .ToList();

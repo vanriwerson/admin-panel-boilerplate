@@ -1,3 +1,5 @@
+using Api.Auditing;
+using Api.Auditing.Services;
 using Api.Dtos;
 using Api.Helpers;
 using Api.Interfaces;
@@ -23,10 +25,11 @@ namespace Api.Services.SystemResourcesServices
 
     public async Task<SystemResourceReadDto?> ExecuteAsync(int id, SystemResourceUpdateDto dto)
     {
-      ValidateEntity.HasExpectedProperties<SystemResourceUpdateDto>(dto);
-      ValidateEntity.HasExpectedValues<SystemResourceUpdateDto>(dto);
+      Guard.AgainstNonPositiveInt(id);
 
-      var resource = await ValidateEntity.EnsureEntityExistsAsync(_repo, id, "SystemResource");
+      var resource = await _repo.Query().FirstOrDefaultAsync(r => r.Id == id);
+      if (resource == null)
+        throw new AppException("Recurso não encontrado.", (int)HttpStatusCode.NotFound);
 
       // Capturar o estado anterior
       var prevState = new
@@ -55,21 +58,17 @@ namespace Api.Services.SystemResourcesServices
 
       resource.Name = dto.Name ?? resource.Name;
       resource.ExhibitionName = dto.ExhibitionName ?? resource.ExhibitionName;
-      resource.Active = dto.Active ?? resource.Active;
       resource.UpdatedAt = DateTime.UtcNow;
 
       var updated = await _repo.UpdateAsync(resource);
 
-      await _createSystemLog.ExecuteAsync(LogActionDescribe.Update("SystemResource", updated.Id), data: prevStateJson);
+      await _createSystemLog.ExecuteAsync(SystemLogActionFactory.Update("SystemResource", updated.Id), data: prevStateJson);
 
       return new SystemResourceReadDto
       {
         Id = updated.Id,
         Name = updated.Name,
-        ExhibitionName = updated.ExhibitionName,
-        Active = updated.Active,
-        CreatedAt = updated.CreatedAt,
-        UpdatedAt = updated.UpdatedAt
+        ExhibitionName = updated.ExhibitionName
       };
     }
   }

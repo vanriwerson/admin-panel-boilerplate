@@ -1,8 +1,11 @@
+using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Data;
 using Api.Middlewares;
 using Api.Models;
 using Api.Helpers;
+using Api.Security.Jwt;
+using Api.Security.Passwords;
 using Api.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -41,7 +44,7 @@ namespace Api.Services.AuthServices
                 new System.Security.Claims.Claim("email", user.Email)
             };
 
-            var token = JsonWebToken.Create(claims, expireMinutes: 15);
+            var token = JwtService.Create(claims, expireMinutes: 15);
 
             var webAppUrl = EnvLoader.GetEnv("WEB_APP_URL");
             var resetLink = $"{webAppUrl.TrimEnd('/')}/password-reset?token={token}";
@@ -50,7 +53,7 @@ namespace Api.Services.AuthServices
 
             Console.WriteLine($"[DEBUG] Link de redefinição enviado para {email}: {resetLink}");
 
-            await _createSystemLog.ExecuteAsync(LogActionDescribe.NewPasswordRequest(user.Username), user.Id);
+            await _createSystemLog.ExecuteAsync(SystemLogActionFactory.NewPasswordRequest(user.Username), user.Id);
         }
 
         public async Task ResetPasswordAsync(string token, string newPassword)
@@ -61,7 +64,7 @@ namespace Api.Services.AuthServices
             System.Security.Claims.ClaimsPrincipal principal;
             try
             {
-                principal = JsonWebToken.Decode(token, validateLifetime: true);
+                principal = JwtService.Validate(token, validateLifetime: true);
             }
             catch
             {
@@ -78,13 +81,13 @@ namespace Api.Services.AuthServices
             if (user == null)
                 throw new AppException("Usuário não encontrado.", (int)HttpStatusCode.NotFound);
 
-            user.Password = PasswordHashing.Generate(newPassword);
+            user.Password = PasswordHash.Generate(newPassword);
             user.UpdatedAt = DateTime.UtcNow;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            await _createSystemLog.ExecuteAsync(LogActionDescribe.PasswordReset(user.Username), user.Id);
+            await _createSystemLog.ExecuteAsync(SystemLogActionFactory.PasswordReset(user.Username), user.Id);
         }
     }
 }

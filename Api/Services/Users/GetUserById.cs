@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Middlewares;
 
 namespace Api.Services.Users;
 
@@ -14,7 +15,7 @@ public class GetUserById
 
     public async Task<UserReadDto> ExecuteAsync(int id)
     {
-        Guard.AgainstInvalidId(id);
+        Guard.AgainstNonPositiveInt(id);
 
         var user = await _repository.GetByIdAsync(id)
             ?? throw new AppException("Usuário não encontrado.");
@@ -29,7 +30,7 @@ public class GetUserById
                 .Select(ap => new SystemResourceSelectDto
                 {
                     Id = ap.SystemResource.Id,
-                    Name = ap.SystemResource.Name
+                    ExhibitionName = ap.SystemResource.ExhibitionName
                 })
                 .ToList()
         };

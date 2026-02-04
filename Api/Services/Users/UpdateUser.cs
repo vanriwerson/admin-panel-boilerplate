@@ -1,5 +1,7 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Middlewares;
+using Api.Models;
 using Api.Security.Passwords;
 using Api.Validations;
 
@@ -18,7 +20,7 @@ public class UpdateUser
         _validator = validator;
     }
 
-    public async Task<User> ExecuteAsync(UpdateUserDto dto)
+    public async Task<User> ExecuteAsync(UserUpdateDto dto)
     {
         Guard.AgainstNonPositiveInt(dto.Id);
 

@@ -1,4 +1,5 @@
 using Api.Helpers;
+using Api.Security.Jwt;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace Api.Middlewares
 
         var token = authHeader.Substring("Bearer ".Length).Trim();
 
-        if (!JsonWebToken.Verify(token))
+        if (!JwtService.IsValid(token))
         {
           context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
           await context.Response.WriteAsync("Token inválido ou expirado");

@@ -1,7 +1,10 @@
 using Api.Auditing;
+using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
+using Api.Helpers;
 using Api.Interfaces.Repositories;
+using Api.Middlewares;
 using Api.Services.AccessPermissions;
 using Api.Services.Users;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +18,7 @@ public class UpdateUserWithAccessGranted
     private readonly IUserRepository _userRepository;
     private readonly IAccessPermissionRepository _accessPermissionRepository;
     private readonly CreateAccessPermissions _createAccessPermissions;
-    private readonly SystemLogService _logService;
+    private readonly CreateSystemLog _createSystemLog;
 
     public UpdateUserWithAccessGranted(
         ApiDbContext context,
@@ -23,19 +26,19 @@ public class UpdateUserWithAccessGranted
         IUserRepository userRepository,
         IAccessPermissionRepository accessPermissionRepository,
         CreateAccessPermissions createAccessPermissions,
-        SystemLogService logService)
+        CreateSystemLog createSystemLog)
     {
         _context = context;
         _updateUser = updateUser;
         _userRepository = userRepository;
         _accessPermissionRepository = accessPermissionRepository;
         _createAccessPermissions = createAccessPermissions;
-        _logService = logService;
+        _createSystemLog = createSystemLog;
     }
 
     public async Task<UserReadDto> ExecuteAsync(UserUpdateDto dto)
     {
-        Guard.AgainstNonPositiveInt(dto.Id, nameof(dto.Id));
+        Guard.AgainstNonPositiveInt(dto.Id);
 
         await using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -74,14 +77,9 @@ public class UpdateUserWithAccessGranted
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            await _logService.RegisterAsync(
-                action: SystemLogActionFactory.Update("User", updatedUser.Id),
-                data: new SystemLogDataDto
-                {
-                    Type = "update",
-                    PrevState = prevState,
-                    CurrState = dto
-                }
+            await _createSystemLog.ExecuteAsync(
+                userId: updatedUser.Id,
+                action: SystemLogActionFactory.Update("User", updatedUser.Id)
             );
 
             var resultUser = await _userRepository.GetByIdAsync(updatedUser.Id)
@@ -97,7 +95,7 @@ public class UpdateUserWithAccessGranted
                     .Select(ap => new SystemResourceSelectDto
                     {
                         Id = ap.SystemResource.Id,
-                        Name = ap.SystemResource.Name
+                        ExhibitionName = ap.SystemResource.ExhibitionName
                     })
                     .ToList()
             };

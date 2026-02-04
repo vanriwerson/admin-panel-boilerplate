@@ -1,4 +1,6 @@
 using Api.Dtos;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Api.Auditing;
 

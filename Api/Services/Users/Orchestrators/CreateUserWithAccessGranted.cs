@@ -1,7 +1,10 @@
 using Api.Auditing;
+using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
+using Api.Helpers;
 using Api.Interfaces.Repositories;
+using Api.Middlewares;
 using Api.Services.AccessPermissions;
 using Api.Services.Users;
 using Microsoft.EntityFrameworkCore;
@@ -14,20 +17,20 @@ public class CreateUserWithAccessGranted
     private readonly CreateUser _createUser;
     private readonly CreateAccessPermissions _createAccessPermissions;
     private readonly IUserRepository _userRepository;
-    private readonly SystemLogService _logService;
+    private readonly CreateSystemLog _createSystemLog;
 
     public CreateUserWithAccessGranted(
         ApiDbContext context,
         CreateUser createUser,
         CreateAccessPermissions createAccessPermissions,
         IUserRepository userRepository,
-        SystemLogService logService)
+        CreateSystemLog createSystemLog)
     {
         _context = context;
         _createUser = createUser;
         _createAccessPermissions = createAccessPermissions;
         _userRepository = userRepository;
-        _logService = logService;
+        _createSystemLog = createSystemLog;
     }
 
     public async Task<UserReadDto> ExecuteAsync(UserCreateDto dto)
@@ -49,13 +52,9 @@ public class CreateUserWithAccessGranted
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            await _logService.RegisterAsync(
-                action: SystemLogActionFactory.Create("User", user.Id),
-                data: new SystemLogDataDto
-                {
-                    Type = "create",
-                    Created = dto
-                }
+            await _createSystemLog.ExecuteAsync(
+                userId: user.Id,
+                action: SystemLogActionFactory.Create("User",user.Id)
             );
 
             var createdUser = await _userRepository.GetByIdAsync(user.Id)
@@ -71,7 +70,7 @@ public class CreateUserWithAccessGranted
                     .Select(ap => new SystemResourceSelectDto
                     {
                         Id = ap.SystemResource.Id,
-                        Name = ap.SystemResource.Name
+                        ExhibitionName = ap.SystemResource.ExhibitionName
                     })
                     .ToList()
             };

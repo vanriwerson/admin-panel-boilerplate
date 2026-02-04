@@ -1,3 +1,4 @@
+using Api.Auditing;
 using Api.Data;
 using Api.Dtos;
 using Api.Helpers.Pagination;

@@ -29,10 +29,7 @@ namespace Api.Services.SystemResourcesServices
       {
         Id = entity.Id,
         Name = entity.Name,
-        ExhibitionName = entity.ExhibitionName,
-        Active = entity.Active,
-        CreatedAt = entity.CreatedAt,
-        UpdatedAt = entity.UpdatedAt
+        ExhibitionName = entity.ExhibitionName
       };
     }
   }

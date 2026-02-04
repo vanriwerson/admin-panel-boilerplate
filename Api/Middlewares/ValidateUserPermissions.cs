@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Api.Dtos;
 using Api.Helpers;
+using Api.Security.Jwt;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace Api.Middlewares
             }
 
             var token = authHeader.Substring("Bearer ".Length).Trim();
-            var principal = JsonWebToken.Decode(token);
+            var principal = JwtService.Validate(token);
 
             var userPermissionIds = GetPermissionIdsFromToken(principal);
 

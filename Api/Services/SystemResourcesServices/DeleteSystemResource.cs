@@ -1,3 +1,4 @@
+using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Helpers;
 using Api.Interfaces;
@@ -30,7 +31,7 @@ namespace Api.Services.SystemResourcesServices
                 throw new AppException("Recurso não encontrado.", (int)HttpStatusCode.NotFound);
 
             await _createSystemLog.ExecuteAsync(
-                action: LogActionDescribe.Delete("SystemResource", id)
+                action: SystemLogActionFactory.Delete("SystemResource", id)
             );
 
             return true;

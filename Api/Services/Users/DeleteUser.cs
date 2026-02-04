@@ -1,3 +1,4 @@
+using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Helpers;
 using Api.Interfaces.Repositories;
@@ -19,7 +20,7 @@ public class DeleteUser
 
     public async Task<bool> ExecuteAsync(int id)
     {
-        Guard.AgainstNonPositiveInt(id, nameof(id));
+        Guard.AgainstNonPositiveInt(id);
 
         var deleted = await _userRepository.SoftDeleteAsync(id);
 

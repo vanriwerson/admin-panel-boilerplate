@@ -20,24 +20,24 @@ public class SearchUsers
         int pageSize = 10)
     {
         Guard.AgainstNullOrEmpty(term, nameof(term));
-        Guard.AgainstNonPositiveInt(page, nameof(page));
-        Guard.AgainstNonPositiveInt(pageSize, nameof(pageSize));
+        Guard.AgainstNonPositiveInt(page);
+        Guard.AgainstNonPositiveInt(pageSize);
 
         var pagedUsers = await _repository.SearchAsync(term, page, pageSize);
 
-        return new PagedResult<UserListDto>
+        var data = pagedUsers.Data.Select(u => new UserListDto
         {
-            TotalItems = pagedUsers.TotalItems,
-            Page = pagedUsers.Page,
-            PageSize = pagedUsers.PageSize,
-            Data = pagedUsers.Data.Select(u => new UserListDto
-            {
-                Id = u.Id,
-                Username = u.Username,
-                Email = u.Email,
-                FullName = u.FullName,
-                CreatedAt = u.CreatedAt
-            }).ToList()
-        };
+            Id = u.Id,
+            Username = u.Username,
+            Email = u.Email,
+            FullName = u.FullName,
+            CreatedAt = u.CreatedAt
+        }).ToList();
+
+        return new PagedResult<UserListDto>(
+            pagedUsers.TotalItems,
+            pagedUsers.Page,
+            pagedUsers.PageSize,
+            data);
     }
 }

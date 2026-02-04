@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Middlewares;
 using Api.Models;
 
 namespace Api.Validations;
@@ -26,7 +27,7 @@ public class UserValidator
         if (await _repository.ExistsByEmailAsync(dto.Email))
             throw new AppException("Email já está em uso.");
 
-        if (dto.Permissions == null || !dto.Permissions.Any())
+        if (dto.PermissionIds == null || !dto.PermissionIds.Any())
             throw new AppException("Usuário deve possuir ao menos uma permissão.");
     }
 
