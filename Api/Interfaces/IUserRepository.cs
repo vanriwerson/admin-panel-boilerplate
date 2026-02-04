@@ -7,9 +7,9 @@ public interface IUserRepository
     Task<bool> SoftDeleteAsync(int id);
 
     Task<User?> GetByIdAsync(int id);
-    Task<PagedResult<User>> GetPagedAsync(int page, int pageSize);
-
-    Task<IEnumerable<User>> SearchAsync(string term);
+    Task<PagedResult<User>> GetAllAsync(int page, int pageSize);
+    Task<IEnumerable<User>> GetForSelectAsync();
+    Task<PagedResult<User>> SearchAsync(string term, int page, int pageSize);
 
     Task<bool> ExistsByUsernameAsync(string username);
     Task<bool> ExistsByEmailAsync(string email);

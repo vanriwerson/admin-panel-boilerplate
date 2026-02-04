@@ -1,0 +1,95 @@
+using Api.Data;
+using Api.Helpers.Pagination;
+using Api.Interfaces.Repositories;
+using Api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace Api.Repositories;
+
+public class UserRepository : IUserRepository
+{
+    private readonly ApiDbContext _context;
+
+    public UserRepository(ApiDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<User> CreateAsync(User user)
+    {
+        _context.Users.Add(user);
+        return user;
+    }
+
+    public async Task<User> UpdateAsync(User user)
+    {
+        _context.Users.Update(user);
+        return user;
+    }
+
+    public async Task<bool> SoftDeleteAsync(int id)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (user == null) return false;
+
+        user.Active = false;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users
+            .Include(u => u.AccessPermissions)
+                .ThenInclude(ap => ap.SystemResource)
+            .FirstOrDefaultAsync(u => u.Id == id && u.Active);
+    }
+
+    public async Task<PagedResult<User>> GetAllAsync(int page, int pageSize)
+    {
+        var query = _context.Users
+            .AsNoTracking()
+            .Where(u => u.Active)
+            .OrderBy(u => u.FullName);
+
+        return await PagedResult<User>.CreateAsync(query, page, pageSize);
+    }
+
+    public async Task<IEnumerable<User>> GetForSelectAsync()
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Active)
+            .OrderBy(u => u.FullName)
+            .Select(u => new User
+            {
+                Id = u.Id,
+                FullName = u.FullName
+            })
+            .ToListAsync();
+    }
+
+    public async Task<PagedResult<User>> SearchAsync(
+        string term,
+        int page,
+        int pageSize)
+    {
+        var query = _context.Users
+            .AsNoTracking()
+            .Where(u =>
+                u.Active &&
+                (EF.Functions.ILike(u.Username, $"%{term}%") ||
+                 EF.Functions.ILike(u.Email, $"%{term}%") ||
+                 EF.Functions.ILike(u.FullName, $"%{term}%")))
+            .OrderBy(u => u.FullName);
+
+        return await PagedResult<User>.CreateAsync(query, page, pageSize);
+    }
+    public Task<bool> ExistsByUsernameAsync(string username)
+        => _context.Users.AnyAsync(u => u.Username == username);
+
+    public Task<bool> ExistsByEmailAsync(string email)
+        => _context.Users.AnyAsync(u => u.Email == email);
+}
