@@ -1,4 +1,8 @@
-namespace Api.Validations.Users;
+using Api.Dtos;
+using Api.Interfaces.Repositories;
+using Api.Models;
+
+namespace Api.Validations;
 
 public class UserValidator
 {
@@ -9,7 +13,7 @@ public class UserValidator
         _repository = repository;
     }
 
-    public async Task ValidateCreateAsync(CreateUserDto dto)
+    public async Task ValidateCreateAsync(UserCreateDto dto)
     {
         Guard.AgainstNullOrEmpty(dto.Username, nameof(dto.Username));
         Guard.AgainstNullOrEmpty(dto.Email, nameof(dto.Email));
@@ -26,7 +30,7 @@ public class UserValidator
             throw new AppException("Usuário deve possuir ao menos uma permissão.");
     }
 
-    public async Task ValidateUpdateAsync(UpdateUserDto dto, User user)
+    public async Task ValidateUpdateAsync(UserUpdateDto dto, User user)
     {
         if (dto.Username != user.Username &&
             await _repository.ExistsByUsernameAsync(dto.Username))

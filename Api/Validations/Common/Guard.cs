@@ -12,7 +12,7 @@ public static class Guard
             throw new AppException($"'{field}' é obrigatório.");
     }
 
-    public static void AgainstInvalidId(int id)
+    public static void AgainstNonPositiveInt(int id)
     {
         if (id <= 0)
             throw new AppException("Id inválido.");
