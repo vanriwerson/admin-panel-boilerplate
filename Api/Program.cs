@@ -1,151 +1,76 @@
 using Api.Data;
+using Api.Extensions.DependencyInjection;
 using Api.Helpers;
-using Api.Interfaces;
-using Api.Interfaces.Repositories;
 using Api.Middlewares;
-using Api.Repositories;
-using Api.Validations;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Resend;
-using System.Reflection;
 
 Env.Load();
 
 var logger = Logger.LogToConsole("Startup");
 
-// --- Variáveis da connection string ---
-var dbHost = EnvLoader.GetEnv("DB_HOST");
-var dbPort = EnvLoader.GetEnv("DB_PORT");
-var dbUser = EnvLoader.GetEnv("DB_USER");
-var dbPassword = EnvLoader.GetEnv("DB_PASSWORD");
-var dbName = EnvLoader.GetEnv("DB_NAME");
-
-// --- Configurar Kestrel ---
 var builder = WebApplication.CreateBuilder(args);
-var apiPort = EnvLoader.GetEnv("API_PORT");
 
+// --- Kestrel ---
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(int.Parse(apiPort));
+    options.ListenAnyIP(int.Parse(EnvLoader.GetEnv("API_PORT")));
 });
 
-// --- Configurar DbContext ---
-var connectionString =
-    $"Host={dbHost};Port={dbPort};Username={dbUser};Password={dbPassword};Database={dbName}";
-builder.Services.AddDbContext<ApiDbContext>(options => options.UseNpgsql(connectionString));
+// --- DbContext ---
+builder.Services.AddDbContext<ApiDbContext>(options =>
+    options.UseNpgsql(
+        $"Host={EnvLoader.GetEnv("DB_HOST")};" +
+        $"Port={EnvLoader.GetEnv("DB_PORT")};" +
+        $"Username={EnvLoader.GetEnv("DB_USER")};" +
+        $"Password={EnvLoader.GetEnv("DB_PASSWORD")};" +
+        $"Database={EnvLoader.GetEnv("DB_NAME")}"
+    )
+);
 
-// --- Configurar Resend ---
-var resendApiKey = EnvLoader.GetEnv("RESEND_API_KEY");
+// --- Resend ---
 builder.Services.AddHttpClient<ResendClient>();
 builder.Services.Configure<ResendClientOptions>(options =>
 {
-    options.ApiToken = resendApiKey;
+    options.ApiToken = EnvLoader.GetEnv("RESEND_API_KEY");
 });
 builder.Services.AddTransient<ResendClient>();
 
-// --- Registrar repositório genérico ---
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-Console.WriteLine("Repositório genérico registrado.");
-// --- Registrar repositórios especializados ---
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ISystemResourceRepository, SystemResourceRepository>();
-builder.Services.AddScoped<IAccessPermissionRepository, AccessPermissionRepository>();
-builder.Services.AddScoped<ISystemLogRepository, SystemLogRepository>();
+// --- DependencyInjection ---
+builder.Services
+    .AddRepositories(logger)
+    .AddValidators(logger)
+    .AddInfrastructure()
+    .AddApplicationServices(logger);
 
-builder.Services.AddScoped<UserValidator>();
-
-// --- Registrar controllers ---
+// --- Controllers / CORS / Swagger ---
 builder.Services.AddControllers();
-
-// --- Configurar CORS ---
-var frontendUrl = EnvLoader.GetEnv("WEB_APP_URL");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
-    {
-        policy.WithOrigins(frontendUrl)
+        policy.WithOrigins(EnvLoader.GetEnv("WEB_APP_URL"))
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // necessário se usar cookies ou JWT no header
-    });
+              .AllowCredentials()
+    );
 });
-
-// --- Registro do helper responsável por extrair o UserId do token ---
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<Api.Security.Jwt.CurrentUserContext>();
-
-
-// --- Registro automático de Services ---
-var assembly = Assembly.GetExecutingAssembly();
-int servicesRegistrados = 0;
-
-try
-{
-    foreach (
-        var type in assembly
-            .GetTypes()
-            .Where(t => t.IsClass && t.Namespace != null && (
-                t.Namespace.StartsWith("Api.Services") ||
-                t.Namespace.StartsWith("Api.Auditing.Services")
-            ))
-    )
-    {
-        builder.Services.AddScoped(type);
-        servicesRegistrados++;
-    }
-
-    logger.LogInformation("{count} services registrados automaticamente.", servicesRegistrados);
-}
-catch (Exception ex)
-{
-    logger.LogError(ex, "Erro ao registrar services automaticamente.");
-    throw;
-}
-
-// --- Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// --- Testar conexão com DB e executar seed ---
-try
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
-
-    if (db.Database.CanConnect())
-        Console.WriteLine("Conexão com DB ok");
-    else
-        Console.WriteLine("Falha ao conectar no DB");
-
-    // Executar seeds
-    await DbInitializer.SeedAllAsync(db);
-}
-catch (Exception ex)
-{
-    Console.WriteLine("Falha na execução do seed: " + ex.Message);
-    throw;
-}
-
-// --- Pipeline HTTP ---
+// --- Pipeline ---
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// --- Middleware de exceção ---
 app.UseExceptionHandlerMiddleware();
-
-// --- Habilitar CORS ---
 app.UseCors("FrontendPolicy");
-
-// app.UseHttpsRedirection();
-
 app.UseRequireAuthorization();
 app.UseValidateUserPermissions();
-
 app.MapControllers();
+
 app.Run();
