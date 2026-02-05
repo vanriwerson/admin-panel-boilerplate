@@ -1,8 +1,10 @@
 using Api.Data;
 using Api.Helpers;
 using Api.Interfaces;
+using Api.Interfaces.Repositories;
 using Api.Middlewares;
 using Api.Repositories;
+using Api.Validations;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Resend;
@@ -45,6 +47,13 @@ builder.Services.AddTransient<ResendClient>();
 // --- Registrar repositório genérico ---
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 Console.WriteLine("Repositório genérico registrado.");
+// --- Registrar repositórios especializados ---
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISystemResourceRepository, SystemResourceRepository>();
+builder.Services.AddScoped<IAccessPermissionRepository, AccessPermissionRepository>();
+builder.Services.AddScoped<ISystemLogRepository, SystemLogRepository>();
+
+builder.Services.AddScoped<UserValidator>();
 
 // --- Registrar controllers ---
 builder.Services.AddControllers();
@@ -76,7 +85,10 @@ try
     foreach (
         var type in assembly
             .GetTypes()
-            .Where(t => t.IsClass && t.Namespace != null && t.Namespace.StartsWith("Api.Services"))
+            .Where(t => t.IsClass && t.Namespace != null && (
+                t.Namespace.StartsWith("Api.Services") ||
+                t.Namespace.StartsWith("Api.Auditing.Services")
+            ))
     )
     {
         builder.Services.AddScoped(type);
