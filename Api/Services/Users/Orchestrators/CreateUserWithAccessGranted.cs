@@ -54,19 +54,16 @@ public class CreateUserWithAccessGranted
 
             await _createSystemLog.ExecuteAsync(
                 userId: user.Id,
-                action: SystemLogActionFactory.Create("User",user.Id)
+                action: SystemLogActionFactory.Create("User", user.Id)
             );
-
-            var createdUser = await _userRepository.GetByIdAsync(user.Id)
-                ?? throw new AppException("Usuário recém-criado não encontrado.");
 
             return new UserReadDto
             {
-                Id = createdUser.Id,
-                Username = createdUser.Username,
-                Email = createdUser.Email,
-                FullName = createdUser.FullName,
-                Permissions = createdUser.AccessPermissions
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FullName = user.FullName,
+                Permissions = user.AccessPermissions
                     .Select(ap => new SystemResourceSelectDto
                     {
                         Id = ap.SystemResource.Id,
