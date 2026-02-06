@@ -8,6 +8,6 @@ namespace Api.Dtos
         public int Id { get; set; } = default!;
         public string Username { get; set; } = default!;
         public string FullName { get; set; } = default!;
-        public IEnumerable<SystemResourceSelectDto> Permissions { get; set; } = [];
+        public IEnumerable<SystemResourceReadDto> Permissions { get; set; } = [];
     }
 }
