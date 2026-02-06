@@ -40,26 +40,28 @@ public class UpdateUserWithAccessGranted
     {
         Guard.AgainstNonPositiveInt(dto.Id);
 
+        object prevState;
+        object currState;
+
         await using var transaction = await _context.Database.BeginTransactionAsync();
 
         try
         {
-            var prevUser = await _userRepository.GetByIdAsync(dto.Id)
+            var user = await _userRepository.GetByIdAsync(dto.Id)
                 ?? throw new AppException("Usuário não encontrado.");
 
-            // snapshot do estado anterior (antes de qualquer alteração)
-            var prevState = new
+            prevState = new
             {
-                prevUser.Id,
-                prevUser.Username,
-                prevUser.Email,
-                prevUser.FullName,
-                Permissions = prevUser.AccessPermissions
+                user.Username,
+                user.Email,
+                user.FullName,
+                Permissions = user.AccessPermissions
                     .Select(p => p.SystemResourceId)
                     .ToList()
             };
 
             var updatedUser = await _updateUser.ExecuteAsync(dto);
+            await _context.SaveChangesAsync();
 
             if (dto.PermissionIds != null)
             {
@@ -72,38 +74,52 @@ public class UpdateUserWithAccessGranted
                         dto.PermissionIds
                     );
                 }
+
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            await _createSystemLog.ExecuteAsync(
-                userId: updatedUser.Id,
-                action: SystemLogActionFactory.Update("User", updatedUser.Id)
-            );
-
-            var resultUser = await _userRepository.GetByIdAsync(updatedUser.Id)
-                ?? throw new AppException("Usuário atualizado não encontrado.");
-
-            return new UserReadDto
+            currState = new
             {
-                Id = resultUser.Id,
-                Username = resultUser.Username,
-                Email = resultUser.Email,
-                FullName = resultUser.FullName,
-                Permissions = resultUser.AccessPermissions
-                    .Select(ap => new SystemResourceSelectDto
-                    {
-                        Id = ap.SystemResource.Id,
-                        ExhibitionName = ap.SystemResource.ExhibitionName
-                    })
-                    .ToList()
+                updatedUser.Username,
+                updatedUser.Email,
+                updatedUser.FullName,
+                Permissions = dto.PermissionIds
             };
+
+            await transaction.CommitAsync();
         }
         catch
         {
             await transaction.RollbackAsync();
             throw;
         }
+
+        await _createSystemLog.ExecuteAsync(
+            action: SystemLogActionFactory.Update("User", dto.Id),
+            data: new SystemLogDataDto
+            {
+                Type = "update",
+                PrevState = prevState,
+                CurrState = currState
+            }
+        );
+
+        var resultUser = await _userRepository.GetByIdAsync(dto.Id)
+            ?? throw new AppException("Usuário atualizado não encontrado.");
+
+        return new UserReadDto
+        {
+            Id = resultUser.Id,
+            Username = resultUser.Username,
+            Email = resultUser.Email,
+            FullName = resultUser.FullName,
+            Permissions = resultUser.AccessPermissions
+                .Select(ap => new SystemResourceSelectDto
+                {
+                    Id = ap.SystemResource.Id,
+                    ExhibitionName = ap.SystemResource.ExhibitionName
+                })
+                .ToList()
+        };
     }
 }
