@@ -23,6 +23,12 @@ public static class SystemLogDataSerializer
         if (string.IsNullOrWhiteSpace(json))
             return null;
 
-        return JsonSerializer.Deserialize<SystemLogDataDto>(json);
+        return JsonSerializer.Deserialize<SystemLogDataDto>(
+            json,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            }
+        );
     }
 }
