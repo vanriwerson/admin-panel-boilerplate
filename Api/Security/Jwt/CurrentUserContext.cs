@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Api.Security.Jwt;
 
 namespace Api.Security.Jwt;
 
@@ -13,43 +12,33 @@ public class CurrentUserContext
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public int GetId()
+    private ClaimsPrincipal? User =>
+        _httpContextAccessor.HttpContext?.User;
+
+    public bool IsAuthenticated =>
+        User?.Identity?.IsAuthenticated == true;
+
+    public int? GetId()
     {
-        var principal = GetPrincipal();
-        return principal.GetUserId();
+        var claim = User?.FindFirst("id");
+        return claim != null && int.TryParse(claim.Value, out var id)
+            ? id
+            : null;
     }
 
-    public IEnumerable<int> GetPermissionIds()
+    public string? GetUsername()
     {
-        var principal = GetPrincipal();
-        return principal.GetPermissionIds();
+        // prioridade: claim explícita
+        return User?.FindFirst("username")?.Value
+               // fallback padrão do ASP.NET
+               ?? User?.FindFirst(ClaimTypes.Name)?.Value;
     }
 
     public string? GetIpAddress()
     {
         return _httpContextAccessor.HttpContext?
-            .Connection
+            .Connection?
             .RemoteIpAddress?
             .ToString();
-    }
-
-    public string? GetUsername()
-    {
-        var principal = GetPrincipal();
-        return principal.Identity?.Name;
-    }
-
-    private ClaimsPrincipal GetPrincipal()
-    {
-        var httpContext = _httpContextAccessor.HttpContext
-            ?? throw new InvalidOperationException("HttpContext não disponível");
-
-        var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
-            throw new InvalidOperationException("Token JWT ausente no header Authorization");
-
-        var token = authHeader["Bearer ".Length..].Trim();
-
-        return JwtService.Validate(token);
     }
 }

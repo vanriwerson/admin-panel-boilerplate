@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Security.Jwt;
 
-public static class JwtService
+public static class JwtServices
 {
     private static readonly string SecretKey =
         EnvLoader.GetEnv("JWT_SECRET_KEY");

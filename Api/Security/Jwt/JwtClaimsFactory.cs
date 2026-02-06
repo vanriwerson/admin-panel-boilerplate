@@ -9,7 +9,11 @@ public static class JwtClaimsFactory
     {
         ArgumentNullException.ThrowIfNull(user);
 
+        // Identidade principal
         yield return new Claim("id", user.Id.ToString());
+        yield return new Claim(ClaimTypes.Name, user.Username);
+
+        // Claims informativos
         yield return new Claim("username", user.Username);
         yield return new Claim("fullName", user.FullName);
         yield return new Claim("email", user.Email);
