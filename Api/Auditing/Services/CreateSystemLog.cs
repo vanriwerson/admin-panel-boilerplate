@@ -18,20 +18,20 @@ public class CreateSystemLog
     }
 
     public async Task ExecuteAsync(
-        string action,
-        object? data = null,
-        int? userId = null)
+      string action,
+      int? userId = null,
+      string? generatedBy = null,
+      object? data = null
+    )
     {
-        var resolvedUserId = userId ?? _currentUser.GetId();
-
         var log = new SystemLog
         {
-            UserId = resolvedUserId,
+            UserId = userId ?? _currentUser.GetId(),
             Action = action,
             Data = data != null
-                ? SystemLogDataSerializer.Serialize(data)
-                : null,
-            GeneratedBy = _currentUser.GetUsername(),
+            ? SystemLogDataSerializer.Serialize(data)
+            : null,
+            GeneratedBy = generatedBy ?? _currentUser.GetUsername(),
             IpAddress = _currentUser.GetIpAddress(),
             CreatedAt = DateTime.UtcNow
         };
