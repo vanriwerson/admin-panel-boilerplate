@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
+using System.Security.Claims;
 
 namespace Api.Middlewares
 {
@@ -39,7 +40,7 @@ namespace Api.Middlewares
             }
 
             var token = authHeader.Substring("Bearer ".Length).Trim();
-            var principal = JwtService.Validate(token);
+            var principal = JwtServices.Validate(token);
 
             var userPermissionIds = GetPermissionIdsFromToken(principal);
 
@@ -72,18 +73,37 @@ namespace Api.Middlewares
             await _next(context);
         }
 
-        private static int[] GetPermissionIdsFromToken(System.Security.Claims.ClaimsPrincipal principal)
+        private static int[] GetPermissionIdsFromToken(ClaimsPrincipal principal)
         {
             try
             {
-                var permsClaim = principal.Claims.FirstOrDefault(c => c.Type == "permissions")?.Value;
-                if (permsClaim != null)
+                // Backwards-compatible: try a single 'permissions' claim that contains a JSON array
+                var permsClaim = principal?.Claims.FirstOrDefault(c => c.Type == "permissions")?.Value;
+                if (!string.IsNullOrWhiteSpace(permsClaim))
                 {
-                    var permissions = JsonSerializer.Deserialize<SystemResourceSelectDto[]>(permsClaim);
-                    return permissions?.Select(p => p.Id).ToArray() ?? Array.Empty<int>();
+                    try
+                    {
+                        var permissions = JsonSerializer.Deserialize<SystemResourceSelectDto[]>(permsClaim);
+                        return permissions?.Select(p => p.Id).ToArray() ?? Array.Empty<int>();
+                    }
+                    catch { }
                 }
+
+                // Current implementation creates multiple 'permission' claims with single ids
+                var singleIds = principal?.Claims
+                    .Where(c => c.Type == "permission")
+                    .Select(c =>
+                    {
+                        if (int.TryParse(c.Value, out var id)) return id;
+                        return 0;
+                    })
+                    .Where(id => id > 0)
+                    .ToArray();
+
+                return singleIds ?? Array.Empty<int>();
             }
             catch { }
+
             return Array.Empty<int>();
         }
 
