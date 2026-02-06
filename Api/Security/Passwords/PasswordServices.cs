@@ -19,13 +19,13 @@ namespace Api.Services.AuthServices
     {
         private readonly ApiDbContext _context;
         private readonly CreateSystemLog _createSystemLog;
-        private readonly EmailService _emailService;
+        private readonly PasswordResetEmailService _passwordResetEmailService;
 
-        public PasswordServices(ApiDbContext context, CreateSystemLog createSystemLog, EmailService emailService)
+        public PasswordServices(ApiDbContext context, CreateSystemLog createSystemLog, PasswordResetEmailService passwordResetEmailService)
         {
             _context = context;
             _createSystemLog = createSystemLog;
-            _emailService = emailService;
+            _passwordResetEmailService = passwordResetEmailService;
         }
 
         public async Task RequestNewPasswordAsync(string email)
@@ -44,12 +44,12 @@ namespace Api.Services.AuthServices
                 new System.Security.Claims.Claim("email", user.Email)
             };
 
-            var token = JwtService.Create(claims, expireMinutes: 15);
+            var token = JwtServices.Create(claims, expireMinutes: 15);
 
             var webAppUrl = EnvLoader.GetEnv("WEB_APP_URL");
             var resetLink = $"{webAppUrl.TrimEnd('/')}/password-reset?token={token}";
 
-            await _emailService.SendPasswordResetEmailAsync(user.Email, resetLink);
+            await _passwordResetEmailService.SendEmailAsync(user.Email, resetLink);
 
             Console.WriteLine($"[DEBUG] Link de redefinição enviado para {email}: {resetLink}");
 
@@ -64,7 +64,7 @@ namespace Api.Services.AuthServices
             System.Security.Claims.ClaimsPrincipal principal;
             try
             {
-                principal = JwtService.Validate(token, validateLifetime: true);
+                principal = JwtServices.Validate(token, validateLifetime: true);
             }
             catch
             {
