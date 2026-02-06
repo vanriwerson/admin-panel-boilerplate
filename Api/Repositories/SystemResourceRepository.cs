@@ -76,7 +76,7 @@ public class SystemResourceRepository : ISystemResourceRepository
     }
 
     public async Task<PagedResult<SystemResource>> SearchAsync(
-      string term,
+      string key,
       int page,
       int pageSize)
     {
@@ -84,8 +84,8 @@ public class SystemResourceRepository : ISystemResourceRepository
           .AsNoTracking()
           .Where(r =>
             r.Active &&
-            (EF.Functions.ILike(r.Name, $"%{term}%") ||
-             EF.Functions.ILike(r.ExhibitionName, $"%{term}%")))
+            (EF.Functions.ILike(r.Name, $"%{key}%") ||
+             EF.Functions.ILike(r.ExhibitionName, $"%{key}%")))
           .OrderBy(r => r.Name);
 
         return await PagedResult<SystemResource>

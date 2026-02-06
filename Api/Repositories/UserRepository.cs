@@ -72,7 +72,7 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<PagedResult<User>> SearchAsync(
-        string term,
+        string key,
         int page,
         int pageSize)
     {
@@ -80,9 +80,9 @@ public class UserRepository : IUserRepository
             .AsNoTracking()
             .Where(u =>
                 u.Active &&
-                (EF.Functions.ILike(u.Username, $"%{term}%") ||
-                 EF.Functions.ILike(u.Email, $"%{term}%") ||
-                 EF.Functions.ILike(u.FullName, $"%{term}%")))
+                (EF.Functions.ILike(u.Username, $"%{key}%") ||
+                 EF.Functions.ILike(u.Email, $"%{key}%") ||
+                 EF.Functions.ILike(u.FullName, $"%{key}%")))
             .OrderBy(u => u.FullName);
 
         return await PagedResult<User>.CreateAsync(query, page, pageSize);

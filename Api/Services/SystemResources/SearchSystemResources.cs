@@ -15,15 +15,15 @@ public class SearchSystemResources
     }
 
     public async Task<PagedResult<SystemResourceReadDto>> ExecuteAsync(
-      string term,
+      string key,
       int page = 1,
       int pageSize = 10)
     {
-        Guard.AgainstNullOrEmpty(term, nameof(term));
+        Guard.AgainstNullOrEmpty(key, nameof(key));
         Guard.AgainstNonPositiveInt(page);
         Guard.AgainstNonPositiveInt(pageSize);
 
-        var pagedResources = await _repository.SearchAsync(term, page, pageSize);
+        var pagedResources = await _repository.SearchAsync(key, page, pageSize);
 
         var data = pagedResources.Data.Select(r => new SystemResourceReadDto
         {

@@ -103,14 +103,14 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    // GET: api/users/search?term=abc&page=1&pageSize=10
+    // GET: api/users/search?key=abc&page=1&pageSize=10
     [HttpGet("search")]
     public async Task<IActionResult> Search(
-        [FromQuery] string term,
+        [FromQuery] string key,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-        var users = await _searchUsers.ExecuteAsync(term, page, pageSize);
+        var users = await _searchUsers.ExecuteAsync(key, page, pageSize);
         return Ok(users);
     }
 }

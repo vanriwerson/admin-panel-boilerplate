@@ -87,14 +87,14 @@ public class SystemResourcesController : ControllerBase
         return NoContent();
     }
 
-    // GET: api/resources/search?term=abc&page=1&pageSize=10
+    // GET: api/resources/search?key=abc&page=1&pageSize=10
     [HttpGet("search")]
     public async Task<IActionResult> Search(
-        [FromQuery] string term,
+        [FromQuery] string key,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-        var result = await _search.ExecuteAsync(term, page, pageSize);
+        var result = await _search.ExecuteAsync(key, page, pageSize);
         return Ok(result);
     }
 }

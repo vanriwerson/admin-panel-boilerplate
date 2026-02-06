@@ -12,7 +12,7 @@ public interface IUserRepository
     Task<User?> GetByIdAsync(int id);
     Task<PagedResult<User>> GetAllAsync(int page, int pageSize);
     Task<IEnumerable<User>> GetForSelectAsync();
-    Task<PagedResult<User>> SearchAsync(string term, int page, int pageSize);
+    Task<PagedResult<User>> SearchAsync(string key, int page, int pageSize);
 
     Task<bool> ExistsByUsernameAsync(string username);
     Task<bool> ExistsByEmailAsync(string email);

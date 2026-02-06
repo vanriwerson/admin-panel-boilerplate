@@ -15,15 +15,15 @@ public class SearchUsers
     }
 
     public async Task<PagedResult<UserListDto>> ExecuteAsync(
-        string term,
+        string key,
         int page = 1,
         int pageSize = 10)
     {
-        Guard.AgainstNullOrEmpty(term, nameof(term));
+        Guard.AgainstNullOrEmpty(key, nameof(key));
         Guard.AgainstNonPositiveInt(page);
         Guard.AgainstNonPositiveInt(pageSize);
 
-        var pagedUsers = await _repository.SearchAsync(term, page, pageSize);
+        var pagedUsers = await _repository.SearchAsync(key, page, pageSize);
 
         var data = pagedUsers.Data.Select(u => new UserListDto
         {
