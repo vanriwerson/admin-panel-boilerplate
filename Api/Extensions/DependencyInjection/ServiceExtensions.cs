@@ -19,6 +19,7 @@ public static class ServiceExtensions
             t.Namespace != null &&
             (
                 t.Namespace.StartsWith("Api.Services") ||
+                t.Namespace.StartsWith("Api.Security.Auth") ||
                 t.Namespace.StartsWith("Api.Auditing.Services")
             )
         ))

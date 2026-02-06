@@ -2,6 +2,7 @@ using Api.Data;
 using Api.Extensions.DependencyInjection;
 using Api.Helpers;
 using Api.Middlewares;
+using Api.Security.Jwt;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Resend;
@@ -67,8 +68,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseExceptionHandlerMiddleware();
+// app.UseExceptionHandlerMiddleware();
 app.UseCors("FrontendPolicy");
+app.UseJwtAuthentication();
 app.UseRequireAuthorization();
 app.UseValidateUserPermissions();
 app.MapControllers();
