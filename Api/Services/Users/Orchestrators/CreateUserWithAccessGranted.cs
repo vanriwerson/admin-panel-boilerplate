@@ -2,9 +2,8 @@ using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
-using Api.Helpers;
 using Api.Interfaces.Repositories;
-using Api.Middlewares;
+using Api.Models;
 using Api.Services.AccessPermissions;
 using Api.Services.Users;
 using Microsoft.EntityFrameworkCore;
@@ -35,47 +34,60 @@ public class CreateUserWithAccessGranted
 
     public async Task<UserReadDto> ExecuteAsync(UserCreateDto dto)
     {
+        User user;
+
         await using var transaction = await _context.Database.BeginTransactionAsync();
 
         try
         {
-            var user = await _createUser.ExecuteAsync(dto);
+            user = await _createUser.ExecuteAsync(dto);
+            await _context.SaveChangesAsync();
 
-            if (dto.PermissionIds.Any())
-            {
-                await _createAccessPermissions.ExecuteAsync(
-                    user.Id,
-                    dto.PermissionIds
-                );
-            }
+            await _createAccessPermissions.ExecuteAsync(
+                user.Id,
+                dto.PermissionIds
+            );
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
-
-            await _createSystemLog.ExecuteAsync(
-                userId: user.Id,
-                action: SystemLogActionFactory.Create("User", user.Id)
-            );
-
-            return new UserReadDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FullName = user.FullName,
-                Permissions = user.AccessPermissions
-                    .Select(ap => new SystemResourceSelectDto
-                    {
-                        Id = ap.SystemResource.Id,
-                        ExhibitionName = ap.SystemResource.ExhibitionName
-                    })
-                    .ToList()
-            };
         }
         catch
         {
             await transaction.RollbackAsync();
             throw;
         }
+
+        await _createSystemLog.ExecuteAsync(
+            action: SystemLogActionFactory.Create("User", user.Id),
+            data: new SystemLogDataDto
+            {
+                Type = "create",
+                Created = new
+                {
+                    dto.Username,
+                    dto.Email,
+                    dto.FullName,
+                    Permissions = dto.PermissionIds
+                }
+            }
+        );
+
+        var createdUser = await _userRepository.GetByIdAsync(user.Id)
+            ?? throw new Exception("Usuário não encontrado.");
+
+        return new UserReadDto
+        {
+            Id = createdUser.Id,
+            Username = createdUser.Username,
+            Email = createdUser.Email,
+            FullName = createdUser.FullName,
+            Permissions = createdUser.AccessPermissions
+                .Select(ap => new SystemResourceSelectDto
+                {
+                    Id = ap.SystemResource.Id,
+                    ExhibitionName = ap.SystemResource.ExhibitionName
+                })
+                .ToList()
+        };
     }
 }
