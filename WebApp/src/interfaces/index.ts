@@ -4,7 +4,7 @@ export type { ExternalLoginPayload } from './authInterfaces/ExternalLoginPayload
 export type { LoginPayload } from './authInterfaces/LoginPayload';
 export type { LoginResponse } from './authInterfaces/LoginResponse';
 export type { MenuItem } from './MenuItem';
-export type { PaginatedResponse } from './PaginatedResponse';
+export type { PagedResponse } from './PagedResponse';
 export type { PasswordResetPayload } from './authInterfaces/PasswordResetPayload';
 export type { PermissionsContextProps } from './contextsInterfaces/PermissionsContextProps';
 export type { SystemLog } from './systemLogsInterfaces/SystemLog';
