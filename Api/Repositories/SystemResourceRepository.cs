@@ -55,7 +55,7 @@ public class SystemResourceRepository : ISystemResourceRepository
         var query = _context.SystemResources
           .AsNoTracking()
           .Where(r => r.Active)
-          .OrderBy(r => r.Name);
+          .OrderBy(r => r.Id);
 
         return await PagedResult<SystemResource>
           .CreateAsync(query, page, pageSize);
@@ -66,7 +66,7 @@ public class SystemResourceRepository : ISystemResourceRepository
         return await _context.SystemResources
           .AsNoTracking()
           .Where(r => r.Active)
-          .OrderBy(r => r.Name)
+          .OrderBy(r => r.ExhibitionName)
           .Select(r => new SystemResource
           {
               Id = r.Id,
