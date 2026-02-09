@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -9,14 +9,13 @@ import {
   Paper,
   TablePagination,
   Typography,
-  Box,
   IconButton,
 } from '@mui/material';
+import { Visibility } from '@mui/icons-material';
 
-import type { SystemLog, SystemLogFiltersPayload } from '../../interfaces';
+import type { SystemLogFiltersPayload } from '../../interfaces';
 import { useReports } from '../../hooks/useReports';
 import LogDetailsModal from '../LogDetailsModal';
-import { Visibility } from '@mui/icons-material';
 import NoResultsFound from '../NoResultsFound';
 
 interface ReportsTableProps {
@@ -25,8 +24,7 @@ interface ReportsTableProps {
 
 export default function ReportsTable({ filters }: ReportsTableProps) {
   const { logs, pagination, setPagination, setReportFilters } = useReports();
-  const [selectedLog, setSelectedLog] = useState<SystemLog | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLogId, setSelectedLogId] = useState<number | null>(null);
 
   useEffect(() => {
     setReportFilters({
@@ -36,73 +34,45 @@ export default function ReportsTable({ filters }: ReportsTableProps) {
     });
   }, [filters, pagination.pageSize, setReportFilters]);
 
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPagination((prev) => ({
-      ...prev,
-      page: newPage + 1,
-    }));
-  };
-
-  const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPagination({
-      ...pagination,
-      page: 1,
-      pageSize: parseInt(e.target.value, 10),
-    });
-  };
-
-  const handleViewDetails = (log: SystemLog) => {
-    setSelectedLog(log);
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedLog(null);
-  };
-
   return (
     <Paper sx={{ p: 2 }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
-        <Typography variant="h6">Logs do Sistema</Typography>
-      </Box>
+      <Typography variant="h6" mb={2}>
+        Logs do Sistema
+      </Typography>
 
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Usuário</TableCell>
+              <TableCell>Gerado por</TableCell>
               <TableCell>Ação</TableCell>
               <TableCell>Data</TableCell>
               <TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             {logs.length > 0 ? (
-              logs.map((log: SystemLog) => (
+              logs.map((log) => (
                 <TableRow key={log.id} hover>
                   <TableCell>{log.id}</TableCell>
-                  <TableCell>{log.user.fullName}</TableCell>
+                  <TableCell>{log.generatedBy}</TableCell>
                   <TableCell>{log.action}</TableCell>
                   <TableCell>
                     {new Date(log.createdAt).toLocaleString()}
                   </TableCell>
+                  {(log.action.includes('create') || log.action.includes('update')) && (
+
                   <TableCell align="right">
-                    {log.usedPayload && (
-                      <IconButton
-                        onClick={() => handleViewDetails(log)}
-                        title="Ver detalhes do log"
-                      >
-                        <Visibility />
-                      </IconButton>
-                    )}
+                    <IconButton
+                      title="Ver detalhes"
+                      onClick={() => setSelectedLogId(log.id)}
+                    >
+                      <Visibility />
+                    </IconButton>
                   </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
@@ -116,22 +86,29 @@ export default function ReportsTable({ filters }: ReportsTableProps) {
         </Table>
       </TableContainer>
 
-      <Box display="flex" justifyContent="flex-end">
-        <TablePagination
-          component="div"
-          count={pagination.totalItems}
-          page={pagination.page - 1}
-          onPageChange={handleChangePage}
-          rowsPerPage={pagination.pageSize}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Itens por página:"
-          rowsPerPageOptions={[5, 10, 25]}
-        />
-      </Box>
+      <TablePagination
+        component="div"
+        count={pagination.totalItems}
+        page={pagination.page - 1}
+        rowsPerPage={pagination.pageSize}
+        rowsPerPageOptions={[5, 10, 25]}
+        labelRowsPerPage="Itens por página:"
+        onPageChange={(_, newPage) =>
+          setPagination((prev) => ({ ...prev, page: newPage + 1 }))
+        }
+        onRowsPerPageChange={(e) =>
+          setPagination({
+            ...pagination,
+            page: 1,
+            pageSize: Number(e.target.value),
+          })
+        }
+      />
+
       <LogDetailsModal
-        open={modalOpen}
-        log={selectedLog}
-        onClose={handleCloseModal}
+        logId={selectedLogId}
+        open={!!selectedLogId}
+        onClose={() => setSelectedLogId(null)}
       />
     </Paper>
   );

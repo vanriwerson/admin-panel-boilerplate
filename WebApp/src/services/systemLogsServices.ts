@@ -20,3 +20,8 @@ export async function getLogReports(params: SystemLogFiltersPayload) {
   const { data } = await api.get<SystemLogsPagination>(url);
   return data;
 }
+
+export async function getLogDetails(logId: number) {
+  const { data } = await api.get(`/reports/${logId}`);
+  return data;
+}
