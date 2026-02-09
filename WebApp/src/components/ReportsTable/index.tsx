@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,13 +10,13 @@ import {
   TablePagination,
   Typography,
   IconButton,
-} from '@mui/material';
-import { Visibility } from '@mui/icons-material';
+} from "@mui/material";
+import { Visibility } from "@mui/icons-material";
 
-import type { SystemLogFiltersPayload } from '../../interfaces';
-import { useReports } from '../../hooks/useReports';
-import LogDetailsModal from '../LogDetailsModal';
-import NoResultsFound from '../NoResultsFound';
+import type { SystemLogFiltersPayload } from "../../interfaces";
+import { useReports } from "../../hooks/useReports";
+import LogDetailsModal from "../LogDetailsModal";
+import NoResultsFound from "../NoResultsFound";
 
 interface ReportsTableProps {
   filters: SystemLogFiltersPayload;
@@ -62,16 +62,18 @@ export default function ReportsTable({ filters }: ReportsTableProps) {
                   <TableCell>
                     {new Date(log.createdAt).toLocaleString()}
                   </TableCell>
-                  {(log.action.includes('create') || log.action.includes('update')) && (
-
-                  <TableCell align="right">
-                    <IconButton
-                      title="Ver detalhes"
-                      onClick={() => setSelectedLogId(log.id)}
-                    >
-                      <Visibility />
-                    </IconButton>
-                  </TableCell>
+                  {log.action.includes("create") ||
+                  log.action.includes("update") ? (
+                    <TableCell align="right">
+                      <IconButton
+                        title="Ver detalhes"
+                        onClick={() => setSelectedLogId(log.id)}
+                      >
+                        <Visibility />
+                      </IconButton>
+                    </TableCell>
+                  ) : (
+                    <TableCell />
                   )}
                 </TableRow>
               ))
