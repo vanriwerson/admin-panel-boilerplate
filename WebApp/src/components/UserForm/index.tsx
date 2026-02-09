@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, Button, FormHelperText, Paper } from "@mui/material";
 import type { UserFormValues, UserRead } from "../../interfaces";
-import { cleanStates, mapSystemResourcesToFormValue } from "../../helpers";
+import { cleanStates } from "../../helpers";
 import { useAuth } from "../../hooks";
 import SystemResourceSelect from "../SystemResourcesSelect";
 import { canEditPassword, canEditPermissions } from "../../permissions/Rules";
