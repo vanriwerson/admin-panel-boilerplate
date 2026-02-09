@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import { Container } from '@mui/material';
+import { useState } from "react";
+import { Container } from "@mui/material";
 import {
   PageTitle,
   UserEditionModal,
   UserForm,
   UsersTable,
   ConfirmDialog,
-} from '../../components';
-import type { UserFormValues, UserRead } from '../../interfaces';
-import { useUsers, useNotification } from '../../hooks';
-import { usePermissions } from '../../hooks';
-import { getErrorMessage } from '../../helpers';
+} from "../../components";
+import type { UserFormValues, UserRead } from "../../interfaces";
+import { useUsers, useNotification } from "../../hooks";
+import { usePermissions } from "../../hooks";
+import { getErrorMessage } from "../../helpers";
 
 export default function Users() {
-  const { fetchUsers, addUser, editUser, removeUser } = useUsers();
+  const { fetchUsers, fetchUserById, addUser, editUser, removeUser } =
+    useUsers();
   const { showNotification } = useNotification();
   const { permissionsMap } = usePermissions();
   const [editingUser, setEditingUser] = useState<UserRead | null>(null);
@@ -26,10 +27,10 @@ export default function Users() {
   async function handleCreate(user: UserFormValues) {
     try {
       await addUser(user);
-      showNotification('Usuário cadastrado com sucesso!', 'success');
+      showNotification("Usuário cadastrado com sucesso!", "success");
       await fetchUsers();
     } catch (err) {
-      showNotification(getErrorMessage(err), 'error');
+      showNotification(getErrorMessage(err), "error");
     }
   }
 
@@ -37,10 +38,10 @@ export default function Users() {
     if (!editingUser) return;
     try {
       await editUser({ ...editingUser, ...user });
-      showNotification('Usuário atualizado com sucesso!', 'success');
+      showNotification("Usuário atualizado com sucesso!", "success");
       await fetchUsers();
     } catch (err) {
-      showNotification(getErrorMessage(err), 'error');
+      showNotification(getErrorMessage(err), "error");
     } finally {
       setOpen(false);
     }
@@ -53,10 +54,10 @@ export default function Users() {
   async function confirmDelete() {
     try {
       await removeUser(confirmDialog.id);
-      showNotification('Usuário excluído com sucesso!', 'success');
+      showNotification("Usuário excluído com sucesso!", "success");
       await fetchUsers();
     } catch (err) {
-      showNotification(getErrorMessage(err), 'error');
+      showNotification(getErrorMessage(err), "error");
     } finally {
       setConfirmDialog({ open: false, id: 0 });
     }
@@ -66,7 +67,10 @@ export default function Users() {
     setConfirmDialog({ open: false, id: 0 });
   }
 
-  function handleOpenEditionModal(user: UserRead) {
+  async function handleOpenEditionModal(userId: number) {
+    const user = await fetchUserById(userId);
+    if (!user) return;
+
     setEditingUser(user);
     setOpen(true);
   }
@@ -75,11 +79,11 @@ export default function Users() {
     <Container
       sx={{
         mt: 4,
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        textAlign: 'center',
+        alignItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        textAlign: "center",
       }}
     >
       <PageTitle

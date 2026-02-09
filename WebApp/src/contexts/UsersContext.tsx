@@ -11,6 +11,7 @@ import type {
   UserRead,
   UserFormValues,
   UsersContextProps,
+  UserList,
 } from '../interfaces';
 import {
   listUsers,
@@ -29,7 +30,7 @@ export default UsersContext;
 
 export function UsersProvider({ children }: { children: ReactNode }) {
   const { authUser } = useAuth();
-  const [users, setUsers] = useState<UserRead[]>([]);
+  const [users, setUsers] = useState<UserList[]>([]);
   const [pagination, setPagination] = useState(cleanStates.tablePagination);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,13 +65,13 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     [pagination.page, pagination.pageSize]
   );
 
-  const visibleUsers = useMemo(() => {
-    if (showRootUsers) return users;
+//   const visibleUsers = useMemo(() => {
+//     if (showRootUsers) return users;
 
-    return users.filter((user) => {
-      return !isRootUser(user);
-    });
-  }, [users, showRootUsers]);
+//     return users.filter((user) => {
+//       return !isRootUser(user);
+//     });
+//   }, [users, showRootUsers]);
 
   const addUser = useCallback(async (user: UserFormValues) => {
     setLoading(true);
@@ -124,7 +125,7 @@ export function UsersProvider({ children }: { children: ReactNode }) {
   return (
     <UsersContext.Provider
       value={{
-        users: visibleUsers,
+        users,
         pagination,
         loading,
         error,

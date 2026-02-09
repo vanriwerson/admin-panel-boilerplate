@@ -1,7 +1,7 @@
-import type { SystemResource } from '../interfaces';
+import type { SystemResourceOption } from '../interfaces';
 
 export function mapSystemResourcesToFormValue(
-  permissions: SystemResource[] | undefined
+  permissions: SystemResourceOption[] | undefined
 ): number[] {
   if (!permissions) return [];
   return permissions

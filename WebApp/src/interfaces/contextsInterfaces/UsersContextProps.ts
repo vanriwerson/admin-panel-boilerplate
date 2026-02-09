@@ -1,10 +1,11 @@
 import type { UserFormValues } from '../userInterfaces/UserFormValues';
+import type { UserList } from '../userInterfaces/UserList';
 import type { UserOption } from '../userInterfaces/UserOption';
 import type { UserRead } from '../userInterfaces/UserRead';
 import type { UsersPagination } from '../userInterfaces/UsersPagination';
 
 export interface UsersContextProps {
-  users: UserRead[];
+  users: UserList[];
   pagination: Omit<UsersPagination, 'data'>;
   loading: boolean;
   error: string | null;

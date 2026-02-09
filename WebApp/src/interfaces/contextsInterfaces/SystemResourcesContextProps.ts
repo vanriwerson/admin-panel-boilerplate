@@ -1,4 +1,5 @@
 import type { SystemResource } from '../systemResourcesInterfaces/SystemResource';
+import type { SystemResourceOption } from '../systemResourcesInterfaces/SystemResourceOption';
 import type { SystemResourcesPagination } from '../systemResourcesInterfaces/SystemResourcesPagination';
 
 export interface SystemResourcesContextProps {
@@ -14,7 +15,7 @@ export interface SystemResourcesContextProps {
   addSystemResource: (resource: SystemResource) => Promise<void>;
   editSystemResource: (resource: SystemResource) => Promise<void>;
   removeSystemResource: (id: string) => Promise<void>;
-  fetchSystemResourcesForSelect: () => Promise<SystemResource[]>;
+  fetchSystemResourcesForSelect: () => Promise<SystemResourceOption[]>;
   setPagination: React.Dispatch<
     React.SetStateAction<Omit<SystemResourcesPagination, 'data'>>
   >;

@@ -15,12 +15,12 @@ import {
 } from '@mui/material';
 import { Edit, Delete, Search } from '@mui/icons-material';
 
-import type { UserRead } from '../../interfaces';
+import type { UserList } from '../../interfaces';
 import { useUsers } from '../../hooks';
 import NoResultsFound from '../NoResultsFound';
 
 interface UsersTableProps {
-  onEdit: (user: UserRead) => void;
+  onEdit: (id: number) => void;
   onDelete?: (id: number) => void;
 }
 
@@ -83,8 +83,7 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
               <TableCell>Usuário</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Nome completo</TableCell>
-              <TableCell>Criado em</TableCell>
-              <TableCell>Atualizado em</TableCell>
+              <TableCell>Ativo desde</TableCell>
               <TableCell sx={{ minWidth: 112 }} align="center">
                 Ações
               </TableCell>
@@ -98,7 +97,7 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
                 </TableCell>
               </TableRow>
             ) : users.length > 0 ? (
-              users.map((user: UserRead) => (
+              users.map((user: UserList) => (
                 <TableRow key={user.id} hover>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
@@ -106,13 +105,10 @@ export default function UsersTable({ onEdit, onDelete }: UsersTableProps) {
                   <TableCell>
                     {new Date(user.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell>
-                    {new Date(user.updatedAt).toLocaleString()}
-                  </TableCell>
                   <TableCell sx={{ minWidth: 112 }} align="center">
                     <IconButton
                       color="primary"
-                      onClick={() => onEdit(user)}
+                      onClick={() => onEdit(user.id)}
                       title="Editar usuário"
                     >
                       <Edit />

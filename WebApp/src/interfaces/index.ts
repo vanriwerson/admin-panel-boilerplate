@@ -20,6 +20,7 @@ export type { SystemStats } from './SystemStats';
 export type { ThemeContextProps } from './contextsInterfaces/ThemeContextProps';
 export type { UsersContextProps } from './contextsInterfaces/UsersContextProps';
 export type { UserFormValues } from './userInterfaces/UserFormValues';
+export type { UserList } from './userInterfaces/UserList';
 export type { UserOption } from './userInterfaces/UserOption';
 export type { UserRead } from './userInterfaces/UserRead';
 export type { UsersPagination } from './userInterfaces/UsersPagination';
