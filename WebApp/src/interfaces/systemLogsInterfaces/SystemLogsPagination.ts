@@ -1,4 +1,4 @@
-import type { PaginatedResponse } from '../PaginatedResponse';
-import type { SystemLog } from './SystemLog';
+import type { PagedResponse } from '../PagedResponse';
+import type { SystemLogList } from './SystemLogList';
 
-export type SystemLogsPagination = PaginatedResponse<SystemLog>;
+export type SystemLogsPagination = PagedResponse<SystemLogList>;
