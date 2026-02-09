@@ -1,4 +1,4 @@
-import type { PaginatedResponse } from '../PaginatedResponse';
-import type { UserRead } from './UserRead';
+import type { PagedResponse } from '../PagedResponse';
+import type { UserList } from './UserList';
 
-export type UsersPagination = PaginatedResponse<UserRead>;
+export type UsersPagination = PagedResponse<UserList>;

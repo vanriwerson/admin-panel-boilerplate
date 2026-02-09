@@ -1,5 +1,5 @@
 import type {
-  PaginatedResponse,
+  PagedResponse,
   SystemLogFiltersPayload,
   SystemResource,
   UserFormValues,
@@ -10,7 +10,7 @@ interface FormStates {
   initialPermissionsMap: Record<string, ValidPermission>;
   logsReportFilters: Omit<SystemLogFiltersPayload, 'page' | 'pageSize'>;
   systemResource: SystemResource;
-  tablePagination: Omit<PaginatedResponse<unknown>, 'data'>;
+  tablePagination: Omit<PagedResponse<unknown>, 'data'>;
   userForm: UserFormValues;
 }
 
@@ -37,6 +37,6 @@ export const cleanStates: FormStates = {
     email: '',
     fullName: '',
     password: '',
-    permissions: [],
+    permissionIds: [],
   },
 };
