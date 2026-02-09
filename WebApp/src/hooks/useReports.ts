@@ -3,7 +3,6 @@ import type {
   SystemLogList,
   SystemLogFiltersPayload,
   SystemLogsPagination,
-  SystemLogRead,
 } from '../interfaces';
 import { getLogReports, getLogDetails } from '../services';
 import { getErrorMessage } from '../helpers';

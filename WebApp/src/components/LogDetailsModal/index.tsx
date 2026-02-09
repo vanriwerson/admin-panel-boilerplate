@@ -1,13 +1,13 @@
-import { Modal, Box, Typography, Paper, IconButton } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose, faEye } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from 'react';
+import { Modal, Box, Typography, Paper, IconButton } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClose, faEye } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
 
-import type { SystemLogRead } from '../../interfaces';
-import { useReports } from '../../hooks/useReports';
-import { useNotification } from '../../hooks';
-import { getErrorMessage } from '../../helpers';
-import JsonWrapper from '../JsonWrapper';
+import type { SystemLogRead } from "../../interfaces";
+import { useReports } from "../../hooks/useReports";
+import { useNotification } from "../../hooks";
+import { getErrorMessage } from "../../helpers";
+import JsonWrapper from "../JsonWrapper";
 
 interface Props {
   open: boolean;
@@ -34,7 +34,7 @@ export default function LogDetailsModal({ open, logId, onClose }: Props) {
         const data = await fetchLogDetails(logId);
         setLog(data);
       } catch (err) {
-        showNotification(getErrorMessage(err), 'error');
+        showNotification(getErrorMessage(err), "error");
       } finally {
         setLoading(false);
       }
@@ -49,13 +49,13 @@ export default function LogDetailsModal({ open, logId, onClose }: Props) {
     <Modal open={open} onClose={onClose}>
       <Box
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: { xs: '90%', sm: 600, md: 900 },
-          maxHeight: '90vh',
-          overflow: 'auto',
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "90%", sm: 600, md: 900 },
+          maxHeight: "90vh",
+          overflow: "auto",
         }}
       >
         <Paper sx={{ p: 3 }}>
@@ -78,19 +78,12 @@ export default function LogDetailsModal({ open, logId, onClose }: Props) {
             <Typography>Carregando...</Typography>
           ) : (
             <>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                mb={3}
-                gap={2}
-              >
+              <Box display="flex" justifyContent="space-between" mb={3} gap={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     Gerado por
                   </Typography>
-                  <Typography variant="body1">
-                    {log.generatedBy}
-                  </Typography>
+                  <Typography variant="body1">{log.generatedBy}</Typography>
                 </Box>
 
                 <Box>
@@ -112,21 +105,21 @@ export default function LogDetailsModal({ open, logId, onClose }: Props) {
 
               {log.data && (
                 <Box display="flex" gap={3} width="100%">
-                  {log.data.type === 'create' && (
+                  {log.data.type === "create" && (
                     <JsonWrapper
                       title="Payload utilizado"
                       jsonContent={log.data.created}
                     />
                   )}
 
-                  {log.data.type === 'update' && (
+                  {log.data.type === "update" && (
                     <>
                       <JsonWrapper
                         title="Estado anterior"
                         jsonContent={log.data.prevState}
                       />
                       <JsonWrapper
-                        title="Estado atual"
+                        title="Estado após atualização"
                         jsonContent={log.data.currState}
                       />
                     </>
