@@ -47,14 +47,13 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id && u.Active);
     }
 
-    public async Task<PagedResult<User>> GetAllAsync(int page, int pageSize)
+    public IQueryable<User> Query()
     {
-        var query = _context.Users
+        return _context.Users
             .AsNoTracking()
+            .Include(u => u.AccessPermissions)
             .Where(u => u.Active)
             .OrderBy(u => u.FullName);
-
-        return await PagedResult<User>.CreateAsync(query, page, pageSize);
     }
 
     public async Task<IEnumerable<User>> GetForSelectAsync()
@@ -71,21 +70,13 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
-    public async Task<PagedResult<User>> SearchAsync(
-        string key,
-        int page,
-        int pageSize)
+    public IQueryable<User> SearchQuery(string key)
     {
-        var query = _context.Users
-            .AsNoTracking()
-            .Where(u =>
-                u.Active &&
-                (EF.Functions.ILike(u.Username, $"%{key}%") ||
-                 EF.Functions.ILike(u.Email, $"%{key}%") ||
-                 EF.Functions.ILike(u.FullName, $"%{key}%")))
-            .OrderBy(u => u.FullName);
-
-        return await PagedResult<User>.CreateAsync(query, page, pageSize);
+        return Query().Where(u =>
+            EF.Functions.ILike(u.Username, $"%{key}%") ||
+            EF.Functions.ILike(u.Email, $"%{key}%") ||
+            EF.Functions.ILike(u.FullName, $"%{key}%")
+        );
     }
     public Task<bool> ExistsByUsernameAsync(string username)
         => _context.Users.AnyAsync(u => u.Username == username);
