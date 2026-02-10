@@ -30,14 +30,6 @@ builder.Services.AddDbContext<ApiDbContext>(options =>
     )
 );
 
-// --- Resend ---
-builder.Services.AddHttpClient<ResendClient>();
-builder.Services.Configure<ResendClientOptions>(options =>
-{
-    options.ApiToken = EnvLoader.GetEnv("RESEND_API_KEY");
-});
-builder.Services.AddTransient<ResendClient>();
-
 // --- DependencyInjection ---
 builder.Services
     .AddRepositories(logger)
