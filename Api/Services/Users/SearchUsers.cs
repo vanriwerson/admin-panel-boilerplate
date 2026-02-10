@@ -2,16 +2,21 @@ using Api.Dtos;
 using Api.Helpers;
 using Api.Helpers.Pagination;
 using Api.Interfaces.Repositories;
+using Api.Security.Policies;
 
 namespace Api.Services.Users;
 
 public class SearchUsers
 {
     private readonly IUserRepository _repository;
+    private readonly UserVisibilityPolicy _visibility;
 
-    public SearchUsers(IUserRepository repository)
+    public SearchUsers(
+        IUserRepository repository,
+        UserVisibilityPolicy visibility)
     {
         _repository = repository;
+        _visibility = visibility;
     }
 
     public async Task<PagedResult<UserListDto>> ExecuteAsync(
@@ -23,21 +28,23 @@ public class SearchUsers
         Guard.AgainstNonPositiveInt(page);
         Guard.AgainstNonPositiveInt(pageSize);
 
-        var pagedUsers = await _repository.SearchAsync(key, page, pageSize);
+        var query = _repository.SearchQuery(key);
 
-        var data = pagedUsers.Data.Select(u => new UserListDto
+        var visibleQuery = _visibility.ApplyToQuery(query);
+
+        var dtoQuery = visibleQuery.Select(u => new UserListDto
         {
             Id = u.Id,
             Username = u.Username,
             Email = u.Email,
             FullName = u.FullName,
             CreatedAt = u.CreatedAt
-        }).ToList();
+        });
 
-        return new PagedResult<UserListDto>(
-            pagedUsers.TotalItems,
-            pagedUsers.Page,
-            pagedUsers.PageSize,
-            data);
+        return await PagedResult<UserListDto>.CreateAsync(
+            dtoQuery,
+            page,
+            pageSize
+        );
     }
 }
