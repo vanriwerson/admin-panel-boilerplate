@@ -1,6 +1,7 @@
 using Api.Helpers;
 using Api.Security.Jwt;
 using Api.Security.Passwords;
+using Api.Security.Policies;
 using Microsoft.Extensions.DependencyInjection;
 using Resend;
 
@@ -12,6 +13,7 @@ public static class InfrastructureExtensions
     {
         services.AddHttpContextAccessor();
         services.AddScoped<CurrentUserContext>();
+        services.AddScoped<UserVisibilityPolicy>();
 
         // --- Resend ---
         var resendApiKey = EnvLoader.GetEnv("RESEND_API_KEY");

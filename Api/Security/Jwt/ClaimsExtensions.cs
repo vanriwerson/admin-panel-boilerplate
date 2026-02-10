@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Security.Permissions;
 
 namespace Api.Security.Jwt;
 
@@ -13,4 +14,13 @@ public static class ClaimsExtensions
         => principal.Claims
             .Where(c => c.Type == "permission")
             .Select(c => int.Parse(c.Value));
+
+    public static bool HasPermission(
+        this ClaimsPrincipal principal,
+        int permissionId
+    )
+        => principal.GetPermissionIds().Contains(permissionId);
+
+    public static bool IsRoot(this ClaimsPrincipal principal)
+        => principal.HasPermission(BasePermissions.ROOT);
 }

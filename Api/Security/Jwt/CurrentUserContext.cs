@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using Api.Security.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace Api.Security.Jwt;
 
@@ -12,33 +13,33 @@ public class CurrentUserContext
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private ClaimsPrincipal? User =>
+    private ClaimsPrincipal? Principal =>
         _httpContextAccessor.HttpContext?.User;
 
     public bool IsAuthenticated =>
-        User?.Identity?.IsAuthenticated == true;
+        Principal?.Identity?.IsAuthenticated == true;
 
     public int? GetId()
     {
-        var claim = User?.FindFirst("id");
+        var claim = Principal?.FindFirst("id");
         return claim != null && int.TryParse(claim.Value, out var id)
             ? id
             : null;
     }
 
+    public bool IsRoot()
+        => Principal?.IsRoot() == true;
+
+    public bool HasPermission(int permissionId)
+        => Principal?.HasPermission(permissionId) == true;
+
     public string? GetUsername()
-    {
-        // prioridade: claim explícita
-        return User?.FindFirst("username")?.Value
-               // fallback padrão do ASP.NET
-               ?? User?.FindFirst(ClaimTypes.Name)?.Value;
-    }
+        => Principal?.FindFirst("username")?.Value
+           ?? Principal?.FindFirst(ClaimTypes.Name)?.Value;
 
     public string? GetIpAddress()
-    {
-        return _httpContextAccessor.HttpContext?
+        => _httpContextAccessor.HttpContext?
             .Connection?
             .RemoteIpAddress?
             .ToString();
-    }
 }
