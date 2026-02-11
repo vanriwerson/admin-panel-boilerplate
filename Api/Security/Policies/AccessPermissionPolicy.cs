@@ -1,4 +1,5 @@
 using Api.Security.Jwt;
+using Api.Middlewares;
 using Api.Security.Permissions;
 
 namespace Api.Security.Policies;
@@ -15,13 +16,18 @@ public class AccessPermissionPolicy
     public void EnsureCanGrant(IEnumerable<int> permissionIds)
     {
         if (!_currentUser.IsAuthenticated)
-            throw new UnauthorizedAccessException("Usuário não autenticado.");
+            throw new AppException(
+                "Usuário não autenticado.",
+                StatusCodes.Status401Unauthorized
+            );
 
         if (permissionIds.Contains(BasePermissions.ROOT)
             && !_currentUser.IsRoot())
         {
-            throw new UnauthorizedAccessException(
-                "Apenas usuário ROOT pode conceder permissão ROOT.");
+            throw new AppException(
+                "Apenas usuário ROOT pode conceder permissão ROOT.",
+                StatusCodes.Status403Forbidden
+            );
         }
     }
 }

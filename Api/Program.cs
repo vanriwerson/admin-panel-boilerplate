@@ -60,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseExceptionHandlerMiddleware();
+app.UseExceptionHandlerMiddleware();
 app.UseCors("FrontendPolicy");
 app.UseJwtAuthentication();
 app.UseRequireAuthorization();
