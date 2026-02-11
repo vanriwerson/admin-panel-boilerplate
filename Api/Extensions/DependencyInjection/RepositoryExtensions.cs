@@ -13,8 +13,6 @@ public static class RepositoryExtensions
         ILogger logger
     )
     {
-        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISystemResourceRepository, SystemResourceRepository>();
         services.AddScoped<IAccessPermissionRepository, AccessPermissionRepository>();

@@ -88,4 +88,10 @@ public class SystemLogRepository : ISystemLogRepository
             pageSize
         );
     }
+
+    public IQueryable<SystemLog> Query()
+    {
+        return _context.SystemLogs
+            .AsNoTracking();
+    }
 }

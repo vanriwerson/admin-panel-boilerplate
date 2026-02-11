@@ -18,4 +18,6 @@ public interface ISystemLogRepository
         int page,
         int pageSize
     );
+
+    IQueryable<SystemLog> Query();
 }
