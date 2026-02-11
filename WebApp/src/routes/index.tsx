@@ -48,11 +48,7 @@ const privateRoutes = [
   },
   {
     path: "/reports",
-    element: (
-      <UsersProvider>
-        <Reports />
-      </UsersProvider>
-    ),
+    element: <Reports />,
     requiredPermission: PERMISSIONS.REPORTS,
   },
 ];
