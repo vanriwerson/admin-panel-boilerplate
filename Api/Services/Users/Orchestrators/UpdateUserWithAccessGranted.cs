@@ -5,6 +5,7 @@ using Api.Dtos;
 using Api.Helpers;
 using Api.Interfaces.Repositories;
 using Api.Middlewares;
+using Api.Security.Policies;
 using Api.Services.AccessPermissions;
 using Api.Services.Users;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ public class UpdateUserWithAccessGranted
     private readonly IAccessPermissionRepository _accessPermissionRepository;
     private readonly CreateAccessPermissions _createAccessPermissions;
     private readonly CreateSystemLog _createSystemLog;
+    private readonly AccessPermissionPolicy _accessPermissionPolicy;
 
     public UpdateUserWithAccessGranted(
         ApiDbContext context,
@@ -26,7 +28,8 @@ public class UpdateUserWithAccessGranted
         IUserRepository userRepository,
         IAccessPermissionRepository accessPermissionRepository,
         CreateAccessPermissions createAccessPermissions,
-        CreateSystemLog createSystemLog)
+        CreateSystemLog createSystemLog,
+        AccessPermissionPolicy accessPermissionPolicy)
     {
         _context = context;
         _updateUser = updateUser;
@@ -34,11 +37,18 @@ public class UpdateUserWithAccessGranted
         _accessPermissionRepository = accessPermissionRepository;
         _createAccessPermissions = createAccessPermissions;
         _createSystemLog = createSystemLog;
+        _accessPermissionPolicy = accessPermissionPolicy;
     }
 
     public async Task<UserReadDto> ExecuteAsync(UserUpdateDto dto)
     {
         Guard.AgainstNonPositiveInt(dto.Id);
+
+        // 🔐 REGRA DE SEGURANÇA (somente se for alterar permissões)
+        if (dto.PermissionIds != null)
+        {
+            _accessPermissionPolicy.EnsureCanGrant(dto.PermissionIds);
+        }
 
         object prevState;
         object currState;
