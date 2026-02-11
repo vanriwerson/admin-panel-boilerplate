@@ -6,6 +6,7 @@ import { useAuth } from "../../hooks";
 import SystemResourceSelect from "../SystemResourcesSelect";
 import { canEditPassword, canEditPermissions } from "../../permissions/Rules";
 import { mapUserReadToFormValues } from "../../mappers";
+import { SystemResourcesProvider } from "../../contexts";
 
 interface Props {
   onSubmit: (user: UserFormValues) => void;
@@ -105,14 +106,16 @@ export default function UserForm({ onSubmit, user }: Props) {
         />
       )}
 
-      <Box sx={{ width: "100%" }}>
-        <SystemResourceSelect
-          value={form.permissionIds}
-          onChange={handlePermissionsChange}
-          readOnly={!canEditPerms}
-        />
-        {error && <FormHelperText error>{error}</FormHelperText>}
-      </Box>
+      <SystemResourcesProvider>
+        <Box sx={{ width: "100%" }}>
+          <SystemResourceSelect
+            value={form.permissionIds}
+            onChange={handlePermissionsChange}
+            readOnly={!canEditPerms}
+          />
+          {error && <FormHelperText error>{error}</FormHelperText>}
+        </Box>
+      </SystemResourcesProvider>
 
       <Box display="flex" width="100%" gap={2} justifyContent="center">
         <Button variant="contained" type="submit">

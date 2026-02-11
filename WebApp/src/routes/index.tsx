@@ -1,5 +1,5 @@
-import { createBrowserRouter } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
+import { createBrowserRouter } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
 import {
   DashBoard,
   Login,
@@ -9,27 +9,27 @@ import {
   Resources,
   UnauthorizedAccess,
   Users,
-} from '../pages';
-import { CleanLayout, DefaultLayout } from '../layouts';
+} from "../pages";
+import { CleanLayout, DefaultLayout } from "../layouts";
 import {
   PermissionsProvider,
   SystemResourcesProvider,
   UsersProvider,
-} from '../contexts';
-import { PERMISSIONS } from '../permissions';
+} from "../contexts";
+import { PERMISSIONS } from "../permissions";
 
 const publicRoutes = [
-  { path: '/login', element: <Login /> },
-  { path: '/password-reset', element: <PasswordReset /> },
+  { path: "/login", element: <Login /> },
+  { path: "/password-reset", element: <PasswordReset /> },
 ];
 
 const privateRoutes = [
   {
-    path: '/dashboard',
+    path: "/dashboard",
     element: <DashBoard />,
   },
   {
-    path: '/users',
+    path: "/users",
     element: (
       <UsersProvider>
         <Users />
@@ -38,12 +38,16 @@ const privateRoutes = [
     requiredPermission: PERMISSIONS.USERS,
   },
   {
-    path: '/resources',
-    element: <Resources />,
+    path: "/resources",
+    element: (
+      <SystemResourcesProvider>
+        <Resources />
+      </SystemResourcesProvider>
+    ),
     requiredPermission: PERMISSIONS.RESOURCES,
   },
   {
-    path: '/reports',
+    path: "/reports",
     element: (
       <UsersProvider>
         <Reports />
@@ -66,20 +70,18 @@ const router = createBrowserRouter([
   {
     element: <CleanLayout />,
     children: [
-      { path: '/', element: <Login /> },
+      { path: "/", element: <Login /> },
       ...publicRoutes,
-      { path: '/unauthorized', element: <UnauthorizedAccess /> },
-      { path: '*', element: <NotFound /> },
+      { path: "/unauthorized", element: <UnauthorizedAccess /> },
+      { path: "*", element: <NotFound /> },
     ],
   },
 
   {
     element: (
-      <SystemResourcesProvider>
-        <PermissionsProvider>
-          <DefaultLayout />
-        </PermissionsProvider>
-      </SystemResourcesProvider>
+      <PermissionsProvider>
+        <DefaultLayout />
+      </PermissionsProvider>
     ),
     children: protectedRoutes,
   },
