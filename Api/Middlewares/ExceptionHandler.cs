@@ -1,48 +1,73 @@
 using System.Net;
 using System.Text.Json;
 
-namespace Api.Middlewares
-{
-  public class ExceptionHandler
-  {
-    private readonly RequestDelegate _next;
+namespace Api.Middlewares;
 
-    public ExceptionHandler(RequestDelegate next)
+public class ExceptionHandler
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandler> _logger;
+
+    public ExceptionHandler(
+        RequestDelegate next,
+        ILogger<ExceptionHandler> logger)
     {
-      _next = next;
+        _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-      try
-      {
-        await _next(context);
-      }
-      catch (AppException ex)
-      {
-        context.Response.StatusCode = ex.StatusCode;
-        context.Response.ContentType = "application/json";
+        try
+        {
+            await _next(context);
+        }
+        catch (AppException ex)
+        {
+            _logger.LogWarning(ex,
+                "Erro de aplicação: {Message} | Path: {Path} | User: {User}",
+                ex.Message,
+                context.Request.Path,
+                context.User?.Identity?.Name);
 
-        var result = JsonSerializer.Serialize(new { message = ex.Message });
-        await context.Response.WriteAsync(result);
-      }
-      catch (Exception)
-      {
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-        context.Response.ContentType = "application/json";
+            context.Response.StatusCode = ex.StatusCode;
+            context.Response.ContentType = "application/json";
 
-        var result = JsonSerializer.Serialize(new { message = "Ocorreu um erro inesperado." });
-        await context.Response.WriteAsync(result);
-      }
+            var result = JsonSerializer.Serialize(new
+            {
+                error = ex.Message,
+                status = ex.StatusCode
+            });
+
+            await context.Response.WriteAsync(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Erro não tratado: {Path} | User: {User}",
+                context.Request.Path,
+                context.User?.Identity?.Name);
+
+            context.Response.StatusCode =
+                (int)HttpStatusCode.InternalServerError;
+
+            context.Response.ContentType = "application/json";
+
+            var result = JsonSerializer.Serialize(new
+            {
+                error = "Ocorreu um erro inesperado.",
+                status = 500
+            });
+
+            await context.Response.WriteAsync(result);
+        }
     }
-  }
+}
 
-  // Extensão para Program.cs
-  public static class ExceptionHandlerExtensions
-  {
+public static class ExceptionHandlerExtensions
+{
     public static IApplicationBuilder UseExceptionHandlerMiddleware(this IApplicationBuilder app)
     {
-      return app.UseMiddleware<ExceptionHandler>();
+        return app.UseMiddleware<ExceptionHandler>();
     }
-  }
 }
