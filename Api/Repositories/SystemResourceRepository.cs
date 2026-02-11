@@ -61,18 +61,11 @@ public class SystemResourceRepository : ISystemResourceRepository
           .CreateAsync(query, page, pageSize);
     }
 
-    public async Task<IEnumerable<SystemResource>> GetForSelectAsync()
+    public IQueryable<SystemResource> Query()
     {
-        return await _context.SystemResources
-          .AsNoTracking()
-          .Where(r => r.Active)
-          .OrderBy(r => r.ExhibitionName)
-          .Select(r => new SystemResource
-          {
-              Id = r.Id,
-              ExhibitionName = r.ExhibitionName
-          })
-          .ToListAsync();
+        return _context.SystemResources
+            .AsNoTracking()
+            .Where(r => r.Active);
     }
 
     public async Task<PagedResult<SystemResource>> SearchAsync(

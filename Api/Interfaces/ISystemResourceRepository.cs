@@ -11,7 +11,7 @@ public interface ISystemResourceRepository
 
     Task<SystemResource?> GetByIdAsync(int id);
     Task<PagedResult<SystemResource>> GetAllAsync(int page, int pageSize);
-    Task<IEnumerable<SystemResource>> GetForSelectAsync();
+    IQueryable<SystemResource> Query();
     Task<PagedResult<SystemResource>> SearchAsync(string key, int page, int pageSize);
 
     Task<bool> ExistsByNameAsync(string name);

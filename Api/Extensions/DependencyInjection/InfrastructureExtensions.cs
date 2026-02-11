@@ -14,6 +14,7 @@ public static class InfrastructureExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<CurrentUserContext>();
         services.AddScoped<UserVisibilityPolicy>();
+        services.AddScoped<SystemResourceVisibilityPolicy>();
 
         // --- Resend ---
         var resendApiKey = EnvLoader.GetEnv("RESEND_API_KEY");
