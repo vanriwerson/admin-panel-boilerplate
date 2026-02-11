@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Mappers;
 using Api.Middlewares;
 using Api.Security.Policies;
 
@@ -29,19 +30,6 @@ public class GetUserById
         if (!_visibility.CanAccess(user))
             throw new AppException("Usuário não encontrado.");
 
-        return new UserReadDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            FullName = user.FullName,
-            Permissions = user.AccessPermissions
-                .Select(ap => new SystemResourceSelectDto
-                {
-                    Id = ap.SystemResource.Id,
-                    ExhibitionName = ap.SystemResource.ExhibitionName
-                })
-                .ToList()
-        };
+        return UserMapper.MapToUserReadDto(user);
     }
 }

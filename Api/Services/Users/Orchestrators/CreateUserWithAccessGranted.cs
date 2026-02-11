@@ -3,6 +3,7 @@ using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Mappers;
 using Api.Models;
 using Api.Security.Policies;
 using Api.Services.AccessPermissions;
@@ -85,19 +86,6 @@ public class CreateUserWithAccessGranted
         var createdUser = await _userRepository.GetByIdAsync(user.Id)
             ?? throw new Exception("Usuário não encontrado.");
 
-        return new UserReadDto
-        {
-            Id = createdUser.Id,
-            Username = createdUser.Username,
-            Email = createdUser.Email,
-            FullName = createdUser.FullName,
-            Permissions = createdUser.AccessPermissions
-                .Select(ap => new SystemResourceSelectDto
-                {
-                    Id = ap.SystemResource.Id,
-                    ExhibitionName = ap.SystemResource.ExhibitionName
-                })
-                .ToList()
-        };
+        return UserMapper.MapToUserReadDto(createdUser);
     }
 }

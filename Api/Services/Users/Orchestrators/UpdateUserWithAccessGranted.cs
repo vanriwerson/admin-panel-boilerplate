@@ -4,6 +4,7 @@ using Api.Data;
 using Api.Dtos;
 using Api.Helpers;
 using Api.Interfaces.Repositories;
+using Api.Mappers;
 using Api.Middlewares;
 using Api.Security.Policies;
 using Api.Services.AccessPermissions;
@@ -44,7 +45,6 @@ public class UpdateUserWithAccessGranted
     {
         Guard.AgainstNonPositiveInt(dto.Id);
 
-        // 🔐 REGRA DE SEGURANÇA (somente se for alterar permissões)
         if (dto.PermissionIds != null)
         {
             _accessPermissionPolicy.EnsureCanGrant(dto.PermissionIds);
@@ -117,19 +117,6 @@ public class UpdateUserWithAccessGranted
         var resultUser = await _userRepository.GetByIdAsync(dto.Id)
             ?? throw new AppException("Usuário atualizado não encontrado.");
 
-        return new UserReadDto
-        {
-            Id = resultUser.Id,
-            Username = resultUser.Username,
-            Email = resultUser.Email,
-            FullName = resultUser.FullName,
-            Permissions = resultUser.AccessPermissions
-                .Select(ap => new SystemResourceSelectDto
-                {
-                    Id = ap.SystemResource.Id,
-                    ExhibitionName = ap.SystemResource.ExhibitionName
-                })
-                .ToList()
-        };
+        return UserMapper.MapToUserReadDto(resultUser);
     }
 }
