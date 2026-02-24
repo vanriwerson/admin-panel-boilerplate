@@ -68,4 +68,13 @@ public class AuthServices
 
         return response;
     }
+
+    public async Task LogoutAsync(int userId, string username)
+    {
+        await _log.ExecuteAsync(
+            SystemLogActionFactory.Logout(username),
+            userId,
+            username
+        );
+    }
 }

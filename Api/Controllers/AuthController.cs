@@ -1,5 +1,6 @@
 using Api.Dtos;
 using Api.Security.Auth;
+using Api.Security.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -72,5 +73,25 @@ public class AuthController : ControllerBase
         }
     }
 
-    // TODO: POST api/auth/logout
+    // POST api/auth/logout
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(
+        [FromServices] CurrentUserContext currentUser)
+    {
+        if (!currentUser.IsAuthenticated)
+            return Unauthorized(new { message = "Usuário não autenticado." });
+
+        var userId = currentUser.GetId();
+        var username = currentUser.GetUsername();
+
+        if (userId == null || username == null)
+            return Unauthorized(new { message = "Usuário inválido." });
+
+        await _authServices.LogoutAsync(
+            userId.Value,
+            username
+        );
+
+        return NoContent();
+    }
 }

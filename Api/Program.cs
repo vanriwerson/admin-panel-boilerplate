@@ -5,7 +5,6 @@ using Api.Middlewares;
 using Api.Security.Jwt;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-using Resend;
 
 Env.Load();
 
