@@ -17,6 +17,7 @@ public static class RepositoryExtensions
         services.AddScoped<ISystemResourceRepository, SystemResourceRepository>();
         services.AddScoped<IAccessPermissionRepository, AccessPermissionRepository>();
         services.AddScoped<ISystemLogRepository, SystemLogRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         logger.LogInformation("Repositories registrados com sucesso");
 
