@@ -14,8 +14,8 @@ export default PermissionsContext;
 
 export function PermissionsProvider({ children }: { children: ReactNode }) {
   const permissionsMap = cleanStates.initialPermissionsMap;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, _setLoading] = useState(true);
+  const [error, _setError] = useState<string | null>(null);
 
   const pageTitleIcons = getPageTitleIcons(menuItems);
 

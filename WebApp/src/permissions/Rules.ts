@@ -1,12 +1,19 @@
 import type { AuthUser, SystemResource, UserRead } from '../interfaces';
 import { PERMISSIONS, type ValidPermission } from './tokens';
+// permissions may come from full `SystemResource` objects or lightweight
+// `SystemResourceOption` values returned by some endpoints.  The latter do not
+// include a `name` field, so we treat that property as optional.
 interface EvalPermissions {
   username: string;
-  permissions: SystemResource[];
+  permissions: Array<SystemResource | { exhibitionName: string; id: number; name?: string }>;
 }
 
 function getUserPermissions(authUser: EvalPermissions): Set<ValidPermission> {
-  return new Set(authUser.permissions.map((p) => p.name as ValidPermission));
+  return new Set(
+    authUser.permissions
+      .map((p) => (p as any).name as ValidPermission)
+      .filter((n) => !!n)
+  );
 }
 
 export function isRootUser(authUser: EvalPermissions): boolean {

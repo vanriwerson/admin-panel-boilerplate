@@ -3,6 +3,7 @@ export {
   externalLogin,
   requestPasswordReset,
   resetPassword,
+  refreshToken,
 } from './authServices';
 
 export { getLogReports, getLogDetails } from './systemLogsServices';

@@ -3,6 +3,8 @@ export type { AuthUser } from './userInterfaces/AuthUser';
 export type { ExternalLoginPayload } from './authInterfaces/ExternalLoginPayload';
 export type { LoginPayload } from './authInterfaces/LoginPayload';
 export type { LoginResponse } from './authInterfaces/LoginResponse';
+export type { RefreshRequest } from './authInterfaces/RefreshRequest';
+export type { RefreshResponse } from './authInterfaces/RefreshResponse';
 export type { MenuItem } from './MenuItem';
 export type { PagedResponse } from './PagedResponse';
 export type { PasswordResetPayload } from './authInterfaces/PasswordResetPayload';

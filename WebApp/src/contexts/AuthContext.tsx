@@ -4,7 +4,7 @@ import {
   useEffect,
   useCallback,
   type ReactNode,
-} from 'react';
+} from "react";
 import type {
   AuthContextProps,
   AuthUser,
@@ -12,20 +12,25 @@ import type {
   LoginPayload,
   LoginResponse,
   PasswordResetPayload,
-} from '../interfaces';
+  RefreshResponse,
+} from "../interfaces";
 import {
   externalLogin,
   login,
   requestPasswordReset,
   resetPassword,
-} from '../services';
+  refreshToken as refreshService,
+} from "../services";
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export default AuthContext;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(
-    localStorage.getItem('token')
+    localStorage.getItem("token"),
+  );
+  const [refreshToken, setRefreshToken] = useState<string | null>(
+    localStorage.getItem("refreshToken"),
   );
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
@@ -38,8 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     setAuthUser(userData);
     setToken(data.token);
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('authUser', JSON.stringify(userData));
+    setRefreshToken(data.refreshToken);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("refreshToken", data.refreshToken);
+    localStorage.setItem("authUser", JSON.stringify(userData));
   }, []);
 
   const handleLogin = useCallback(
@@ -47,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await login(payload);
       handleAuthData(data);
     },
-    [handleAuthData]
+    [handleAuthData],
   );
 
   const handleExternalLogin = useCallback(
@@ -55,39 +62,73 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await externalLogin(payload);
       handleAuthData(data);
     },
-    [handleAuthData]
+    [handleAuthData],
   );
 
   const handlePasswordResetRequest = useCallback(
     async (email: string): Promise<string> => {
       return await requestPasswordReset(email);
     },
-    []
+    [],
   );
 
   const handlePasswordReset = useCallback(
     async (payload: PasswordResetPayload): Promise<string> => {
       return await resetPassword(payload);
     },
-    []
+    [],
   );
 
   function handleLogout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('authUser');
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("authUser");
     setToken(null);
+    setRefreshToken(null);
     setAuthUser(null);
   }
 
+  // keep authUser in sync with localStorage (e.g. when another tab updates)
   useEffect(() => {
-    const savedUser = localStorage.getItem('authUser');
+    const savedUser = localStorage.getItem("authUser");
     if (savedUser) setAuthUser(JSON.parse(savedUser));
-  }, []);
+
+    const onRefreshed = () => {
+      const newToken = localStorage.getItem("token");
+      if (newToken) setToken(newToken);
+      const newRefresh = localStorage.getItem("refreshToken");
+      if (newRefresh) setRefreshToken(newRefresh);
+    };
+
+    window.addEventListener("tokenRefreshed", onRefreshed);
+
+    // try to refresh on startup if there's a refresh token but no active token
+    const tryStartupRefresh = async () => {
+      const storedRefresh = localStorage.getItem("refreshToken");
+      if (storedRefresh && !token) {
+        try {
+          const data: RefreshResponse = await refreshService({
+            refreshToken: storedRefresh,
+          });
+          setToken(data.token);
+          setRefreshToken(data.refreshToken);
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("refreshToken", data.refreshToken);
+        } catch {
+          // ignore failure; user will need to login
+        }
+      }
+    };
+    tryStartupRefresh();
+
+    return () => window.removeEventListener("tokenRefreshed", onRefreshed);
+  }, [token, handleAuthData]);
 
   return (
     <AuthContext.Provider
       value={{
         token,
+        refreshToken,
         authUser,
         handleLogin,
         handleExternalLogin,
