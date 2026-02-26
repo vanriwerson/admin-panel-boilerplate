@@ -94,4 +94,25 @@ public class AuthController : ControllerBase
 
         return NoContent();
     }
+
+    // POST api/auth/refresh
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
+    {
+        try
+        {
+            var response = await _authServices.RefreshAsync(request.RefreshToken);
+            if (response == null)
+                return Unauthorized(new { message = "Refresh token inválido." });
+
+            return Ok(response);
+        }
+        catch
+        {
+            return StatusCode(
+                500,
+                new { message = "Erro ao processar refresh token." }
+            );
+        }
+    }
 }

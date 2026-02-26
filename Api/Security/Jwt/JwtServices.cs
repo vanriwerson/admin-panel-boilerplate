@@ -11,9 +11,12 @@ public static class JwtServices
     private static readonly string SecretKey =
         EnvLoader.GetEnv("JWT_SECRET_KEY");
 
+    // NOTE: during tests we set default lifetime to 1 minute.  In
+    // production you can override this by passing a different value or
+    // reading from configuration.
     public static string Create(
         IEnumerable<Claim> claims,
-        int expireMinutes = 480
+        int expireMinutes = 1
     )
     {
         var key = new SymmetricSecurityKey(
