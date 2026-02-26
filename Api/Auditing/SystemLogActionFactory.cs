@@ -25,4 +25,7 @@ public static class SystemLogActionFactory
 
     public static string PasswordReset(string username)
         => $"user {username} alterou a senha";
+
+    public static string TokenRefreshed(string username)
+        => $"user {username} renovou o token";
 }
