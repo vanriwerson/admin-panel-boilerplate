@@ -101,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     window.addEventListener("tokenRefreshed", onRefreshed);
+    window.addEventListener("logout", handleLogout);
 
     // try to refresh on startup if there's a refresh token but no active token
     const tryStartupRefresh = async () => {
@@ -115,13 +116,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("refreshToken", data.refreshToken);
         } catch {
-          // ignore failure; user will need to login
+          // refresh failed; clear state so ProtectedRoute can redirect
+          handleLogout();
         }
       }
     };
     tryStartupRefresh();
 
-    return () => window.removeEventListener("tokenRefreshed", onRefreshed);
+    return () => {
+      window.removeEventListener("tokenRefreshed", onRefreshed);
+      window.removeEventListener("logout", handleLogout);
+    };
   }, [token, handleAuthData]);
 
   return (

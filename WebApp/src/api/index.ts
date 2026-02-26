@@ -52,6 +52,9 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('authUser');
+
+      // tell the app that authentication has been lost so contexts can react
+      window.dispatchEvent(new Event('logout'));
     }
 
     return Promise.reject(error);
