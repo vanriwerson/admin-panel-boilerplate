@@ -3,20 +3,92 @@ using Api.Models;
 using Api.Security.Passwords;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Data
+namespace Api.Data;
+
+public static class DbInitializer
 {
-    public static class DbInitializer
+    public static async Task SeedSystemResourcesAsync(ApiDbContext context)
     {
-        public static async Task SeedUsersAsync(ApiDbContext context)
+        if (await context.SystemResources.AnyAsync())
+            return;
+
+        var resources = new List<SystemResource>
+            {
+                new SystemResource { Name = "root", ExhibitionName = "Administrador" },
+                new SystemResource { Name = "users", ExhibitionName = "Gerenciamento de Usuários" },
+                new SystemResource { Name = "resources", ExhibitionName = "Recursos do Sistema" },
+                new SystemResource { Name = "reports", ExhibitionName = "Auditoria do Sistema" },
+            };
+
+        foreach (var resource in resources)
         {
-            var runSeed = Environment.GetEnvironmentVariable("RUN_USERS_SEED");
-            if (!string.Equals(runSeed, "true", StringComparison.OrdinalIgnoreCase))
-                return;
+            resource.CreatedAt = DateTime.UtcNow;
+            resource.UpdatedAt = DateTime.UtcNow;
+        }
 
-            if (await context.Users.AnyAsync())
-                return;
+        await context.SystemResources.AddRangeAsync(resources);
+        await context.SaveChangesAsync();
 
-            var users = new List<User>
+        Console.WriteLine("Seed de system resources executada.");
+    }
+
+    public static async Task CreateRootAsync(ApiDbContext context)
+    {
+        if (await context.Users.AnyAsync(u => u.Username == "root"))
+            return;
+
+        var rootResource = await context.SystemResources.FirstOrDefaultAsync(r => r.Name == "root");
+        if (rootResource == null)
+        {
+            rootResource = new SystemResource
+            {
+                Name = "root",
+                ExhibitionName = "Administrador",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            await context.SystemResources.AddAsync(rootResource);
+            await context.SaveChangesAsync();
+        }
+
+        var rootUser = new User
+        {
+            Username = "root",
+            Email = "root@admin.com",
+            Password = PasswordHash.Generate("root1234"), // trocar para senha segura em produção
+            FullName = "Administrador",
+            Active = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        await context.Users.AddAsync(rootUser);
+        await context.SaveChangesAsync();
+
+        var accessPermission = new AccessPermission
+        {
+            UserId = rootUser.Id,
+            SystemResourceId = rootResource.Id,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        await context.AccessPermissions.AddAsync(accessPermission);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("Usuário root criado com sucesso.");
+    }
+
+    public static async Task SeedUsersAsync(ApiDbContext context)
+    {
+        var runSeed = Environment.GetEnvironmentVariable("RUN_USERS_SEED");
+        if (!string.Equals(runSeed, "true", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        if (await context.Users.AnyAsync(u => u.Username != "root"))
+            return;
+
+        var users = new List<User>
             {
                 new User { Username = "alice", Email = "alice@test.com", Password = "123456", FullName = "Alice Wonderland" },
                 new User { Username = "bob", Email = "bob@test.com", Password = "123456", FullName = "Bob Builder" },
@@ -30,96 +102,36 @@ namespace Api.Data
                 new User { Username = "judy", Email = "judy@test.com", Password = "123456", FullName = "Judy Hopps" },
             };
 
-            foreach (var user in users)
-            {
-                user.Password = PasswordHash.Generate(user.Password);
-                user.CreatedAt = DateTime.UtcNow;
-                user.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await context.Users.AddRangeAsync(users);
-            await context.SaveChangesAsync();
-
-            Console.WriteLine("Seed de usuários de teste executada.");
-        }
-
-        public static async Task SeedSystemResourcesAsync(ApiDbContext context)
+        foreach (var user in users)
         {
-            if (await context.SystemResources.AnyAsync())
-                return;
-
-            var resources = new List<SystemResource>
-            {
-                new SystemResource { Name = "root", ExhibitionName = "Administrador" },
-                new SystemResource { Name = "users", ExhibitionName = "Gerenciamento de Usuários" },
-                new SystemResource { Name = "resources", ExhibitionName = "Recursos do Sistema" },
-                new SystemResource { Name = "reports", ExhibitionName = "Auditoria do Sistema" },
-            };
-
-            foreach (var resource in resources)
-            {
-                resource.CreatedAt = DateTime.UtcNow;
-                resource.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await context.SystemResources.AddRangeAsync(resources);
-            await context.SaveChangesAsync();
-
-            Console.WriteLine("Seed de system resources executada.");
+            user.Password = PasswordHash.Generate(user.Password);
+            user.CreatedAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
         }
 
-        public static async Task CreateRootAsync(ApiDbContext context)
-        {
-            if (await context.Users.AnyAsync(u => u.Username == "root"))
-                return;
+        await context.Users.AddRangeAsync(users);
+        await context.SaveChangesAsync();
 
-            var rootResource = await context.SystemResources.FirstOrDefaultAsync(r => r.Name == "root");
-            if (rootResource == null)
-            {
-                rootResource = new SystemResource
-                {
-                    Name = "root",
-                    ExhibitionName = "Administrador",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                await context.SystemResources.AddAsync(rootResource);
-                await context.SaveChangesAsync();
-            }
+        Console.WriteLine("Seed de usuários de teste executada.");
+    }
 
-            var rootUser = new User
-            {
-                Username = "root",
-                Email = "root@admin.com",
-                Password = PasswordHash.Generate("root1234"), // trocar para senha segura em produção
-                FullName = "Administrador",
-                Active = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+    public static async Task SeedAllAsync(ApiDbContext context)
+    {
+        await SeedSystemResourcesAsync(context);
+        await CreateRootAsync(context);
+        await SeedUsersAsync(context);
+    }
+}
 
-            await context.Users.AddAsync(rootUser);
-            await context.SaveChangesAsync();
+public static class ApplicationBuilderExtensions
+{
+    public static async Task UseDbInitializerAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
 
-            var accessPermission = new AccessPermission
-            {
-                UserId = rootUser.Id,
-                SystemResourceId = rootResource.Id,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+        await context.Database.MigrateAsync();
 
-            await context.AccessPermissions.AddAsync(accessPermission);
-            await context.SaveChangesAsync();
-
-            Console.WriteLine("Usuário root criado com sucesso.");
-        }
-
-        public static async Task SeedAllAsync(ApiDbContext context)
-        {
-            await SeedUsersAsync(context);
-            await SeedSystemResourcesAsync(context);
-            await CreateRootAsync(context);
-        }
+        await DbInitializer.SeedAllAsync(context);
     }
 }

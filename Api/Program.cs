@@ -52,6 +52,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// --- Seed Data ---
+await app.UseDbInitializerAsync();
+
 // --- Pipeline ---
 if (app.Environment.IsDevelopment())
 {
