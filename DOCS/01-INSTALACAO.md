@@ -60,7 +60,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=admin_panel_db
 
 # Seed do Banco (cria dados iniciais)
-SEED_DB=true
+RUN_USERS_SEED=true
 
 # Porta da API (defina sua própria porta)
 # Para projetos DTI PMA, siga a sequência 521x (5210, 5211, 5212...)
@@ -191,7 +191,7 @@ DB_PASSWORD=postgres
 DB_NAME=admin_panel_db
 
 # Seed do Banco
-SEED_DB=true
+RUN_USERS_SEED=true
 
 # Porta da API (defina sua própria porta)
 # Para projetos DTI PMA, siga a sequência 521x (5210, 5211, 5212...)
@@ -288,7 +288,7 @@ dotnet ef migrations remove
 | `POSTGRES_USER`     | Usuário PostgreSQL (Docker)  | Não\*       | -         |
 | `POSTGRES_PASSWORD` | Senha PostgreSQL (Docker)    | Não\*       | -         |
 | `POSTGRES_DB`       | Database PostgreSQL (Docker) | Não\*       | -         |
-| `SEED_DB`           | Executar seed inicial        | Não         | false     |
+| `RUN_USERS_SEED`    | Executar seed inicial        | Não         | false     |
 | `API_PORT`          | Porta da API\*\*\*           | Sim         | -         |
 | `JWT_SECRET_KEY`    | Chave secreta para JWT       | Sim         | -         |
 | `WEB_APP_URL`       | URL do frontend (CORS)       | Sim         | -         |

@@ -997,10 +997,12 @@ app.MapControllers();
 #### 8. Seed do Banco de Dados
 
 ```csharp
-if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
+if (Environment.GetEnvironmentVariable("RUN_USERS_SEED") == "true")
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+    // Seeds root user + system resources; dummy users are added when
+    // RUN_USERS_SEED=true.
     DbInitializer.Initialize(context);
 }
 ```
@@ -1055,7 +1057,7 @@ FullName: "Root User"
 
 - Usuário root recebe todas as 4 permissões
 
-#### 4. Usuários de Teste (se RUN_USERS_SEED=true)
+#### 4. Usuários de Teste (executados se `RUN_USERS_SEED=true`)
 
 ```csharp
 Usernames: alice, bob, carol, dave, eve, frank, grace, heidi, ivan, judy

@@ -119,7 +119,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=admin_panel_db
 
 # Seeds
-SEED_DB=true
+RUN_USERS_SEED=true
 
 # Application
 API_PORT={PORT}

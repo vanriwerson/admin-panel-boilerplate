@@ -15,7 +15,7 @@ cp WebApp/.env.example WebApp/.env
 
 # 3. Edite Api/.env com suas configurações
 # DB_HOST=db, DB_PORT=5432, DB_USER=postgres, DB_PASSWORD=postgres
-# DB_NAME=admin_panel_db, API_PORT={PORT}, SEED_DB=true
+# DB_NAME=admin_panel_db, API_PORT={PORT}, RUN_USERS_SEED=true
 # JWT_SECRET_KEY=sua-chave-secreta-aqui
 # WEB_APP_URL=http://localhost:5173
 
@@ -285,9 +285,9 @@ npm run dev
 ### Banco de dados vazio
 
 ```bash
-# Verifique a variável SEED_DB
+# Verifique a variável RUN_USERS_SEED
 cat Api/.env
-# Deve conter: SEED_DB=true
+# Deve conter: RUN_USERS_SEED=true
 
 # Reinicie o container da API
 docker-compose restart api
@@ -311,7 +311,9 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=admin_panel_db
 
 # Seeds
-SEED_DB=true                # Cria dados iniciais (usuário root)
+RUN_USERS_SEED=true          # Cria dados iniciais (usuário root) e, em
+                           # ambiente de desenvolvimento, usuários de teste
+                           # (nome mais descritivo que RUN_USERS_SEED).
 
 # API
 API_PORT={PORT}
@@ -349,7 +351,7 @@ Antes de fazer deploy em produção:
 - [ ] Configure HTTPS/TLS
 - [ ] Configure backup do banco de dados
 - [ ] Configure variáveis de ambiente via secrets
-- [ ] Defina `SEED_DB=false` (ou remova a variável)
+- [ ] Defina `RUN_USERS_SEED=false` (ou remova a variável)
 - [ ] Configure rate limiting
 - [ ] Configure logs estruturados
 - [ ] Configure monitoramento
