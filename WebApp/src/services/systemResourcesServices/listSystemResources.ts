@@ -2,6 +2,7 @@ import api from '../../api';
 import type {
   SystemResourcesPagination,
   SystemResource,
+  SystemResourceOption,
 } from '../../interfaces';
 
 export async function listSystemResources(
@@ -20,7 +21,7 @@ export async function listSystemResources(
 }
 
 export async function listSystemResourcesForSelect() {
-  const { data } = await api.get<SystemResource[]>('/resources/options');
+  const { data } = await api.get<SystemResourceOption[]>('/resources/options');
   return data;
 }
 

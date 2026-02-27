@@ -116,11 +116,7 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
   const fetchSystemResourcesForSelect = useCallback(async () => {
     try {
       const data = await listSystemResourcesForSelect();
-      // transform to option shape
-      return data.map((r) => ({
-        id: r.id as number,
-        exhibitionName: r.exhibitionName,
-      }));
+      return data;
     } catch (err) {
       console.error("Erro ao buscar recursos do sistema para select:", err);
       return [];
