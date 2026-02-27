@@ -1,30 +1,22 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Api.Models
+namespace Api.Models;
+
+public class SystemLog
 {
-  [Table("system_logs")]
-  public class SystemLog
-  {
-    [Key]
     public int Id { get; set; }
 
-    [Required]
-    [Column("user_id")]
-    public required int UserId { get; set; }
+    public int? UserId { get; set; }
 
-    [Required]
-    [Column("action")]
-    [MaxLength(255)]
-    public required string Action { get; set; }
+    public string Action { get; set; } = null!;
 
-    [Column("used_payload")]
-    public string? UsedPayload { get; set; }
+    public string? Data { get; set; }
 
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string? GeneratedBy { get; set; }
 
-    [ForeignKey(nameof(UserId))]
+    public string? IpAddress { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
     public User? User { get; set; }
-  }
 }

@@ -1,105 +1,100 @@
 using Api.Dtos;
-using Api.Helpers;
-using Api.Services.SystemResourcesServices;
+using Api.Services.SystemResources;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[ApiController]
+[Route("api/resources")]
+public class SystemResourcesController : ControllerBase
 {
-  [ApiController]
-  [Route("api/resources")]
-  public class SystemResourcesController : ControllerBase
-  {
-    private readonly CreateSystemResource _createSystemResource;
-    private readonly GetAllSystemResources _getAllSystemResources;
-    private readonly GetSystemResourceById _getSystemResourceById;
-    private readonly UpdateSystemResource _updateSystemResource;
-    private readonly DeleteSystemResource _deleteSystemResource;
-    private readonly SearchSystemResources _searchSystemResources;
+    private readonly CreateSystemResource _create;
+    private readonly GetAllSystemResources _getAll;
+    private readonly GetSystemResourceById _getById;
+    private readonly UpdateSystemResource _update;
+    private readonly DeleteSystemResource _delete;
+    private readonly SearchSystemResources _search;
+    private readonly GetSystemResourcesForSelect _getForSelect;
 
     public SystemResourcesController(
-        CreateSystemResource createSystemResource,
-        GetAllSystemResources getAllSystemResources,
-        GetSystemResourceById getSystemResourceById,
-        UpdateSystemResource updateSystemResource,
-        DeleteSystemResource deleteSystemResource,
-        SearchSystemResources searchSystemResources)
+        CreateSystemResource create,
+        GetAllSystemResources getAll,
+        GetSystemResourceById getById,
+        UpdateSystemResource update,
+        DeleteSystemResource delete,
+        SearchSystemResources search,
+        GetSystemResourcesForSelect getForSelect)
     {
-      _createSystemResource = createSystemResource;
-      _getAllSystemResources = getAllSystemResources;
-      _getSystemResourceById = getSystemResourceById;
-      _updateSystemResource = updateSystemResource;
-      _deleteSystemResource = deleteSystemResource;
-      _searchSystemResources = searchSystemResources;
+        _create = create;
+        _getAll = getAll;
+        _getById = getById;
+        _update = update;
+        _delete = delete;
+        _search = search;
+        _getForSelect = getForSelect;
     }
 
     // POST: api/resources
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] SystemResourceCreateDto dto)
     {
-      if (dto == null) return BadRequest(new { message = "Payload inválido." });
-
-      var created = await _createSystemResource.ExecuteAsync(dto);
-      if (created == null)
-        return BadRequest(new { message = "Falha ao criar recurso do sistema." });
-
-      return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        var result = await _create.ExecuteAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     // GET: api/resources?page=1&pageSize=10
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-      var allResources = await _getAllSystemResources.ExecuteAsync(page, pageSize);
-      return Ok(allResources);
+        var result = await _getAll.ExecuteAsync(page, pageSize);
+        return Ok(result);
     }
 
     // GET: api/resources/options
     [HttpGet("options")]
-    public async Task<IActionResult> GetOptions()
+    public async Task<IActionResult> GetForSelect()
     {
-      var options = await _getAllSystemResources.GetOptionsAsync();
-      return Ok(options);
+        var result = await _getForSelect.ExecuteAsync();
+        return Ok(result);
     }
 
     // GET: api/resources/{id}
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-      var resource = await _getSystemResourceById.ExecuteAsync(id);
-      if (resource == null) return NotFound(new { message = "Recurso do sistema não encontrado." });
-      return Ok(resource);
+        var result = await _getById.ExecuteAsync(id);
+        return Ok(result);
     }
 
     // PUT: api/resources/{id}
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] SystemResourceUpdateDto dto)
+    public async Task<IActionResult> Update(
+        int id,
+        [FromBody] SystemResourceUpdateDto dto)
     {
-      if (dto == null) return BadRequest(new { message = "Payload inválido." });
-
-      var updated = await _updateSystemResource.ExecuteAsync(id, dto);
-      if (updated == null) return NotFound(new { message = "Recurso do sistema não encontrado." });
-
-      return Ok(updated);
+        Guard.AgainstMismatchedIds(id, dto.Id);
+        var result = await _update.ExecuteAsync(id, dto);
+        return Ok(result);
     }
 
     // DELETE: api/resources/{id}
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-      var deleted = await _deleteSystemResource.ExecuteAsync(id);
-      if (!deleted) return NotFound(new { message = "Recurso do sistema não encontrado." });
-      return NoContent();
+        await _delete.ExecuteAsync(id);
+        return NoContent();
     }
 
     // GET: api/resources/search?key=abc&page=1&pageSize=10
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string key, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> Search(
+        [FromQuery] string key,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-      if (string.IsNullOrWhiteSpace(key))
-        return BadRequest(new { message = "A chave de pesquisa é obrigatória." });
-
-      var foundResources = await _searchSystemResources.ExecuteAsync(key, page, pageSize);
-      return Ok(foundResources);
+        var result = await _search.ExecuteAsync(key, page, pageSize);
+        return Ok(result);
     }
-  }
 }

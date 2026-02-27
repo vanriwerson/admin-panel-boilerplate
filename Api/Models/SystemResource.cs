@@ -1,32 +1,16 @@
-using System.ComponentModel.DataAnnotations;
+using Api.Models.Common;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Api.Models
+namespace Api.Models;
+
+public class SystemResource : AuditableEntity
 {
-  [Table("system_resources")]
-  public class SystemResource
-  {
-    [Key]
-    public int Id { get; set; }
+  public int Id { get; set; }
 
-    [Required]
-    [Column("name")]
-    [MaxLength(100)]
-    public required string Name { get; set; }
+  public string Name { get; set; } = null!;
+  public string ExhibitionName { get; set; } = null!;
 
-    [Required]
-    [Column("exhibition_name")]
-    [MaxLength(100)]
-    public required string ExhibitionName { get; set; }
+  public bool Active { get; set; } = true;
 
-    [Required]
-    [Column("active")]
-    public bool Active { get; set; } = true;
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-  }
+  public ICollection<AccessPermission> AccessPermissions { get; set; } = new List<AccessPermission>();
 }

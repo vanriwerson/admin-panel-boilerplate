@@ -5,23 +5,23 @@ import {
   useCallback,
   type ReactNode,
   useMemo,
-} from 'react';
+} from "react";
 
 import type {
   SystemResource,
   SystemResourcesContextProps,
-} from '../interfaces';
+} from "../interfaces";
 import {
   listSystemResources,
   createSystemResource,
   updateSystemResource,
   deleteSystemResource,
   listSystemResourcesForSelect,
-} from '../services';
-import { cleanStates, getErrorMessage } from '../helpers';
-import { useAuth } from '../hooks';
-import { isRootUser } from '../permissions/Rules';
-import { PERMISSIONS } from '../permissions';
+} from "../services";
+import { cleanStates, getErrorMessage } from "../helpers";
+import { useAuth } from "../hooks";
+import { isRootUser } from "../permissions/Rules";
+import { PERMISSIONS } from "../permissions";
 
 const SystemResourcesContext = createContext<
   SystemResourcesContextProps | undefined
@@ -41,7 +41,7 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
     async (
       page = pagination.page,
       pageSize = pagination.pageSize,
-      searchKey = ''
+      searchKey = "",
     ) => {
       setLoading(true);
       setError(null);
@@ -58,12 +58,12 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
         });
       } catch (err) {
         setError(getErrorMessage(err));
-        console.error('Erro ao listar recursos do sistema:', err);
+        console.error("Erro ao listar recursos do sistema:", err);
       } finally {
         setLoading(false);
       }
     },
-    [pagination.page, pagination.pageSize]
+    [pagination.page, pagination.pageSize],
   );
 
   const visibleResources = useMemo(() => {
@@ -84,7 +84,7 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     },
-    [fetchSystemResources]
+    [fetchSystemResources],
   );
 
   const editSystemResource = useCallback(
@@ -97,7 +97,7 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     },
-    [fetchSystemResources]
+    [fetchSystemResources],
   );
 
   const removeSystemResource = useCallback(
@@ -110,14 +110,19 @@ export function SystemResourcesProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     },
-    [fetchSystemResources]
+    [fetchSystemResources],
   );
 
   const fetchSystemResourcesForSelect = useCallback(async () => {
     try {
-      return await listSystemResourcesForSelect();
+      const data = await listSystemResourcesForSelect();
+      // transform to option shape
+      return data.map((r) => ({
+        id: r.id as number,
+        exhibitionName: r.exhibitionName,
+      }));
     } catch (err) {
-      console.error('Erro ao buscar recursos do sistema para select:', err);
+      console.error("Erro ao buscar recursos do sistema para select:", err);
       return [];
     }
   }, []);

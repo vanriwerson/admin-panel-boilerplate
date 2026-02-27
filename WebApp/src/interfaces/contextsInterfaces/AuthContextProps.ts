@@ -5,6 +5,7 @@ import type { AuthUser } from '../userInterfaces/AuthUser';
 
 export interface AuthContextProps {
   token: string | null;
+  refreshToken: string | null;
   authUser: AuthUser | null;
   handleLogin: (payload: LoginPayload) => Promise<void>;
   handleExternalLogin: (payload: ExternalLoginPayload) => Promise<void>;

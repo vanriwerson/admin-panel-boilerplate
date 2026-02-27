@@ -1,61 +1,62 @@
 using Api.Helpers;
+using Api.Security.Jwt;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Api.Middlewares
 {
-  public class RequireAuthorization
-  {
-    private readonly RequestDelegate _next;
-
-    public RequireAuthorization(RequestDelegate next)
+    public class RequireAuthorization
     {
-      _next = next;
-    }
+        private readonly RequestDelegate _next;
 
-    public async Task InvokeAsync(HttpContext context)
-    {
-      var path = context.Request.Path.Value?.ToLower() ?? "";
-      var method = context.Request.Method.ToUpper();
-
-      if (path.Contains("/auth/"))
-      {
-        await _next(context);
-        return;
-      }
-
-      if (method is "GET" or "POST" or "PUT" or "DELETE")
-      {
-        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-
-        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+        public RequireAuthorization(RequestDelegate next)
         {
-          context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-          await context.Response.WriteAsync("Header Authorization ausente ou inválido");
-          return;
+            _next = next;
         }
 
-        var token = authHeader.Substring("Bearer ".Length).Trim();
-
-        if (!JsonWebToken.Verify(token))
+        public async Task InvokeAsync(HttpContext context)
         {
-          context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-          await context.Response.WriteAsync("Token inválido ou expirado");
-          return;
+            var path = context.Request.Path.Value?.ToLower() ?? "";
+            var method = context.Request.Method.ToUpper();
+
+            if (path.Contains("/auth/"))
+            {
+                await _next(context);
+                return;
+            }
+
+            if (method is "GET" or "POST" or "PUT" or "DELETE")
+            {
+                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+
+                if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    await context.Response.WriteAsync("Header Authorization ausente ou inválido");
+                    return;
+                }
+
+                var token = authHeader.Substring("Bearer ".Length).Trim();
+
+                if (!JwtServices.IsValid(token))
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    await context.Response.WriteAsync("Token inválido ou expirado");
+                    return;
+                }
+            }
+
+            await _next(context);
         }
-      }
-
-      await _next(context);
     }
-  }
 
-  // ✅ Extensão para facilitar o uso no Program.cs
-  public static class RequireAuthorizationExtensions
-  {
-    public static IApplicationBuilder UseRequireAuthorization(this IApplicationBuilder app)
+    // ✅ Extensão para facilitar o uso no Program.cs
+    public static class RequireAuthorizationExtensions
     {
-      return app.UseMiddleware<RequireAuthorization>();
+        public static IApplicationBuilder UseRequireAuthorization(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<RequireAuthorization>();
+        }
     }
-  }
 }

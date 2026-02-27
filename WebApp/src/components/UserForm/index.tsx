@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Box, TextField, Button, FormHelperText, Paper } from '@mui/material';
-import type { UserFormValues, UserRead } from '../../interfaces';
-import { cleanStates, mapSystemResourcesToFormValue } from '../../helpers';
-import { useAuth } from '../../hooks';
-import SystemResourceSelect from '../SystemResourcesSelect';
-import { canEditPassword, canEditPermissions } from '../../permissions/Rules';
+import { useState, useEffect } from "react";
+import { Box, TextField, Button, FormHelperText, Paper } from "@mui/material";
+import type { UserFormValues, UserRead } from "../../interfaces";
+import { cleanStates } from "../../helpers";
+import { useAuth } from "../../hooks";
+import SystemResourceSelect from "../SystemResourcesSelect";
+import { canEditPassword, canEditPermissions } from "../../permissions/Rules";
+import { mapUserReadToFormValues } from "../../mappers";
+import { SystemResourcesProvider } from "../../contexts";
 
 interface Props {
   onSubmit: (user: UserFormValues) => void;
@@ -14,43 +16,36 @@ interface Props {
 export default function UserForm({ onSubmit, user }: Props) {
   const [form, setForm] = useState(cleanStates.userForm);
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { authUser } = useAuth();
 
   const showPasswordField = authUser && canEditPassword(authUser, user);
   const canEditPerms = authUser && canEditPermissions(authUser, user);
 
   useEffect(() => {
-    if (user) {
-      setForm({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        password: '',
-        fullName: user.fullName,
-        permissions: mapSystemResourcesToFormValue(user.permissions),
-      });
-    }
+    if (!user) return;
+
+    setForm(mapUserReadToFormValues(user));
   }, [user]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handlePermissionsChange(permissions: number[]) {
-    setForm({ ...form, permissions });
-    if (permissions.length > 0) setError('');
+  function handlePermissionsChange(permissionIds: number[]) {
+    setForm({ ...form, permissionIds });
+    if (permissionIds.length > 0) setError("");
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (form.permissions.length === 0) {
-      setError('É necessário conceder ao menos uma permissão.');
+    if (form.permissionIds.length === 0) {
+      setError("É necessário conceder ao menos uma permissão.");
       return;
     }
-    setError('');
+    setError("");
 
-    if (user && (!form.password || form.password.trim() === '')) {
+    if (user && (!form.password || form.password.trim() === "")) {
       delete form.password;
     }
     onSubmit(form);
@@ -62,11 +57,11 @@ export default function UserForm({ onSubmit, user }: Props) {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        alignItems: 'center',
-        display: 'flex',
-        flexWrap: 'wrap',
+        alignItems: "center",
+        display: "flex",
+        flexWrap: "wrap",
         gap: 2,
-        justifyContent: 'center',
+        justifyContent: "center",
         marginBottom: 4,
         maxWidth: 800,
         padding: 2,
@@ -111,18 +106,20 @@ export default function UserForm({ onSubmit, user }: Props) {
         />
       )}
 
-      <Box sx={{ width: '100%' }}>
-        <SystemResourceSelect
-          value={form.permissions}
-          onChange={handlePermissionsChange}
-          readOnly={!canEditPerms}
-        />
-        {error && <FormHelperText error>{error}</FormHelperText>}
-      </Box>
+      <SystemResourcesProvider>
+        <Box sx={{ width: "100%" }}>
+          <SystemResourceSelect
+            value={form.permissionIds}
+            onChange={handlePermissionsChange}
+            readOnly={!canEditPerms}
+          />
+          {error && <FormHelperText error>{error}</FormHelperText>}
+        </Box>
+      </SystemResourcesProvider>
 
       <Box display="flex" width="100%" gap={2} justifyContent="center">
         <Button variant="contained" type="submit">
-          {user ? 'Atualizar' : 'Cadastrar'}
+          {user ? "Atualizar" : "Cadastrar"}
         </Button>
 
         <Button

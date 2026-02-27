@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import type {
-  SystemLog,
+  SystemLogList,
   SystemLogFiltersPayload,
   SystemLogsPagination,
 } from '../interfaces';
-import { getLogReports } from '../services/systemLogsServices';
+import { getLogReports, getLogDetails } from '../services';
 import { getErrorMessage } from '../helpers';
 
 export function useReports() {
-  const [logs, setLogs] = useState<SystemLog[]>([]);
+  const [logs, setLogs] = useState<SystemLogList[]>([]);
   const [pagination, setPagination] = useState({
     totalItems: 0,
     page: 1,
@@ -56,6 +56,22 @@ export function useReports() {
     [filters, pagination.page, pagination.pageSize]
   );
 
+  const fetchLogDetails = useCallback(async (logId: number) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await getLogDetails(logId);
+      return data;
+    } catch (err) {
+      setError(getErrorMessage(err));
+      console.error('Erro ao obter detalhes do log:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const setReportFilters = useCallback(
     (newFilters: SystemLogFiltersPayload) => {
       setFilters(newFilters);
@@ -75,6 +91,7 @@ export function useReports() {
     error,
     filters,
     fetchReports,
+    fetchLogDetails,
     setReportFilters,
     setPagination,
   };

@@ -3,9 +3,10 @@ export {
   externalLogin,
   requestPasswordReset,
   resetPassword,
+  refreshToken,
 } from './authServices';
 
-export { getLogReports } from './systemLogsServices';
+export { getLogReports, getLogDetails } from './systemLogsServices';
 
 export { createSystemResource } from './systemResourcesServices/createSystemResource';
 export {

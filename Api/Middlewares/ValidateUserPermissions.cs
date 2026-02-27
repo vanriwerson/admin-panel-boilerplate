@@ -1,118 +1,112 @@
 using System.Net;
 using System.Text.Json;
+using System.Security.Claims;
 using Api.Dtos;
-using Api.Helpers;
+using Api.Security.Jwt;
+using Api.Security.Permissions;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
-using System.Threading.Tasks;
-using System.IO;
 
-namespace Api.Middlewares
+namespace Api.Middlewares;
+
+public class ValidateUserPermissions
 {
-  public class ValidateUserPermissions
-  {
     private readonly RequestDelegate _next;
 
     public ValidateUserPermissions(RequestDelegate next)
     {
-      _next = next;
+        _next = next;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-      var path = context.Request.Path.Value?.ToLower() ?? "";
-      var method = context.Request.Method.ToUpper();
+        var path = context.Request.Path.Value?.ToLower() ?? "";
+        var method = context.Request.Method.ToUpper();
 
-      if (method == "GET" || path.Contains("/auth/"))
-      {
-        await _next(context);
-        return;
-      }
-
-      var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-      if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
-      {
-        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-        await context.Response.WriteAsync("Header Authorization ausente ou inválido.");
-        return;
-      }
-
-      var token = authHeader.Substring("Bearer ".Length).Trim();
-      var principal = JsonWebToken.Decode(token);
-
-      var userPermissionIds = GetPermissionIdsFromToken(principal);
-
-      // Usuário root (1) tem acesso total
-      if (userPermissionIds.Contains(1))
-      {
-        await _next(context);
-        return;
-      }
-
-      var requiredPermissions = EndpointPermissions.GetRequiredPermissions(path);
-      if (requiredPermissions.Any() && !requiredPermissions.Any(rp => userPermissionIds.Contains(rp)))
-      {
-        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-        await context.Response.WriteAsync("Acesso negado: você não possui permissão para este recurso.");
-        return;
-      }
-
-      if (path.StartsWith("/users") && (method == "POST" || method == "PUT"))
-      {
-        var bodyPermissions = await GetPermissionsFromBodyAsync(context);
-        if (bodyPermissions.Contains(1) || bodyPermissions.Contains(3))
+        if (path.Contains("/auth/") || path.Contains("/options"))
         {
-          context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-          await context.Response.WriteAsync("Acesso negado: não é permitido atribuir permissões root(1) ou systemResources(3).");
-          return;
+            await _next(context);
+            return;
         }
-      }
 
-      await _next(context);
-    }
-
-    private static int[] GetPermissionIdsFromToken(System.Security.Claims.ClaimsPrincipal principal)
-    {
-      try
-      {
-        var permsClaim = principal.Claims.FirstOrDefault(c => c.Type == "permissions")?.Value;
-        if (permsClaim != null)
+        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
         {
-          var permissions = JsonSerializer.Deserialize<SystemResourceOptionDto[]>(permsClaim);
-          return permissions?.Select(p => p.Id).ToArray() ?? Array.Empty<int>();
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("Header Authorization ausente ou inválido.");
+            return;
         }
-      }
-      catch { }
-      return Array.Empty<int>();
+
+        var token = authHeader["Bearer ".Length..].Trim();
+        var principal = JwtServices.Validate(token);
+
+        if (principal == null)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("Token inválido.");
+            return;
+        }
+
+        if (principal.IsRoot())
+        {
+            await _next(context);
+            return;
+        }
+
+        var requiredPermissions = EndpointPermissions.GetRequiredPermissions(path);
+
+        if (requiredPermissions.Any() &&
+            !requiredPermissions.Any(principal.HasPermission))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync("Acesso negado.");
+            return;
+        }
+
+        if (path.StartsWith("/users") && (method == "POST" || method == "PUT"))
+        {
+            var bodyPermissions = await GetPermissionsFromBodyAsync(context);
+
+            if (bodyPermissions.Contains(BasePermissions.ROOT) ||
+                bodyPermissions.Contains(BasePermissions.RESOURCES))
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsync(
+                    "Acesso negado: não é permitido atribuir permissões root ou resources."
+                );
+                return;
+            }
+        }
+
+        await _next(context);
     }
 
     private static async Task<int[]> GetPermissionsFromBodyAsync(HttpContext context)
     {
-      context.Request.EnableBuffering();
-      using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
-      var body = await reader.ReadToEndAsync();
-      context.Request.Body.Position = 0;
+        context.Request.EnableBuffering();
 
-      try
-      {
-        using var jsonDoc = JsonDocument.Parse(body);
-        if (jsonDoc.RootElement.TryGetProperty("permissions", out var permsElement) &&
-            permsElement.ValueKind == JsonValueKind.Array)
+        using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
+        var body = await reader.ReadToEndAsync();
+        context.Request.Body.Position = 0;
+
+        try
         {
-          return permsElement.EnumerateArray().Select(p => p.GetInt32()).ToArray();
+            using var json = JsonDocument.Parse(body);
+            if (json.RootElement.TryGetProperty("permissions", out var perms) &&
+                perms.ValueKind == JsonValueKind.Array)
+            {
+                return perms.EnumerateArray().Select(p => p.GetInt32()).ToArray();
+            }
         }
-      }
-      catch { }
+        catch { }
 
-      return Array.Empty<int>();
+        return Array.Empty<int>();
     }
-  }
+}
 
-  public static class ValidateUserPermissionsExtensions
-  {
+public static class ValidateUserPermissionsExtensions
+{
     public static IApplicationBuilder UseValidateUserPermissions(this IApplicationBuilder app)
     {
-      return app.UseMiddleware<ValidateUserPermissions>();
+        return app.UseMiddleware<ValidateUserPermissions>();
     }
-  }
 }

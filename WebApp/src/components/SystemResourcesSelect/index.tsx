@@ -11,10 +11,8 @@ import {
   Box,
   TextField,
 } from '@mui/material';
-import { useAuth } from '../../hooks';
-import SystemResourcesContext from '../../contexts/SystemResourcesContext';
-import { filterAssignablePermissions } from '../../permissions/Rules';
-import type { SystemResource } from '../../interfaces';
+import { SystemResourcesContext } from '../../contexts';
+import type { SystemResourceOption } from '../../interfaces';
 import type { SelectChangeEvent } from '@mui/material';
 
 interface Props {
@@ -28,12 +26,11 @@ export default function SystemResourceSelect({
   onChange,
   readOnly = false,
 }: Props) {
-  const { authUser } = useAuth();
   const { fetchSystemResourcesForSelect, loading } = useContext(
     SystemResourcesContext
   )!;
 
-  const [options, setOptions] = useState<SystemResource[]>([]);
+  const [options, setOptions] = useState<SystemResourceOption[]>([]);
 
   useEffect(() => {
     async function loadOptions() {
@@ -42,11 +39,6 @@ export default function SystemResourceSelect({
     }
     loadOptions();
   }, [fetchSystemResourcesForSelect]);
-
-  const filteredOptions = useMemo(() => {
-    if (!authUser) return [];
-    return filterAssignablePermissions(authUser, options);
-  }, [authUser, options]);
 
   const selectedNames = useMemo(() => {
     if (!options.length) return [];
@@ -93,7 +85,7 @@ export default function SystemResourceSelect({
         input={<OutlinedInput label="Permissões" />}
         renderValue={() => selectedNames.join(', ')}
       >
-        {filteredOptions.map((resource) => (
+        {options.map((resource) => (
           <MenuItem key={resource.id} value={String(resource.id)}>
             <Checkbox checked={value.includes(resource.id!)} />
             <ListItemText primary={resource.exhibitionName} />

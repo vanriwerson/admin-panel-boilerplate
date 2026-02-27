@@ -4,6 +4,8 @@ import type {
   LoginResponse,
   ExternalLoginPayload,
   PasswordResetPayload,
+  RefreshRequest,
+  RefreshResponse,
 } from '../interfaces';
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -28,4 +30,11 @@ export async function resetPassword(
 ): Promise<string> {
   const { data } = await api.post('/auth/password/reset', payload);
   return data.message;
+}
+
+export async function refreshToken(
+  payload: RefreshRequest
+): Promise<RefreshResponse> {
+  const { data } = await api.post<RefreshResponse>('/auth/refresh', payload);
+  return data;
 }

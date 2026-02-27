@@ -9,6 +9,5 @@ export interface PermissionsContextProps {
   menuItems: MenuItem[];
   loading: boolean;
   error: string | null;
-  refreshPermissions: () => Promise<void>;
   getMenuItemsForUser: (authUser: AuthUser | null) => MenuItem[];
 }

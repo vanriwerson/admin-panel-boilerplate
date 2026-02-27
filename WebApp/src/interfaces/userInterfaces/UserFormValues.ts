@@ -4,5 +4,5 @@ export interface UserFormValues {
   email: string;
   fullName: string;
   password?: string;
-  permissions: number[];
+  permissionIds: number[];
 }

@@ -1,11 +1,9 @@
-import type { SystemResource } from '../systemResourcesInterfaces/SystemResource';
+import type { SystemResourceOption } from '../systemResourcesInterfaces/SystemResourceOption';
 
 export interface UserRead {
   id: number;
   username: string;
   email: string;
   fullName: string;
-  permissions: SystemResource[];
-  createdAt: Date;
-  updatedAt: Date;
+  permissions: SystemResourceOption[];
 }
