@@ -20,6 +20,7 @@ import {
   requestPasswordReset,
   resetPassword,
   refreshToken as refreshService,
+  logout as logoutService,
 } from "../services";
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -79,7 +80,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  function handleLogout() {
+  async function handleLogout() {
+    const existingToken = localStorage.getItem("token");
+
+    if (existingToken) {
+      try {
+        await logoutService();
+      } catch (err) {
+        // ignore network errors — we'll always clear local state
+        console.error("logout service failed", err);
+      }
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("authUser");

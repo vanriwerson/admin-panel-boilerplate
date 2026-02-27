@@ -6,6 +6,8 @@ export {
   refreshToken,
 } from './authServices';
 
+export { logout } from './authServices';
+
 export { getLogReports, getLogDetails } from './systemLogsServices';
 
 export { createSystemResource } from './systemResourcesServices/createSystemResource';

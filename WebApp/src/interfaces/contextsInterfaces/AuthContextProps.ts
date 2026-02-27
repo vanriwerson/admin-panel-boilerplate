@@ -11,5 +11,5 @@ export interface AuthContextProps {
   handleExternalLogin: (payload: ExternalLoginPayload) => Promise<void>;
   handlePasswordResetRequest: (email: string) => Promise<string>;
   handlePasswordReset: (payload: PasswordResetPayload) => Promise<string>;
-  handleLogout: () => void;
+  handleLogout: () => Promise<void>;
 }

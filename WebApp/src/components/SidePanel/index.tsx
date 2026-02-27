@@ -7,12 +7,12 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
-} from '@mui/material';
-import { useLocation } from 'react-router-dom';
-import AuthUserDisplay from '../AuthUserDisplay';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { useAuth, usePermissions } from '../../hooks';
+} from "@mui/material";
+import { useLocation } from "react-router-dom";
+import AuthUserDisplay from "../AuthUserDisplay";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { useAuth, usePermissions } from "../../hooks";
 
 interface SidePanelProps {
   open: boolean;
@@ -38,24 +38,24 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        whiteSpace: 'nowrap',
+        whiteSpace: "nowrap",
         transition: (theme) =>
-          theme.transitions.create('width', {
+          theme.transitions.create("width", {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
-        '& .MuiDrawer-paper': {
+        "& .MuiDrawer-paper": {
           width: drawerWidth,
           transition: (theme) =>
-            theme.transitions.create('width', {
+            theme.transitions.create("width", {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.enteringScreen,
             }),
-          overflowX: 'hidden',
+          overflowX: "hidden",
         },
       }}
     >
-      <Box sx={{ overflow: 'hidden' }}>
+      <Box sx={{ overflow: "hidden" }}>
         <AuthUserDisplay collapsed={!open} />
 
         <List>
@@ -75,7 +75,7 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
                     sx={{
                       backgroundColor: isActive
                         ? (theme) => `${theme.palette.primary.main}`
-                        : 'transparent',
+                        : "transparent",
                     }}
                   >
                     <ListItemIcon>
@@ -85,8 +85,8 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
                       primary={item.label}
                       sx={{
                         opacity: open ? 1 : 0,
-                        transition: 'opacity 0.3s',
-                        whiteSpace: 'nowrap',
+                        transition: "opacity 0.3s",
+                        whiteSpace: "nowrap",
                       }}
                     />
                   </ListItemButton>
@@ -103,9 +103,9 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
               disableHoverListener={open}
             >
               <ListItemButton
-                onClick={() => {
-                  handleLogout();
-                  onNavigate('/login');
+                onClick={async () => {
+                  await handleLogout();
+                  onNavigate("/login");
                 }}
               >
                 <ListItemIcon>
@@ -115,8 +115,8 @@ export default function SidePanel({ open, onNavigate }: SidePanelProps) {
                   primary="Sair"
                   sx={{
                     opacity: open ? 1 : 0,
-                    transition: 'opacity 0.3s',
-                    whiteSpace: 'nowrap',
+                    transition: "opacity 0.3s",
+                    whiteSpace: "nowrap",
                   }}
                 />
               </ListItemButton>
