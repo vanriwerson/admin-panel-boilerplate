@@ -1,12 +1,11 @@
 export {
   login,
   externalLogin,
-  requestPasswordReset,
-  resetPassword,
   refreshToken,
+  logout,
 } from './authServices';
 
-export { logout } from './authServices';
+export { requestPasswordReset, resetPassword } from './passwordsServices';
 
 export { getLogReports, getLogDetails } from './systemLogsServices';
 

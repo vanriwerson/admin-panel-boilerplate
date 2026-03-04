@@ -20,7 +20,7 @@ namespace Api.Middlewares
             var path = context.Request.Path.Value?.ToLower() ?? "";
             var method = context.Request.Method.ToUpper();
 
-            if (path.Contains("/auth/"))
+            if (path.Contains("/auth/") || path.Contains("/password/"))
             {
                 await _next(context);
                 return;

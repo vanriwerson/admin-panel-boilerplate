@@ -22,7 +22,7 @@ public class ValidateUserPermissions
         var path = context.Request.Path.Value?.ToLower() ?? "";
         var method = context.Request.Method.ToUpper();
 
-        if (path.Contains("/auth/") || path.Contains("/options"))
+        if (path.Contains("/auth/") || path.Contains("/password/") || path.Contains("/options"))
         {
             await _next(context);
             return;
