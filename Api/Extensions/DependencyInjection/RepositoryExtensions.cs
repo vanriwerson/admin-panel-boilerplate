@@ -1,5 +1,4 @@
-using Api.Interfaces;
-using Api.Interfaces.Repositories;
+using System.Reflection;
 using Api.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,11 +12,28 @@ public static class RepositoryExtensions
         ILogger logger
     )
     {
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<ISystemResourceRepository, SystemResourceRepository>();
-        services.AddScoped<IAccessPermissionRepository, AccessPermissionRepository>();
-        services.AddScoped<ISystemLogRepository, SystemLogRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        var assembly = typeof(UserRepository).Assembly;
+
+        var repositoryTypes = assembly
+            .GetTypes()
+            .Where(t =>
+                t.IsClass &&
+                !t.IsAbstract &&
+                t.Namespace != null &&
+                t.Namespace.StartsWith("Api.Repositories") &&
+                t.Name.EndsWith("Repository"));
+
+        foreach (var implementationType in repositoryTypes)
+        {
+            var interfaceType = implementationType
+                .GetInterfaces()
+                .FirstOrDefault(i => i.Name == $"I{implementationType.Name}");
+
+            if (interfaceType != null)
+            {
+                services.AddScoped(interfaceType, implementationType);
+            }
+        }
 
         logger.LogInformation("Repositories registrados com sucesso");
 
