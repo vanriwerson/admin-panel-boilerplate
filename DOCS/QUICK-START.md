@@ -221,24 +221,61 @@ curl -X POST http://localhost:{PORT}/api/users \
 
 ```
 admin-panel-boilerplate/
-├── Api/                    # Backend .NET
+├── Api/                    # Backend .NET 8
 │   ├── Controllers/        # Endpoints REST
 │   ├── Services/           # Lógica de negócio
 │   ├── Models/             # Entidades do banco
+│   │   └── Common/
 │   ├── Dtos/               # Data Transfer Objects
-│   └── Middlewares/        # Autenticação e permissões
+│   ├── Data/               # Configuração do banco
+│   │   └── Configurations/
+│   ├── Repositories/       # Acesso a dados
+│   ├── Security/           # Autenticação e autorização
+│   │   ├── Auth/
+│   │   ├── Jwt/
+│   │   ├── Passwords/
+│   │   ├── Permissions/
+│   │   ├── Policies/
+│   │   └── RefreshTokens/
+│   ├── Middlewares/        # Pipeline HTTP
+│   ├── Auditing/           # Sistema de logs
+│   ├── Extensions/         # Injeção de dependências
+│   │   └── DependencyInjection/
+│   ├── Interfaces/         # Contratos
+│   │   └── Repositories/
+│   ├── Helpers/            # Utilitários
+│   │   └── Pagination/
+│   ├── Mappers/            # Mapeamento de dados
+│   ├── Validations/        # Validações customizadas
+│   ├── Migrations/         # EF Core migrations
+│   └── Program.cs          # Entry point
 │
-├── WebApp/                 # Frontend React
+├── WebApp/                 # Frontend React 19
 │   ├── src/
-│   │   ├── pages/          # Páginas
-│   │   ├── components/     # Componentes
+│   │   ├── api/            # Configuração Axios
+│   │   ├── components/     # Componentes reutilizáveis
+│   │   ├── contexts/       # Estado global
 │   │   ├── hooks/          # Custom hooks
+│   │   ├── interfaces/     # TypeScript types
+│   │   ├── layouts/        # Layouts de página
+│   │   ├── mappers/        # Mapeamento de dados
+│   │   ├── pages/          # Páginas/views
+│   │   ├── permissions/    # RBAC
+│   │   ├── routes/         # Roteamento
 │   │   ├── services/       # Chamadas de API
-│   │   └── contexts/       # Estado global
+│   │   ├── helpers/        # Utilitários
+│   │   ├── theme.ts        # Tema Material-UI
+│   │   ├── App.tsx         # Componente raiz
+│   │   └── main.tsx        # Entry point
 │   └── public/
 │
 ├── DOCS/                   # Documentação completa
-└── docker-compose.yml      # Orquestração
+├── docker-compose.development.yml
+├── docker-compose.production.yml
+├── docker-compose.staging.yml
+├── package.json
+├── AdminPanel.sln
+└── README.md
 ```
 
 ## Recursos Disponíveis
@@ -264,25 +301,6 @@ admin-panel-boilerplate/
 - ✅ Tema Claro/Escuro
 - ✅ Proteção de Rotas
 - ✅ Menu Dinâmico por Permissões
-
-## Próximos Passos
-
-### Para Usuários
-
-1. ✅ [Instalação Completa](./01-INSTALACAO.md)
-2. ✅ [Guia de Uso](./07-GUIA-DE-USO.md)
-3. ✅ [Sistema de Permissões](./06-PERMISSOES.md)
-
-### Para Desenvolvedores
-
-1. ✅ [Arquitetura](./02-ARQUITETURA.md)
-2. ✅ [Backend](./03-BACKEND.md)
-3. ✅ [Frontend](./04-FRONTEND.md)
-4. ✅ [Desenvolvimento](./08-DESENVOLVIMENTO.md)
-
-### Para Integrações
-
-1. ✅ [API Reference](./05-API-REFERENCE.md)
 
 ## Problemas Comuns
 
@@ -351,9 +369,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=admin_panel_db
 
 # Seeds
-RUN_USERS_SEED=true          # Cria dados iniciais (usuário root) e, em
-                           # ambiente de desenvolvimento, usuários de teste
-                           # (nome mais descritivo que RUN_USERS_SEED).
+RUN_USERS_SEED=true          # Cria usuários de teste
 
 # API
 API_PORT={PORT}

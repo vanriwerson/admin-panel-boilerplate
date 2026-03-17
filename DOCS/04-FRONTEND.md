@@ -43,24 +43,41 @@ WebApp/src/
 │   └── index.ts
 ├── assets/                   # Imagens e ícones
 ├── components/               # Componentes reutilizáveis
+│   ├── ActionsSelect/
+│   ├── AuthUserDisplay/
+│   ├── ConfirmDialog/
 │   ├── LoginForm/
-│   ├── UserForm/
-│   ├── UsersTable/
-│   ├── SystemResourceForm/
-│   ├── SystemResourcesTable/
+│   ├── NoResultsFound/
+│   ├── PageTitle/
 │   ├── ReportsTable/
 │   ├── SidePanel/
+│   ├── SnackbarNotification/
+│   ├── StatsCard/
+│   ├── SystemResourceEditionModal/
+│   ├── SystemResourceForm/
+│   ├── SystemResourcesSelect/
+│   ├── SystemResourcesTable/
+│   ├── UserEditionModal/
+│   ├── UserForm/
+│   ├── UsersSelect/
+│   ├── UsersTable/
 │   └── ...
 ├── contexts/                 # Estado global
 │   ├── AuthContext.tsx
-│   └── ThemeContext.tsx
+│   ├── NotificationContext.tsx
+│   ├── PermissionsContext.tsx
+│   ├── SystemResourcesContext.tsx
+│   ├── ThemeContext.tsx
+│   └── UsersContext.tsx
 ├── helpers/                  # Utilitários
 ├── hooks/                    # Custom hooks
 │   ├── useAuth.ts
-│   ├── useThemeMode.ts
-│   ├── useUsers.ts
+│   ├── useNotification.ts
+│   ├── usePermissions.ts
+│   ├── useReports.ts
 │   ├── useSystemResources.ts
-│   └── useReports.ts
+│   ├── useThemeMode.ts
+│   └── useUsers.ts
 ├── interfaces/               # TypeScript types
 │   ├── User.ts
 │   ├── SystemResource.ts
@@ -68,6 +85,7 @@ WebApp/src/
 ├── layouts/                  # Layouts
 │   ├── DefaultLayout.tsx
 │   └── CleanLayout.tsx
+├── mappers/                  # Mapeamento de dados
 ├── pages/                    # Páginas
 │   ├── Login.tsx
 │   ├── PasswordReset.tsx
@@ -230,6 +248,83 @@ interface ThemeContextType {
 
 - Gerencia tema claro/escuro
 - Persiste preferência no localStorage
+
+### NotificationContext
+
+**Arquivo:** `WebApp/src/contexts/NotificationContext.tsx:1`
+
+**Estado:**
+
+```typescript
+interface NotificationContextType {
+  showSuccess: (message: string) => void;
+  showError: (message: string) => void;
+  showInfo: (message: string) => void;
+  showWarning: (message: string) => void;
+}
+```
+
+**Funcionalidades:**
+
+- Exibe notificações toast
+- Integração com Snackbar do Material-UI
+
+### PermissionsContext
+
+**Arquivo:** `WebApp/src/contexts/PermissionsContext.tsx:1`
+
+**Estado:**
+
+```typescript
+interface PermissionsContextType {
+  userPermissions: string[];
+  hasPermission: (permission: string) => boolean;
+  isRootUser: boolean;
+}
+```
+
+**Funcionalidades:**
+
+- Gerencia permissões do usuário atual
+- Métodos utilitários para validação de RBAC
+
+### SystemResourcesContext
+
+**Arquivo:** `WebApp/src/contexts/SystemResourcesContext.tsx:1`
+
+**Estado:**
+
+```typescript
+interface SystemResourcesContextType {
+  systemResources: SystemResource[];
+  loading: boolean;
+  fetchSystemResources: () => Promise<void>;
+}
+```
+
+**Funcionalidades:**
+
+- Cache de recursos do sistema
+- Evita chamadas repetidas à API
+
+### UsersContext
+
+**Arquivo:** `WebApp/src/contexts/UsersContext.tsx:1`
+
+**Estado:**
+
+```typescript
+interface UsersContextType {
+  users: User[];
+  loading: boolean;
+  fetchUsers: () => Promise<void>;
+}
+```
+
+**Funcionalidades:**
+
+- Cache de usuários
+- Estado compartilhado entre componentes
 - Integra com Material-UI ThemeProvider
 
 **Uso:**
@@ -322,6 +417,38 @@ interface LogFilters {
   startDate?: string;
   endDate?: string;
 }
+```
+
+### useNotification
+
+**Arquivo:** `WebApp/src/hooks/useNotification.ts:1`
+
+Acessa o NotificationContext para exibir notificações:
+
+```typescript
+export const useNotification = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error("useNotification must be used within NotificationProvider");
+  }
+  return context;
+};
+```
+
+### usePermissions
+
+**Arquivo:** `WebApp/src/hooks/usePermissions.ts:1`
+
+Acessa o PermissionsContext para validações de RBAC:
+
+```typescript
+export const usePermissions = () => {
+  const context = useContext(PermissionsContext);
+  if (!context) {
+    throw new Error("usePermissions must be used within PermissionsProvider");
+  }
+  return context;
+};
 ```
 
 ## Componentes

@@ -164,6 +164,36 @@ public class AuthController : ControllerBase
 - `startDate`: Data inicial (opcional)
 - `endDate`: Data final (opcional)
 
+### SystemStatsController
+
+**Arquivo:** `Api/Controllers/SystemStatsController.cs:1`
+
+**Rota base:** `/api/stats`
+
+**Permissão requerida:** ID 1 (root) ou ID 4 (reports)
+
+**Endpoints:**
+
+| Método | Rota      | Descrição                |
+| ------ | --------- | ------------------------ |
+| GET    | `/users`  | Estatísticas de usuários |
+| GET    | `/system` | Estatísticas do sistema  |
+
+### PasswordsController
+
+**Arquivo:** `Api/Controllers/PasswordsController.cs:1`
+
+**Rota base:** `/api/passwords`
+
+**Permissão requerida:** Autenticado
+
+**Endpoints:**
+
+| Método | Rota              | Descrição             |
+| ------ | ----------------- | --------------------- |
+| PUT    | `/change`         | Alterar senha própria |
+| PUT    | `/reset/{userId}` | Resetar senha (admin) |
+
 ## Services
 
 Services contêm toda a lógica de negócio. Cada operação tem seu próprio service.
@@ -368,6 +398,52 @@ Estrutura similar aos UsersServices:
 
 - `name` único (identificador interno)
 - `name` não pode conter espaços
+
+### SystemStatsServices
+
+**Pasta:** `Api/Services/SystemStatsServices/`
+
+#### GetUserStats
+
+**Arquivo:** `Api/Services/SystemStatsServices/GetUserStats.cs:1`
+
+**Responsabilidades:**
+
+- Contar usuários totais ativos
+- Contar usuários com permissões
+- Calcular usuários sem permissões
+- Retornar estatísticas
+
+#### GetSystemStats
+
+**Arquivo:** `Api/Services/SystemStatsServices/GetSystemStats.cs:1`
+
+**Responsabilidades:**
+
+- Estatísticas gerais do sistema
+- Contadores de recursos
+- Logs recentes
+- Métricas de uso
+
+### AccessPermissions
+
+**Pasta:** `Api/Services/AccessPermissions/`
+
+Services para gerenciamento de permissões:
+
+- `AssignPermission.cs`
+- `RevokePermission.cs`
+- `GetUserPermissions.cs`
+
+### RefreshTokens
+
+**Pasta:** `Api/Services/RefreshTokens/`
+
+Services para tokens de refresh:
+
+- `CreateRefreshToken.cs`
+- `RevokeRefreshToken.cs`
+- `RefreshAccessToken.cs`
 - Não pode deletar recursos com permissões ativas
 
 ### SystemLogsServices

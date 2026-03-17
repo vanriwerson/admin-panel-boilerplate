@@ -46,15 +46,18 @@ O Admin Panel Boilerplate segue uma arquitetura em camadas com separação clara
 ### Stack Tecnológica
 
 **Backend:**
-- Framework: ASP.NET Core 8
+
+- Framework: ASP.NET Core 8.0
 - ORM: Entity Framework Core 9.0.9
 - Banco de Dados: PostgreSQL 14+
 - Autenticação: JWT (System.IdentityModel.Tokens.Jwt 8.14.0)
 - Hashing: BCrypt.Net-Next 4.0.3
 - Email: Resend API 0.1.7
-- Documentação: Swagger/OpenAPI (Swashbuckle 6.6.2)
+- Documentação: Swagger/OpenAPI (Swashbuckle.AspNetCore 6.6.2, Microsoft.AspNetCore.OpenApi 8.0.20)
+- Variáveis de Ambiente: DotNetEnv 3.1.1
 
 **Frontend:**
+
 - Framework: React 19.1.1
 - Build Tool: Vite 7.1.7
 - Linguagem: TypeScript 5.9.3
@@ -62,12 +65,14 @@ O Admin Panel Boilerplate segue uma arquitetura em camadas com separação clara
 - Roteamento: React Router 7.9.4
 - HTTP Client: Axios 1.12.2
 - Date Utils: date-fns 4.1.0
+- Ícones: FontAwesome 7.1.0
 
 **Infraestrutura & CI/CD:**
+
 - Containerização: Docker
 - Orquestração: Docker Compose
 - CI/CD: GitHub Actions
-- Versionamento: Semantic Release 25
+- Versionamento: Semantic Release 25.0.2
 
 ### Padrões de Design
 
@@ -124,36 +129,35 @@ Api/
 ├── Controllers/              # Endpoints REST
 │   ├── AuthController.cs
 │   ├── UsersController.cs
+│   ├── SystemLogsController.cs
 │   ├── SystemResourcesController.cs
-│   └── SystemLogsController.cs
+│   ├── SystemStatsController.cs
+│   └── PasswordsController.cs
 │
 ├── Services/                 # Lógica de Negócio
-│   ├── AuthServices/
-│   │   ├── LoginService.cs
-│   │   ├── ExternalTokenService.cs
-│   │   ├── PasswordServices.cs
-│   │   └── EmailService.cs
-│   ├── UsersServices/
-│   │   ├── CreateUser.cs
-│   │   ├── GetAllUsers.cs
-│   │   ├── GetUserById.cs
-│   │   ├── UpdateUser.cs
-│   │   ├── DeleteUser.cs
-│   │   └── SearchUsers.cs
-│   ├── SystemResourcesServices/
-│   └── SystemLogsServices/
+│   ├── AccessPermissions/
+│   ├── RefreshTokens/
+│   ├── SystemResources/
+│   ├── SystemStatsServices/
+│   └── Users/
 │
 ├── Models/                   # Entidades do Banco
 │   ├── User.cs
 │   ├── SystemResource.cs
 │   ├── AccessPermission.cs
-│   └── SystemLog.cs
+│   ├── SystemLog.cs
+│   ├── RefreshToken.cs
+│   └── Common/
+│       └── AuditableEntity.cs
 │
 ├── Dtos/                     # Data Transfer Objects
-│   ├── Auth/
-│   ├── Users/
-│   ├── SystemResources/
-│   └── SystemLogs/
+│   ├── AccessPermissionDtos/
+│   ├── AuthDtos/
+│   ├── PasswordDtos/
+│   ├── SystemLogDtos/
+│   ├── SystemResourceDtos/
+│   ├── SystemStatsDtos/
+│   └── UserDtos/
 │
 ├── Data/                     # Configuração do Banco
 │   ├── ApiDbContext.cs
@@ -161,19 +165,45 @@ Api/
 │   └── Configurations/
 │
 ├── Repositories/             # Acesso a Dados
-│   ├── IGenericRepository.cs
-│   └── GenericRepository.cs
+│   ├── AccessPermissionRepository.cs
+│   ├── RefreshTokenRepository.cs
+│   ├── SystemLogRepository.cs
+│   ├── SystemResourceRepository.cs
+│   └── UserRepository.cs
+│
+├── Security/                 # Autenticação e Autorização
+│   ├── Auth/
+│   ├── Jwt/
+│   ├── Passwords/
+│   ├── Permissions/
+│   ├── Policies/
+│   └── RefreshTokens/
 │
 ├── Middlewares/              # Pipeline HTTP
 │   ├── RequireAuthorization.cs
 │   ├── ValidateUserPermissions.cs
-│   └── ExceptionHandler.cs
+│   ├── ExceptionHandler.cs
+│   └── AppException.cs
+│
+├── Auditing/                 # Sistema de Logs
+│   ├── SystemLogActionFactory.cs
+│   └── SystemLogDataSerializer.cs
+│
+├── Extensions/               # Injeção de Dependências
+│   └── DependencyInjection/
+│
+├── Interfaces/               # Contratos
+│   └── Repositories/
 │
 ├── Helpers/                  # Utilitários
-│   ├── JsonWebToken.cs
-│   ├── PasswordHashing.cs
-│   ├── CurrentAuthUser.cs
-│   └── ...
+│   ├── EnvLoader.cs
+│   ├── Logger.cs
+│   └── Pagination/
+│
+├── Mappers/                  # Mapeamento de Dados
+│   └── UserMapper.cs
+│
+├── Validations/              # Validações Customizadas
 │
 └── Program.cs               # Configuração e Bootstrap
 ```
@@ -183,12 +213,14 @@ Api/
 #### 1. Controllers (Camada de Apresentação)
 
 Responsabilidades:
+
 - Receber requisições HTTP
 - Validar entrada básica
 - Delegar para services
 - Retornar respostas HTTP
 
 Exemplo:
+
 ```csharp
 [ApiController]
 [Route("api/users")]
@@ -203,6 +235,7 @@ public class UsersController : ControllerBase
 #### 2. Services (Camada de Negócio)
 
 Responsabilidades:
+
 - Implementar regras de negócio
 - Orquestrar operações
 - Validar dados complexos
@@ -210,6 +243,7 @@ Responsabilidades:
 - Registrar logs
 
 Exemplo:
+
 ```csharp
 public class CreateUser
 {
@@ -225,12 +259,14 @@ public class CreateUser
 #### 3. Repositories (Camada de Acesso a Dados)
 
 Responsabilidades:
+
 - Abstrair acesso ao banco
 - Operações CRUD genéricas
 - Queries customizadas
 - Soft delete
 
 Exemplo:
+
 ```csharp
 public class GenericRepository<T> : IGenericRepository<T>
 {
@@ -243,16 +279,19 @@ public class GenericRepository<T> : IGenericRepository<T>
 #### 4. Middlewares (Pipeline)
 
 **RequireAuthorization:**
+
 - Valida presença de token JWT
 - Verifica assinatura e expiração
 - Extrai claims do usuário
 
 **ValidateUserPermissions:**
+
 - Mapeia endpoint → permissão requerida
 - Verifica se usuário tem a permissão
 - Bloqueio de atribuição de permissões root
 
 **ExceptionHandler:**
+
 - Captura exceções não tratadas
 - Retorna respostas padronizadas
 - Log de erros
@@ -310,14 +349,20 @@ WebApp/src/
 │
 ├── contexts/                 # Estado Global
 │   ├── AuthContext.tsx       # Autenticação
-│   └── ThemeContext.tsx      # Tema claro/escuro
+│   ├── NotificationContext.tsx # Notificações
+│   ├── PermissionsContext.tsx # Permissões RBAC
+│   ├── SystemResourcesContext.tsx # Recursos do sistema
+│   ├── ThemeContext.tsx      # Tema claro/escuro
+│   └── UsersContext.tsx      # Usuários
 │
 ├── hooks/                    # Hooks Customizados
 │   ├── useAuth.ts
-│   ├── useThemeMode.ts
-│   ├── useUsers.ts
+│   ├── useNotification.ts
+│   ├── usePermissions.ts
+│   ├── useReports.ts
 │   ├── useSystemResources.ts
-│   └── useReports.ts
+│   ├── useThemeMode.ts
+│   └── useUsers.ts
 │
 ├── interfaces/               # TypeScript Types
 │   ├── User.ts
@@ -366,6 +411,7 @@ WebApp/src/
 #### 1. Pages (Camada de Apresentação)
 
 Responsabilidades:
+
 - Renderizar a interface
 - Compor componentes
 - Usar hooks customizados
@@ -374,6 +420,7 @@ Responsabilidades:
 #### 2. Components (Componentes Reutilizáveis)
 
 Responsabilidades:
+
 - UI components isolados
 - Recebem props
 - Emitem eventos
@@ -382,12 +429,14 @@ Responsabilidades:
 #### 3. Hooks (Lógica de Negócio)
 
 Responsabilidades:
+
 - Encapsular lógica reutilizável
 - Gerenciar estado local
 - Side effects (API calls)
 - Retornar dados e funções
 
 Exemplo:
+
 ```typescript
 export const useUsers = () => {
   const [users, setUsers] = useState([]);
@@ -408,16 +457,18 @@ export const useUsers = () => {
 #### 4. Services (Camada de Comunicação)
 
 Responsabilidades:
+
 - Fazer chamadas HTTP
 - Transformar dados
 - Tratar erros básicos
 - Retornar promises
 
 Exemplo:
+
 ```typescript
 export const listUsers = async (page: number, limit: number) => {
-  const response = await api.get('/users', {
-    params: { page, limit }
+  const response = await api.get("/users", {
+    params: { page, limit },
   });
   return response.data;
 };
@@ -426,17 +477,20 @@ export const listUsers = async (page: number, limit: number) => {
 #### 5. Contexts (Estado Global)
 
 Responsabilidades:
+
 - Compartilhar estado entre componentes
 - Prover métodos de atualização
 - Persistir dados (localStorage)
 
 **AuthContext:**
+
 - Token JWT
 - Dados do usuário
 - Permissões
 - Métodos de login/logout
 
 **ThemeContext:**
+
 - Tema atual (light/dark)
 - Método para alternar
 
@@ -507,6 +561,7 @@ Component Re-renders
 ### Fluxo de Proteção de Rotas
 
 **Frontend:**
+
 ```
 Route access attempt
     │
@@ -521,6 +576,7 @@ ProtectedRoute component
 ```
 
 **Backend:**
+
 ```
 HTTP Request
     │
@@ -583,6 +639,7 @@ Frontend:
 ### Autenticação JWT
 
 **Token Structure:**
+
 ```json
 {
   "header": {
@@ -601,6 +658,7 @@ Frontend:
 ```
 
 **Claims:**
+
 - `id`: ID do usuário
 - `username`: Nome de usuário
 - `email`: Email
@@ -610,10 +668,12 @@ Frontend:
 ### Proteção de Endpoints
 
 **Middleware Pipeline:**
+
 1. `RequireAuthorization`: Valida presença e validade do JWT
 2. `ValidateUserPermissions`: Valida permissões específicas
 
 **Regras de Permissão:**
+
 - Usuário root (ID 1) tem acesso total
 - Endpoints mapeados para permissões específicas
 - Validação de atribuição de permissões root/resources
@@ -627,6 +687,7 @@ Frontend:
 ### CORS
 
 Configurado para aceitar requisições apenas do frontend:
+
 ```csharp
 options.AddPolicy("AllowWebApp", builder =>
 {
@@ -656,20 +717,24 @@ options.AddPolicy("AllowWebApp", builder =>
       │
       │ 1:N
       ▼
-┌──────────────┐
-│ system_logs  │
-├──────────────┤
-│ id (PK)      │
-│ user_id (FK) │
-│ action       │
-│ created_at   │
-└──────────────┘
+┌──────────────┐       ┌────────────────────┐
+│ system_logs  │       │  refresh_tokens    │
+├──────────────┤       ├────────────────────┤
+│ id (PK)      │       │ id (PK)            │
+│ user_id (FK) │       │ token_hash         │
+│ action       │       │ expires_at         │
+│ data         │       │ is_revoked         │
+│ created_at   │       │ created_at         │
+│ ip_address   │       │ revoked_at         │
+│ generated_by │       │ user_id (FK)       │
+└──────────────┘       └────────────────────┘
 ```
 
 ### Relacionamentos
 
 - **users ↔ system_resources**: Many-to-Many (via access_permissions)
 - **users → system_logs**: One-to-Many
+- **users → refresh_tokens**: One-to-Many
 
 ### Índices
 
@@ -681,6 +746,7 @@ options.AddPolicy("AllowWebApp", builder =>
 ### Migrations
 
 Entity Framework Core gerencia o schema:
+
 ```bash
 dotnet ef migrations add InitialCreate
 dotnet ef database update
@@ -689,10 +755,12 @@ dotnet ef database update
 ### Seeds
 
 **Dados Iniciais (sempre criados):**
+
 - Usuário root (username: root, senha: root1234)
 - 4 recursos do sistema (root, users, resources, reports)
 
 **Dados de Teste (opcional - RUN_USERS_SEED=true):**
+
 - 10 usuários: alice, bob, carol, dave, eve, frank, grace, heidi, ivan, judy
 - Sem permissões por padrão
 

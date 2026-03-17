@@ -17,12 +17,14 @@ Documentação completa do sistema de Role-Based Access Control (RBAC).
 O sistema utiliza RBAC (Role-Based Access Control) para controlar o acesso a recursos e funcionalidades.
 
 **Conceitos principais:**
+
 - **Usuários**: Entidades que usam o sistema
 - **Recursos**: Funcionalidades/módulos do sistema
 - **Permissões**: Associação entre usuário e recurso
 - **Root**: Usuário com acesso total (ID 1)
 
 **Características:**
+
 - Controle granular por recurso
 - Usuário pode ter múltiplas permissões
 - Validação no backend e frontend
@@ -33,12 +35,12 @@ O sistema utiliza RBAC (Role-Based Access Control) para controlar o acesso a rec
 
 ### Recursos Padrão (Seeds)
 
-| ID | Name | Exhibition Name | Descrição |
-|----|------|-----------------|-----------|
-| 1 | root | Administrador | Acesso total ao sistema |
-| 2 | users | Usuários | Gerenciamento de usuários |
-| 3 | resources | Recursos | Gerenciamento de recursos do sistema |
-| 4 | reports | Relatórios | Visualização de logs e auditoria |
+| ID  | Name      | Exhibition Name | Descrição                            |
+| --- | --------- | --------------- | ------------------------------------ |
+| 1   | root      | Administrador   | Acesso total ao sistema              |
+| 2   | users     | Usuários        | Gerenciamento de usuários            |
+| 3   | resources | Recursos        | Gerenciamento de recursos do sistema |
+| 4   | reports   | Relatórios      | Visualização de logs e auditoria     |
 
 ### Hierarquia de Permissões
 
@@ -49,16 +51,16 @@ root (ID: 1)
 ├─ Pode editar qualquer usuário
 └─ Pode deletar qualquer usuário
 
-resources (ID: 3)
-├─ Gerenciar recursos do sistema
-├─ Criar/editar/deletar recursos
-└─ APENAS root pode atribuir esta permissão
-
 users (ID: 2)
 ├─ Gerenciar usuários
 ├─ Criar/editar/deletar usuários
 ├─ Pode atribuir permissões (exceto root e resources)
 └─ Não pode editar usuário root
+
+resources (ID: 3)
+├─ Gerenciar recursos do sistema
+├─ Criar/editar/deletar recursos
+└─ APENAS root pode atribuir esta permissão
 
 reports (ID: 4)
 ├─ Visualizar logs de auditoria
@@ -71,6 +73,7 @@ reports (ID: 4)
 ### Tabelas
 
 #### users
+
 ```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -85,6 +88,7 @@ CREATE TABLE users (
 ```
 
 #### system_resources
+
 ```sql
 CREATE TABLE system_resources (
   id SERIAL PRIMARY KEY,
@@ -97,6 +101,7 @@ CREATE TABLE system_resources (
 ```
 
 #### access_permissions
+
 ```sql
 CREATE TABLE access_permissions (
   id SERIAL PRIMARY KEY,
@@ -149,22 +154,22 @@ users (1) ←→ (N) access_permissions (N) ←→ (1) system_resources
 
 ### Regras de Atribuição
 
-| Usuário Autenticado | Pode Atribuir |
-|---------------------|---------------|
-| Root | root, users, resources, reports (todas) |
-| Com permissão users | users, reports (apenas essas) |
-| Sem permissão users | Nenhuma |
+| Usuário Autenticado | Pode Atribuir                           |
+| ------------------- | --------------------------------------- |
+| Root                | root, users, resources, reports (todas) |
+| Com permissão users | users, reports (apenas essas)           |
+| Sem permissão users | Nenhuma                                 |
 
 ### Regras de Edição
 
-| Ação | Root | Com permissão users | Sem permissão |
-|------|------|---------------------|---------------|
-| Editar próprio perfil | ✓ | ✓ | ✓ |
-| Editar própria senha | ✓ | ✓ | ✓ |
-| Editar outro usuário | ✓ | ✓ (exceto root) | ✗ |
-| Editar senha de outro | ✓ | ✗ | ✗ |
-| Editar permissões | ✓ | ✓ (limitado) | ✗ |
-| Deletar usuário | ✓ | ✓ (exceto root) | ✗ |
+| Ação                  | Root | Com permissão users | Sem permissão |
+| --------------------- | ---- | ------------------- | ------------- |
+| Editar próprio perfil | ✓    | ✓                   | ✓             |
+| Editar própria senha  | ✓    | ✓                   | ✓             |
+| Editar outro usuário  | ✓    | ✓ (exceto root)     | ✗             |
+| Editar senha de outro | ✓    | ✗                   | ✗             |
+| Editar permissões     | ✓    | ✓ (limitado)        | ✗             |
+| Deletar usuário       | ✓    | ✓ (exceto root)     | ✗             |
 
 ## Implementação Backend
 
@@ -264,11 +269,11 @@ if (dto.PermissionsIds != null)
 
 ```typescript
 export const PermissionsMap = {
-  ROOT: 'root',
-  USERS: 'users',
-  RESOURCES: 'resources',
-  REPORTS: 'reports',
-  PROFILE: 'profile',
+  ROOT: "root",
+  USERS: "users",
+  RESOURCES: "resources",
+  REPORTS: "reports",
+  PROFILE: "profile",
 };
 ```
 
@@ -283,10 +288,13 @@ export const isRootUser = (user: User | null): boolean => {
 };
 
 // Verifica se tem permissão específica
-export const hasPermission = (user: User | null, permission: string): boolean => {
+export const hasPermission = (
+  user: User | null,
+  permission: string,
+): boolean => {
   if (!user) return false;
   if (isRootUser(user)) return true; // Root tem todas
-  return user.permissions.some(p => p.name === permission);
+  return user.permissions.some((p) => p.name === permission);
 };
 
 // Pode editar senha de outro usuário?
@@ -295,21 +303,24 @@ export const canEditPassword = (authUser: User, targetUser: User): boolean => {
 };
 
 // Pode editar permissões?
-export const canEditPermissions = (authUser: User, targetUser: User): boolean => {
+export const canEditPermissions = (
+  authUser: User,
+  targetUser: User,
+): boolean => {
   return isRootUser(authUser) && targetUser.id !== 1;
 };
 
 // Filtra permissões que podem ser atribuídas
 export const filterAssignablePermissions = (
   authUser: User,
-  allPermissions: SystemResource[]
+  allPermissions: SystemResource[],
 ): SystemResource[] => {
   if (isRootUser(authUser)) {
     return allPermissions;
   }
   // Remove root e resources para não-root
   return allPermissions.filter(
-    p => p.name !== 'root' && p.name !== 'resources'
+    (p) => p.name !== "root" && p.name !== "resources",
   );
 };
 ```
@@ -360,9 +371,9 @@ interface MenuItem {
 
 export const filterMenuByPermissions = (
   menuItems: MenuItem[],
-  user: User | null
+  user: User | null,
 ): MenuItem[] => {
-  return menuItems.filter(item => {
+  return menuItems.filter((item) => {
     if (!item.permission) return true; // Sem restrição
     return hasPermission(user, item.permission);
   });
@@ -373,10 +384,20 @@ export const filterMenuByPermissions = (
 
 ```typescript
 const menuItems: MenuItem[] = [
-  { path: '/profile', label: 'Perfil', icon: PersonIcon, permission: null },
-  { path: '/users', label: 'Usuários', icon: PeopleIcon, permission: 'users' },
-  { path: '/resources', label: 'Recursos', icon: FolderIcon, permission: 'resources' },
-  { path: '/reports', label: 'Relatórios', icon: AssessmentIcon, permission: 'reports' },
+  { path: "/profile", label: "Perfil", icon: PersonIcon, permission: null },
+  { path: "/users", label: "Usuários", icon: PeopleIcon, permission: "users" },
+  {
+    path: "/resources",
+    label: "Recursos",
+    icon: FolderIcon,
+    permission: "resources",
+  },
+  {
+    path: "/reports",
+    label: "Relatórios",
+    icon: AssessmentIcon,
+    permission: "reports",
+  },
 ];
 
 const visibleItems = filterMenuByPermissions(menuItems, authUser);
@@ -433,6 +454,7 @@ const UserForm = ({ user }: Props) => {
 **Permissões:** root, users, resources, reports
 
 **Pode fazer:**
+
 - ✓ Acessar todas as páginas
 - ✓ Criar/editar/deletar qualquer usuário
 - ✓ Atribuir qualquer permissão
@@ -440,6 +462,7 @@ const UserForm = ({ user }: Props) => {
 - ✓ Ver relatórios
 
 **Não pode fazer:**
+
 - ✗ Nada é restrito
 
 ---
@@ -450,6 +473,7 @@ const UserForm = ({ user }: Props) => {
 **Permissões:** users, reports
 
 **Pode fazer:**
+
 - ✓ Acessar /users
 - ✓ Acessar /reports
 - ✓ Criar usuários com permissões users e reports
@@ -458,6 +482,7 @@ const UserForm = ({ user }: Props) => {
 - ✓ Visualizar logs
 
 **Não pode fazer:**
+
 - ✗ Acessar /resources
 - ✗ Atribuir permissão root
 - ✗ Atribuir permissão resources
@@ -472,11 +497,13 @@ const UserForm = ({ user }: Props) => {
 **Permissões:** reports
 
 **Pode fazer:**
+
 - ✓ Acessar /reports
 - ✓ Filtrar logs por usuário/ação/data
 - ✓ Editar próprio perfil e senha
 
 **Não pode fazer:**
+
 - ✗ Acessar /users
 - ✗ Acessar /resources
 - ✗ Criar/editar/deletar usuários
@@ -490,12 +517,14 @@ const UserForm = ({ user }: Props) => {
 **Permissões:** (nenhuma)
 
 **Pode fazer:**
+
 - ✓ Fazer login
 - ✓ Acessar /profile
 - ✓ Editar próprio perfil e senha
 - ✓ Fazer logout
 
 **Não pode fazer:**
+
 - ✗ Acessar qualquer outra página
 - ✗ Ver menu lateral (vazio)
 - ✗ Qualquer operação CRUD
@@ -509,17 +538,19 @@ const UserForm = ({ user }: Props) => {
 **Usuário:** alice (ID: 5, permissões: users, reports)
 
 **Payload:**
+
 ```json
 {
   "username": "john",
   "email": "john@example.com",
   "password": "password123",
   "fullName": "John Doe",
-  "permissionsIds": [2, 4]  // users, reports
+  "permissionsIds": [2, 4] // users, reports
 }
 ```
 
 **Backend - Middleware:**
+
 ```
 1. Extrai token JWT
 2. Decodifica: userId=5, permissions="2,4"
@@ -530,6 +561,7 @@ const UserForm = ({ user }: Props) => {
 ```
 
 **Backend - Service:**
+
 ```
 1. Valida email único
 2. Valida username único
@@ -541,6 +573,7 @@ const UserForm = ({ user }: Props) => {
 ```
 
 **Frontend:**
+
 ```
 1. UserForm filtra permissões disponíveis
 2. Exibe apenas: users, reports (remove root, resources)
