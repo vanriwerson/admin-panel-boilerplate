@@ -2,25 +2,23 @@
 
 ### Ferramentas Recomendadas
 
-- [Visual Studio Code](https://code.visualstudio.com/)
+_[Visual Studio Code](https://code.visualstudio.com/) com as extensões:_
 
 **Backend (.NET):**
 
-- Extensões:
-  - C# (Microsoft)
-  - C# Dev Kit
-  - NuGet Package Manager
-  - Database Client
+- C# (Microsoft)
+- C# Dev Kit
+- NuGet Package Manager
+- Database Client
 
 **Frontend (React):**
 
-- Extensões:
-  - ESLint
-  - Prettier
-  - ES7+ React/Redux/React-Native snippets
-  - Auto Rename Tag
+- ESLint
+- Prettier
+- ES7+ React/Redux/React-Native snippets
+- Auto Rename Tag
 
-**Banco de Dados:**
+**Banco de Dados (Caso não queira utilizar o Docker):**
 
 - [pgAdmin](https://www.pgadmin.org/) - GUI para PostgreSQL
 - [DBeaver](https://dbeaver.io/) - Alternativa universal
@@ -36,17 +34,17 @@
 
 1. **Inicie um novo projeto a partir do template**
 
-- No github, na [página desse repositório](https://github.com/vanriwerson/admin-panel-boilerplate), clique em:
+- No github, na página desse [repositório](https://github.com/vanriwerson/admin-panel-boilerplate), clique em:
 
 `Use this template` e depois em `Create a new repository`.
 
 ![Github use this template](./assets/use-this-template.png)
 
-- Após configurar o novo repositório (setar o owner, nome do repo, etc...) e clicar em `Create repository`
+- Após configurar o novo repositório (setar o owner, nome do repo, etc...) e clicar em `Create repository`, clone o novo repositório e navegue para ele
 
 ```bash
-  git clone https://github.com/vanriwerson/novo-projeto
-  cd novo-projeto
+  git clone https://github.com/vanriwerson/novo-repo-criado
+  cd novo-repo-criado/
 ```
 
 2. **Configure variáveis de ambiente**
@@ -124,11 +122,11 @@ _Se todas as configurações feitas estiverem corretas, voce verá um log com a 
 
 _Você verá algo como:_
 
-![Github use this template](./assets/run-base-migration.png)
+![Run base migration](./assets/run-base-migration.png)
 
 _O Erro que aparece é normal, pois não temos `__EFMigrationsHistory` nesse momento. O importante para nós é o `Done` ao final. Isso garante que todas as tabelas da migration InitialCreate foram criadas corretamente pelo EF e já temos toda a estrutura necessária para rodar a api._
 
-3. **Instale as dependências do Backend e inicialize a api**
+4. **Instale as dependências do Backend e inicialize a api**
 
 ```bash
   dotnet restore
@@ -138,7 +136,7 @@ _O Erro que aparece é normal, pois não temos `__EFMigrationsHistory` nesse mom
 
 _Isso criará as permissões base e o usuário root, além de usuários fictícios se tiver setado `RUN_USERS_SEED=true` em `Api/.env`_
 
-4. **Navegue para o frontend, instale as dependências e inicialize o WebApp**
+5. **Navegue para o frontend, instale as dependências e inicialize o WebApp**
 
 ```bash
   cd WebApp/
@@ -146,7 +144,11 @@ _Isso criará as permissões base e o usuário root, além de usuários fictíci
   npm run dev
 ```
 
-_Com isso, você poderá [acessar a aplicação localmente](http://localhost:5173) e estará pronto para iniciar o desenvolvimento._
+_Com isso, você poderá acessar a aplicação localmente em http://localhost:5173 (a porta pode variar)._
+
+## Antes de começar a desenvolver
+
+> Antes de iniciar o desenvolvimento de novas funcionalidades, reserve um tempo para explorar e compreender a estrutura do projeto e as features já implementadas. Analisar o código existente é fundamental para evitar a criação de soluções redundantes, economizando tempo e esforço ao reutilizar componentes e lógicas já disponíveis. Ao entender profundamente o que o projeto já oferece, você facilitará a integração de novas features, garantindo uma evolução consistente e eficiente do sistema.
 
 ## Estrutura do Código
 
@@ -154,11 +156,11 @@ _Com isso, você poderá [acessar a aplicação localmente](http://localhost:517
 
 **Backend (C#):**
 
-- Classes: PascalCase (`UserController`, `LoginService`)
+- Classes: PascalCase (`UserController`, `AccessPermission`)
 - Métodos: PascalCase (`ExecuteAsync`, `GetAllUsers`)
 - Variáveis locais: camelCase (`userId`, `authUser`)
-- Constantes: PascalCase (`DefaultLimit`)
 - Interfaces: Prefixo I + PascalCase (`IGenericRepository`)
+- Validators: Nome da Entidade + sufixo Validator (`UserValidator`)
 
 **Frontend (TypeScript):**
 
@@ -177,10 +179,14 @@ _Com isso, você poderá [acessar a aplicação localmente](http://localhost:517
 
 **Backend:**
 
+- Herança de AuditableEntity (garante CreatedAt e UpdatedAt)
+- Interface para repositórios (`IUserRepository`)
+- Implementação do repositório especializado (`UserRepository`, `SystemLogRepository`)
 - Um service por operação (CreateUser, UpdateUser, etc)
 - DTOs para input/output
 - Async/await para operações I/O
-- Try-catch apenas onde necessário (middleware global)
+- Middleware de Erro (uso global)
+- Um Controller por entidade
 
 **Frontend:**
 
@@ -188,32 +194,44 @@ _Com isso, você poderá [acessar a aplicação localmente](http://localhost:517
 - Props tipadas com TypeScript
 - Custom hooks para lógica de negócio
 - Services para chamadas de API
+- ContextApi para estados compartilhados por pontos distintos da aplicação
 
 ## Adicionar Novo Recurso
 
-Vamos criar um módulo completo de **Produtos** (Products) como exemplo.
+> Como a api possui proteção por endpoint, o primeiro passo para implementação é
+> criar o SystemResource correspondente ao novo recurso que se pretende inserir.
 
-### Passo 1: Backend - Model
+A título de exemplo prático, vamos criar um módulo completo de **Product**.
+
+Acessando o WebApp como root, crie o novo recurso de sistema:
+![Add a new SystemResource](./assets/create-system-resource.png)
+
+Após a criação, edite o arquivo [Api/Security/Permissions/EndpointPermissions.cs](../Api/Security/Permissions/EndpointPermissions.cs), adicionando um novo objeto correspondente ao recurso criado. Isso garante que a nova rota entrará na validação de permissões de endpoint.
+
+### Crie o Model da nova entidade
+
+Modele sua entidade com os atributos necesários
 
 **Arquivo:** `Api/Models/Product.cs`
 
 ```csharp
+using Api.Models.Common;
+
 namespace Api.Models;
 
-public class Product
+public class Product: AuditableEntity
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
-    public int Stock { get; set; }
     public bool Active { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
 ```
 
-### Passo 2: Backend - Configuration
+### Crie o arquivo Configuration
+
+Esse arquivo é uma abstração para manter as Models limpas. Nele você define nomes de tabela, colunas, índices únicos, valores padrão, relacionamentos, etc
 
 **Arquivo:** `Api/Data/Configurations/ProductConfiguration.cs`
 
@@ -233,49 +251,59 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Name)
+            .HasColumnName("name")
             .IsRequired()
             .HasMaxLength(255);
 
         builder.Property(p => p.Description)
+            .HasColumnName("description")
             .HasMaxLength(1000);
 
         builder.Property(p => p.Price)
+            .HasColumnName("price")
             .HasColumnType("decimal(18,2)");
 
-        builder.Property(p => p.Stock)
-            .HasDefaultValue(0);
-
         builder.Property(p => p.Active)
+            .HasColumnName("active")
             .HasDefaultValue(true);
 
         builder.Property(p => p.CreatedAt)
+            .HasColumnName("created_at")
             .HasDefaultValueSql("NOW()");
 
         builder.Property(p => p.UpdatedAt)
+            .HasColumnName("updated_at")
             .HasDefaultValueSql("NOW()");
     }
 }
 ```
 
-### Passo 3: Backend - DbContext
+### Adicione o novo DbSet ao ApiDbContext
 
 **Arquivo:** `Api/Data/ApiDbContext.cs`
-
-Adicione o DbSet:
 
 ```csharp
 public DbSet<Product> Products { get; set; }
 ```
 
-### Passo 4: Backend - Migration
+### Crie a Migration
+
+Muito provavelmente, ao desenvolver um sistema baseado nesse template, você terá que incluir várias novas entidades nele. A criação da migration pode ser feita após a criação e configuração de todas elas, gerando um histórico inicial mais limpo. Por exemplo;
 
 ```bash
-cd Api
-dotnet ef migrations add AddProductsTable
-dotnet ef database update
+  cd Api
+  dotnet ef migrations add NovoSistemaInfrastructure
 ```
 
-### Passo 5: Backend - DTOs
+Execute a nova Migration com
+
+```bash
+  dotnet ef database update
+```
+
+### Crie DTOs por caso de uso
+
+Implemente dtos (Data Transfer Object) com informações relevantes para cada caso (criação, listagem, detalhamento, preenchimento de selects do frontend, etc...)
 
 **Arquivo:** `Api/Dtos/Products/CreateProductDto.cs`
 
@@ -286,19 +314,9 @@ namespace Api.Dtos.Products;
 
 public class CreateProductDto
 {
-    [Required]
-    [MaxLength(255)]
     public string Name { get; set; } = string.Empty;
-
-    [MaxLength(1000)]
     public string Description { get; set; } = string.Empty;
-
-    [Required]
-    [Range(0.01, double.MaxValue)]
     public decimal Price { get; set; }
-
-    [Range(0, int.MaxValue)]
-    public int Stock { get; set; }
 }
 ```
 
@@ -312,186 +330,48 @@ public class UpdateProductDto
     public string? Name { get; set; }
     public string? Description { get; set; }
     public decimal? Price { get; set; }
-    public int? Stock { get; set; }
 }
 ```
 
-**Arquivo:** `Api/Dtos/Products/ProductResponseDto.cs`
+**Arquivo:** `Api/Dtos/Products/ProductReadDto.cs`
 
 ```csharp
 namespace Api.Dtos.Products;
 
-public class ProductResponseDto
+public class ProductReadDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
-    public int Stock { get; set; }
     public bool Active { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 ```
 
-### Passo 6: Backend - Services
+### Crie Validators
 
-**Arquivo:** `Api/Services/ProductsServices/CreateProduct.cs`
+Eles são uma abstração das regras de negócio para deixar a camada Services mais limpa.
 
-```csharp
-using Api.Data;
-using Api.Dtos.Products;
-using Api.Models;
-using Api.Repositories;
-using Api.Services.SystemLogsServices;
-using Api.Helpers;
+_Veja Api/Validations/UserValidator e Api/Repositories/UserRepository (algumas validações fazem sentido nessa camada) para exemplos de validação._
 
-namespace Api.Services.ProductsServices;
+### Implemente a Interface do repositório e o repositório da nova entidade
 
-public class CreateProduct
-{
-    private readonly IGenericRepository<Product> _repository;
-    private readonly CreateSystemLog _logService;
+As interfaces de repositório ajudam a pensar _'Quais métodos fazem sentido para essa entidade dentro do sistema?'_ sem se preocupar com a implementação num primeiro momento. É o contrato entre a entidade e a api.
+Repositórios implementam o contrato estabelecido pela interface. Eles devem consumir as models.
 
-    public CreateProduct(
-        IGenericRepository<Product> repository,
-        CreateSystemLog logService)
-    {
-        _repository = repository;
-        _logService = logService;
-    }
+_Veja os arquivos de `Api/Interfaces/Repositories` e `Api/Repositories` para exemplos de implementação._
 
-    public async Task<ProductResponseDto> ExecuteAsync(CreateProductDto dto, int authUserId)
-    {
-        var product = new Product
-        {
-            Name = dto.Name,
-            Description = dto.Description,
-            Price = dto.Price,
-            Stock = dto.Stock,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+### Crie os Services
 
-        var created = await _repository.CreateAsync(product);
+Essa camada é construída com arquivos separados por caso de uso, consumo de Validator, Repository e Helpers em casos específicos (respostas paginadas, por exemplo, são padronizadas por Api/Helpers/Pagination/PagedResult.cs) e entrega de DTOs para o controller.
 
-        await _logService.ExecuteAsync(authUserId, $"Produto criado: {created.Name}");
+Além disso, é aqui que se deve fazer a integração com a auditoria do sistema (geração de SystemLog) nos casos de `Criação`, `Update` e `Exclusão`.
 
-        return new ProductResponseDto
-        {
-            Id = created.Id,
-            Name = created.Name,
-            Description = created.Description,
-            Price = created.Price,
-            Stock = created.Stock,
-            Active = created.Active,
-            CreatedAt = created.CreatedAt,
-            UpdatedAt = created.UpdatedAt
-        };
-    }
-}
-```
+### Implemente o Controller
 
-Crie services similares para: `GetAllProducts`, `GetProductById`, `UpdateProduct`, `DeleteProduct`.
-
-### Passo 7: Backend - Controller
-
-**Arquivo:** `Api/Controllers/ProductsController.cs`
-
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Api.Dtos.Products;
-using Api.Services.ProductsServices;
-using Api.Helpers;
-
-namespace Api.Controllers;
-
-[ApiController]
-[Route("api/products")]
-public class ProductsController : ControllerBase
-{
-    private readonly CreateProduct _createProduct;
-    private readonly GetAllProducts _getAllProducts;
-    private readonly GetProductById _getProductById;
-    private readonly UpdateProduct _updateProduct;
-    private readonly DeleteProduct _deleteProduct;
-
-    public ProductsController(
-        CreateProduct createProduct,
-        GetAllProducts getAllProducts,
-        GetProductById getProductById,
-        UpdateProduct updateProduct,
-        DeleteProduct deleteProduct)
-    {
-        _createProduct = createProduct;
-        _getAllProducts = getAllProducts;
-        _getProductById = getProductById;
-        _updateProduct = updateProduct;
-        _deleteProduct = deleteProduct;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int limit = 10)
-    {
-        var result = await _getAllProducts.ExecuteAsync(page, limit);
-        return Ok(result);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult> GetById(int id)
-    {
-        var result = await _getProductById.ExecuteAsync(id);
-        return Ok(result);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CreateProductDto dto)
-    {
-        var authUserId = CurrentAuthUser.GetId(HttpContext);
-        var result = await _createProduct.ExecuteAsync(dto, authUserId);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult> Update(int id, [FromBody] UpdateProductDto dto)
-    {
-        var authUserId = CurrentAuthUser.GetId(HttpContext);
-        var result = await _updateProduct.ExecuteAsync(id, dto, authUserId);
-        return Ok(result);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var authUserId = CurrentAuthUser.GetId(HttpContext);
-        await _deleteProduct.ExecuteAsync(id, authUserId);
-        return NoContent();
-    }
-}
-```
-
-### Passo 8: Criar Recurso no Sistema
-
-1. Acesse o sistema como `root`
-2. Vá em **Recursos** → **Novo Recurso**
-3. Preencha:
-   - Name: `products`
-   - Exhibition Name: `Produtos`
-4. Anote o ID gerado (ex: 5)
-
-### Passo 9: Backend - Adicionar Permissão
-
-**Arquivo:** `Api/Helpers/EndpointPermissions.cs`
-
-```csharp
-public static readonly Dictionary<string, int> Map = new()
-{
-    { "/api/users", 2 },
-    { "/api/resources", 3 },
-    { "/api/reports", 4 },
-    { "/api/products", 5 }  // Adicione esta linha
-};
-```
+Exponha os endpoints consumindo os services criados.
 
 ### Passo 10: Frontend - Interface
 
@@ -1130,3 +1010,11 @@ test: adiciona testes para CreateUser
 - [Material-UI Documentation](https://mui.com/)
 - [Entity Framework Core](https://docs.microsoft.com/ef/core/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+
+## Suporte
+
+Para dúvidas ou problemas:
+
+1. Consulte esta documentação
+2. Verifique issues existentes no repositório
+3. Abra uma nova issue se necessário
