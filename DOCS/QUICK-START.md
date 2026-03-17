@@ -4,85 +4,125 @@ Comece a usar o Admin Panel Boilerplate em 5 minutos!
 
 ## Instalação Rápida (Docker)
 
+#### 1. Clone o repositório
+
 ```bash
-# 1. Clone o repositório
-git clone <url-do-repositorio>
+git clone git@github.com:vanriwerson/admin-panel-boilerplate.git
 cd admin-panel-boilerplate
+```
 
 # 2. Configure variáveis de ambiente
-cp Api/.env.example Api/.env
-cp WebApp/.env.example WebApp/.env
 
-# 3. Edite Api/.env com suas configurações
-# DB_HOST=db, DB_PORT=5432, DB_USER=postgres, DB_PASSWORD=postgres
-# DB_NAME=admin_panel_db, API_PORT={PORT}, RUN_USERS_SEED=true
-# JWT_SECRET_KEY=sua-chave-secreta-aqui
-# WEB_APP_URL=http://localhost:5173
+```bash
+  cp Api/.env.example Api/.env
+  cp WebApp/.env.example WebApp/.env
+```
+
+Edite os arquivos, adequando portas conforme necessário.
+
+**Api/.env:**
+
+```bash
+  # Database connection
+  DB_HOST=localhost
+  DB_PORT=5432
+  DB_USER=postgres
+  DB_PASSWORD=postgres
+  DB_NAME=admin_panel_db
+
+  # Rodar serviço db utilizando Docker
+  POSTGRES_USER=postgres
+  POSTGRES_PASSWORD=postgres
+  POSTGRES_DB=admin_panel_db
+
+  # Roda seed de usuários para desenvolvimento. Setar como false em produção
+  RUN_USERS_SEED=true
+
+  # Application
+  API_PORT=5209
+
+  # JWT
+  JWT_SECRET_KEY=XvwKtOBmcu74xUwf8iaTLhb+JNCq1F73jUkbkuNHG+U=
+
+  # CORS
+  WEB_APP_URL=http://localhost:5173
+
+  # Redefinição de senha via e-mail
+  RESEND_API_KEY=re_ChaveDeApiDoServicoResend
+  RESEND_FROM_EMAIL=emailCadastradoNoResend
+```
+
+**WebApp/.env:**
+
+```bash
+  VITE_API_BASE_URL=http://localhost:API_PORT/api
+```
 
 # 4. Inicie os containers (desenvolvimento)
+
 docker compose -f docker-compose.development.yml up -d
 
 # 5. Aguarde a inicialização (30-60 segundos)
+
 docker compose -f docker-compose.development.yml logs -f
+
 ```
 
 ## Acesso
 
 - **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:{PORT}
+- **Backend API:** http://localhost:API_PORT
 - **Swagger:** http://localhost:{PORT}/swagger
 
-> **Nota sobre `{PORT}`:** Substitua `{PORT}` pela porta que você definiu em `API_PORT` no arquivo `Api/.env`. Para projetos DTI PMA, siga a convenção de portas da sequência **521x** (5210, 5211, 5212...).
+> **Nota:** Substitua `API_PORT` pelo valor definido para a variável de ambiente `API_PORT` no arquivo `Api/.env`. Para projetos DTI PMA, siga a convenção de portas da sequência **521x** (5210, 5211, 5212...).
 
 ## Credenciais Padrão
 
 ```
+
 Usuário: root
 Senha: root1234
+
 ```
 
 ## Primeiros Passos
 
-### 1. Altere a Senha Root
+### 1. Crie Seu Primeiro Usuário
 
 ```
-1. Faça login
-2. Vá em "Perfil"
-3. Altere a senha
-4. Salve
-```
 
-### 2. Crie Seu Primeiro Usuário
-
-```
 1. Acesse "Usuários"
-2. Clique em "Novo Usuário"
-3. Preencha:
+2. Preencha o form:
    - Username: teste
    - Email: teste@exemplo.com
    - Senha: senha123
    - Nome: Usuário Teste
-   - Permissões: Usuários
-4. Clique em "Criar"
-```
-
-### 3. Teste as Permissões
+   - Permissões: Gerenciamento de Usuários
+3. Clique em "Cadastrar"
 
 ```
+
+### 2. Teste as Permissões
+
+```
+
 1. Faça logout
 2. Entre com o novo usuário (teste / senha123)
 3. Observe que só tem acesso ao módulo "Usuários"
 4. Não consegue acessar "Recursos" ou "Relatórios"
-```
-
-### 4. Explore os Relatórios
 
 ```
+
+### 3. Explore os Relatórios
+
+```
+
 1. Faça login como root
 2. Acesse "Relatórios"
 3. Veja todas as ações registradas
 4. Filtre por usuário ou data
-```
+
+````
 
 ## Comandos Úteis
 
@@ -102,7 +142,7 @@ docker compose -f docker-compose.development.yml logs -f webapp
 # Recriar do zero (CUIDADO: apaga dados!)
 docker compose -f docker-compose.development.yml down -v
 docker compose -f docker-compose.development.yml up -d
-```
+````
 
 ### Backend (Sem Docker)
 
