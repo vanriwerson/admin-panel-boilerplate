@@ -1,5 +1,4 @@
 using Api.Data;
-using Api.Helpers.Pagination;
 using Api.Interfaces.Repositories;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
