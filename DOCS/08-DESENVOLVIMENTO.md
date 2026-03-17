@@ -1,93 +1,159 @@
-# Guia de Desenvolvimento
-
-Guia completo para desenvolvedores que desejam estender e customizar o boilerplate.
-
-## Índice
-
-1. [Ambiente de Desenvolvimento](#ambiente-de-desenvolvimento)
-2. [Estrutura do Código](#estrutura-do-código)
-3. [Adicionar Novo Recurso](#adicionar-novo-recurso)
-4. [Adicionar Novos Endpoints](#adicionar-novos-endpoints)
-5. [Customizar Frontend](#customizar-frontend)
-6. [Migrations e Banco de Dados](#migrations-e-banco-de-dados)
-7. [Testes](#testes)
-8. [Deploy](#deploy)
-9. [Contribuindo](#contribuindo)
-
-## Ambiente de Desenvolvimento
+# Guia de Desenvolvimento (Criação de novos projetos a partir deste template.)
 
 ### Ferramentas Recomendadas
 
-**Backend (.NET):**
 - [Visual Studio Code](https://code.visualstudio.com/)
+
+**Backend (.NET):**
+
 - Extensões:
   - C# (Microsoft)
   - C# Dev Kit
   - NuGet Package Manager
-  - REST Client (para testar API)
+  - Database Client
 
 **Frontend (React):**
-- [Visual Studio Code](https://code.visualstudio.com/)
+
 - Extensões:
   - ESLint
   - Prettier
   - ES7+ React/Redux/React-Native snippets
   - Auto Rename Tag
-  - Path Intellisense
 
 **Banco de Dados:**
+
 - [pgAdmin](https://www.pgadmin.org/) - GUI para PostgreSQL
 - [DBeaver](https://dbeaver.io/) - Alternativa universal
 
-**API Testing:**
+**Cliente REST para testes da API:**
+
 - [Postman](https://www.postman.com/)
+- [Bruno](https://www.usebruno.com/)
 - [Insomnia](https://insomnia.rest/)
 - REST Client (extensão VS Code)
 
 ### Configuração do Ambiente
 
-1. **Clone o repositório**
+1. **Inicie um novo projeto a partir do template**
+
+- No github, na [página desse repositório](https://github.com/vanriwerson/admin-panel-boilerplate), clique em:
+
+`Use this template` e depois em `Create a new repository`.
+
+![Github use this template](./assets/use-this-template.png)
+
+- Após configurar o novo repositório (setar o owner, nome do repo, etc...) e clicar em `Create repository`
+
 ```bash
-git clone <url-do-repositorio>
-cd admin-panel-boilerplate
+  git clone https://github.com/vanriwerson/novo-projeto
+  cd novo-projeto
 ```
 
 2. **Configure variáveis de ambiente**
+
+_Crie arquivos .env para Api e WebApp a partir dos exemplos:_
+
 ```bash
-cp Api/.env.example Api/.env
-cp WebApp/.env.example WebApp/.env
+  cp Api/.env.example Api/.env
+  cp WebApp/.env.example WebApp/.env
 ```
 
-Edite conforme necessário.
+Edite os arquivos, adequando portas conforme necessário.
 
-3. **Backend**
+**Api/.env:**
+
 ```bash
-cd Api
-dotnet restore
-dotnet ef database update
-dotnet run
+  # Database connection
+  DB_HOST=localhost
+  DB_PORT=5432
+  DB_USER=postgres
+  DB_PASSWORD=postgres
+  DB_NAME=admin_panel_db
+
+  # Rodar serviço db utilizando Docker
+  POSTGRES_USER=postgres
+  POSTGRES_PASSWORD=postgres
+  POSTGRES_DB=admin_panel_db
+
+  # Roda seed de usuários para desenvolvimento. Setar como false em produção
+  RUN_USERS_SEED=true
+
+  # Application
+  API_PORT=5209
+
+  # JWT
+  JWT_SECRET_KEY=XvwKtOBmcu74xUwf8iaTLhb+JNCq1F73jUkbkuNHG+U=
+
+  # CORS
+  WEB_APP_URL=http://localhost:5173
+
+  # Redefinição de senha via e-mail
+  RESEND_API_KEY=re_ChaveDeApiDoServicoResend
+  RESEND_FROM_EMAIL=emailCadastradoNoResend
 ```
 
-4. **Frontend**
+**WebApp/.env:**
+
 ```bash
-cd WebApp
-npm install
-npm run dev
+  VITE_API_BASE_URL=http://localhost:API_PORT/api
 ```
 
-5. **Banco de Dados**
-```bash
-# Se usando Docker
-docker-compose up -d db
+3. **Configure o Banco de Dados**
 
-# Ou instale PostgreSQL localmente
+_Após as adequações necessárias nos arquivos .env:_
+
+- Suba o serviço (container) do banco de dados:
+
+```bash
+  docker compose -f docker-compose.development.yml up db
 ```
+
+_Se todas as configurações feitas estiverem corretas, voce verá um log com a mensagem: `database system is ready to accept connections`_
+
+- Navegue até a pasta do backend da aplicação:
+
+```bash
+  cd Api/
+```
+
+- Rode a Migration base da aplicação:
+
+```bash
+  dotnet ef database update
+```
+
+_Você verá algo como:_
+
+![Github use this template](./assets/run-base-migration.png)
+
+_O Erro que aparece é normal, pois não temos `__EFMigrationsHistory` nesse momento. O importante para nós é o `Done` ao final. Isso garante que todas as tabelas da migration InitialCreate foram criadas corretamente pelo EF e já temos toda a estrutura necessária para rodar a api._
+
+3. **Instale as dependências do Backend e inicialize a api**
+
+```bash
+  dotnet restore
+  dotnet ef database update
+  dotnet run
+```
+
+_Isso criará as permissões base e o usuário root, além de usuários fictícios se tiver setado `RUN_USERS_SEED=true` em `Api/.env`_
+
+4. **Navegue para o frontend, instale as dependências e inicialize o WebApp**
+
+```bash
+  cd WebApp/
+  npm install
+  npm run dev
+```
+
+_Com isso, você poderá [acessar a aplicação localmente](http://localhost:5173) e estará pronto para iniciar o desenvolvimento._
 
 ## Estrutura do Código
 
 ### Convenções de Nomenclatura
 
 **Backend (C#):**
+
 - Classes: PascalCase (`UserController`, `LoginService`)
 - Métodos: PascalCase (`ExecuteAsync`, `GetAllUsers`)
 - Variáveis locais: camelCase (`userId`, `authUser`)
@@ -95,6 +161,7 @@ docker-compose up -d db
 - Interfaces: Prefixo I + PascalCase (`IGenericRepository`)
 
 **Frontend (TypeScript):**
+
 - Componentes: PascalCase (`UserForm`, `UsersTable`)
 - Hooks: camelCase com prefixo use (`useUsers`, `useAuth`)
 - Variáveis/funções: camelCase (`handleLogin`, `fetchUsers`)
@@ -102,18 +169,21 @@ docker-compose up -d db
 - Constantes: UPPER_SNAKE_CASE (`API_BASE_URL`)
 
 **Banco de Dados (PostgreSQL):**
+
 - Tabelas: snake_case plural (`users`, `system_resources`)
 - Colunas: snake_case (`user_id`, `created_at`)
 
 ### Padrões de Código
 
 **Backend:**
+
 - Um service por operação (CreateUser, UpdateUser, etc)
 - DTOs para input/output
 - Async/await para operações I/O
 - Try-catch apenas onde necessário (middleware global)
 
 **Frontend:**
+
 - Um componente por arquivo
 - Props tipadas com TypeScript
 - Custom hooks para lógica de negócio
@@ -459,12 +529,16 @@ export interface UpdateProductDto {
 **Arquivo:** `WebApp/src/services/productsServices.ts`
 
 ```typescript
-import api from '../api';
-import { Product, CreateProductDto, UpdateProductDto } from '../interfaces/Product';
+import api from "../api";
+import {
+  Product,
+  CreateProductDto,
+  UpdateProductDto,
+} from "../interfaces/Product";
 
 export const productsServices = {
   listProducts: async (page: number, limit: number) => {
-    const response = await api.get('/products', { params: { page, limit } });
+    const response = await api.get("/products", { params: { page, limit } });
     return response.data;
   },
 
@@ -474,7 +548,7 @@ export const productsServices = {
   },
 
   createProduct: async (data: CreateProductDto) => {
-    const response = await api.post('/products', data);
+    const response = await api.post("/products", data);
     return response.data;
   },
 
@@ -494,9 +568,13 @@ export const productsServices = {
 **Arquivo:** `WebApp/src/hooks/useProducts.ts`
 
 ```typescript
-import { useState } from 'react';
-import { Product, CreateProductDto, UpdateProductDto } from '../interfaces/Product';
-import { productsServices } from '../services/productsServices';
+import { useState } from "react";
+import {
+  Product,
+  CreateProductDto,
+  UpdateProductDto,
+} from "../interfaces/Product";
+import { productsServices } from "../services/productsServices";
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -634,14 +712,29 @@ import { PermissionsMap } from '../permissions/PermissionsMap';
 **Arquivo:** `WebApp/src/components/SidePanel/index.tsx`
 
 ```typescript
-import InventoryIcon from '@mui/icons-material/Inventory';
+import InventoryIcon from "@mui/icons-material/Inventory";
 
 const menuItems = [
-  { path: '/profile', label: 'Perfil', icon: PersonIcon, permission: null },
-  { path: '/users', label: 'Usuários', icon: PeopleIcon, permission: 'users' },
-  { path: '/resources', label: 'Recursos', icon: FolderIcon, permission: 'resources' },
-  { path: '/reports', label: 'Relatórios', icon: AssessmentIcon, permission: 'reports' },
-  { path: '/products', label: 'Produtos', icon: InventoryIcon, permission: 'products' }, // Nova linha
+  { path: "/profile", label: "Perfil", icon: PersonIcon, permission: null },
+  { path: "/users", label: "Usuários", icon: PeopleIcon, permission: "users" },
+  {
+    path: "/resources",
+    label: "Recursos",
+    icon: FolderIcon,
+    permission: "resources",
+  },
+  {
+    path: "/reports",
+    label: "Relatórios",
+    icon: AssessmentIcon,
+    permission: "reports",
+  },
+  {
+    path: "/products",
+    label: "Produtos",
+    icon: InventoryIcon,
+    permission: "products",
+  }, // Nova linha
 ];
 ```
 
@@ -708,9 +801,9 @@ public async Task<ActionResult> GetStats()
 
 ```typescript
 getUserStats: async () => {
-  const response = await api.get('/users/stats');
+  const response = await api.get("/users/stats");
   return response.data;
-}
+};
 ```
 
 2. **Use no Componente**
@@ -730,18 +823,19 @@ useEffect(() => {
 **Arquivo:** `WebApp/src/theme.ts`
 
 ```typescript
-export const getTheme = (mode: 'light' | 'dark') => createTheme({
-  palette: {
-    mode,
-    primary: {
-      main: mode === 'light' ? '#1976d2' : '#90caf9', // Azul
+export const getTheme = (mode: "light" | "dark") =>
+  createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: mode === "light" ? "#1976d2" : "#90caf9", // Azul
+      },
+      secondary: {
+        main: mode === "light" ? "#dc004e" : "#f48fb1", // Rosa
+      },
+      // Adicione mais cores conforme necessário
     },
-    secondary: {
-      main: mode === 'light' ? '#dc004e' : '#f48fb1', // Rosa
-    },
-    // Adicione mais cores conforme necessário
-  },
-});
+  });
 ```
 
 ### Adicionar Logo
@@ -890,21 +984,21 @@ npx cypress open
 **Arquivo de teste:** `WebApp/cypress/e2e/login.cy.ts`
 
 ```typescript
-describe('Login', () => {
-  it('should login with valid credentials', () => {
-    cy.visit('/login');
-    cy.get('input[name="identifier"]').type('root');
-    cy.get('input[name="password"]').type('root1234');
+describe("Login", () => {
+  it("should login with valid credentials", () => {
+    cy.visit("/login");
+    cy.get('input[name="identifier"]').type("root");
+    cy.get('input[name="password"]').type("root1234");
     cy.get('button[type="submit"]').click();
-    cy.url().should('include', '/profile');
+    cy.url().should("include", "/profile");
   });
 
-  it('should show error with invalid credentials', () => {
-    cy.visit('/login');
-    cy.get('input[name="identifier"]').type('invalid');
-    cy.get('input[name="password"]').type('wrong');
+  it("should show error with invalid credentials", () => {
+    cy.visit("/login");
+    cy.get('input[name="identifier"]').type("invalid");
+    cy.get('input[name="password"]').type("wrong");
     cy.get('button[type="submit"]').click();
-    cy.contains('Credenciais inválidas').should('be.visible');
+    cy.contains("Credenciais inválidas").should("be.visible");
   });
 });
 ```
@@ -916,7 +1010,7 @@ describe('Login', () => {
 **Production docker-compose.yml:**
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -982,6 +1076,7 @@ networks:
 ### Deploy em Cloud (AWS, Azure, etc)
 
 Consulte documentação específica da plataforma para:
+
 - EC2 / App Service
 - RDS / Azure Database
 - S3 / Blob Storage
@@ -1019,6 +1114,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore:` Tarefas de manutenção
 
 **Exemplos:**
+
 ```
 feat: adiciona CRUD de produtos
 fix: corrige validação de email
@@ -1034,10 +1130,3 @@ test: adiciona testes para CreateUser
 - [Material-UI Documentation](https://mui.com/)
 - [Entity Framework Core](https://docs.microsoft.com/ef/core/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-
-## Suporte
-
-Para dúvidas ou problemas:
-1. Consulte esta documentação
-2. Verifique issues existentes no repositório
-3. Abra uma nova issue se necessário
