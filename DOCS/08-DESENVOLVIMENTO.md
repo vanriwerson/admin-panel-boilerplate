@@ -1,5 +1,49 @@
 # Guia de Desenvolvimento (Criação de novos projetos a partir deste template.)
 
+## Instalações Necessárias
+
+Antes de começar a trabalhar neste projeto, certifique-se de ter instaladas as ferramentas abaixo (ou equivalentes) no seu ambiente:
+
+- **.NET SDK** (recomendado: 8.x) - necessário para compilar e rodar o backend.
+
+  ```bash
+    # Exemplo (Ubuntu):
+    sudo apt update && sudo apt install -y dotnet-sdk-8.0
+    # Windows/Mac: baixe em https://dotnet.microsoft.com/download
+  ```
+
+- **Node.js** (recomendado: 18.x ou superior) - necessário para rodar o frontend.
+
+  ```bash
+    # Exemplo (nvm):
+    nvm install 18
+    nvm use 18
+    # Alternativamente: https://nodejs.org/
+  ```
+
+- **Docker** (opcional, mas recomendado) - usado para rodar o banco de dados e outros serviços em containers.
+
+  ```bash
+    # Exemplo (Ubuntu):
+    sudo apt update && sudo apt install -y docker.io
+    # Verifique com: docker --version
+  ```
+
+- **Docker Compose** (pode vir incluso com Docker Desktop / Docker Engine como `docker compose`) - usado para orquestrar os serviços usados pelo template.
+
+  ```bash
+    # Verifique instalação:
+    docker compose version
+    # Se necessário (Ubuntu):
+    sudo apt install -y docker-compose
+  ```
+
+- **dotnet-ef** (Entity Framework CLI) - para executar migrations e gerenciar o banco de dados:
+  ```bash
+    dotnet tool install --global dotnet-ef
+    dotnet ef --version
+  ```
+
 ### Ferramentas Recomendadas
 
 _[Visual Studio Code](https://code.visualstudio.com/) com as extensões:_
