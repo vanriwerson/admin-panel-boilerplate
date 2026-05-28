@@ -79,11 +79,9 @@ export default function Users() {
     <Container
       sx={{
         mt: 4,
-        alignItems: "center",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        textAlign: "center",
+        gap: 3,
       }}
     >
       <PageTitle

@@ -57,14 +57,12 @@ export default function UserForm({ onSubmit, user }: Props) {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        alignItems: "center",
         display: "flex",
         flexWrap: "wrap",
         gap: 2,
-        justifyContent: "center",
         marginBottom: 4,
-        maxWidth: 800,
         padding: 2,
+        width: "100%",
       }}
     >
       <TextField

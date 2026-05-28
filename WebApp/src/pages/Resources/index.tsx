@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { Container } from '@mui/material';
-import type { SystemResource } from '../../interfaces';
+import { useState } from "react";
+import { Container } from "@mui/material";
+import type { SystemResource } from "../../interfaces";
 import {
   useNotification,
   usePermissions,
   useSystemResources,
-} from '../../hooks';
+} from "../../hooks";
 import {
   SystemResourceForm,
   SystemResourcesTable,
   SystemResourceEditionModal,
   ConfirmDialog,
   PageTitle,
-} from '../../components';
-import { getErrorMessage } from '../../helpers';
+} from "../../components";
+import { getErrorMessage } from "../../helpers";
 
 export default function Resources() {
   const {
@@ -27,7 +27,7 @@ export default function Resources() {
   const { permissionsMap } = usePermissions();
 
   const [editingResource, setEditingResource] = useState<SystemResource | null>(
-    null
+    null,
   );
   const [open, setOpen] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({
@@ -38,11 +38,11 @@ export default function Resources() {
   async function handleCreate(resource: SystemResource) {
     try {
       await addSystemResource(resource);
-      showNotification('Recurso criado com sucesso!', 'success');
+      showNotification("Recurso criado com sucesso!", "success");
       fetchSystemResources(pagination.page, pagination.pageSize); // atualiza tabela
     } catch (err) {
       console.error(err);
-      showNotification(getErrorMessage(err), 'error');
+      showNotification(getErrorMessage(err), "error");
     }
   }
 
@@ -50,11 +50,11 @@ export default function Resources() {
     if (!editingResource) return;
     try {
       await editSystemResource({ ...editingResource, ...resource });
-      showNotification('Recurso atualizado com sucesso!', 'success');
+      showNotification("Recurso atualizado com sucesso!", "success");
       fetchSystemResources(pagination.page, pagination.pageSize);
     } catch (err) {
       console.error(err);
-      showNotification(getErrorMessage(err), 'error');
+      showNotification(getErrorMessage(err), "error");
     } finally {
       setOpen(false);
     }
@@ -67,11 +67,11 @@ export default function Resources() {
   async function confirmDelete() {
     try {
       await removeSystemResource(confirmDialog.id.toString());
-      showNotification('Recurso excluído com sucesso!', 'success');
+      showNotification("Recurso excluído com sucesso!", "success");
       fetchSystemResources(pagination.page, pagination.pageSize);
     } catch (err) {
       console.error(err);
-      showNotification(getErrorMessage(err), 'error');
+      showNotification(getErrorMessage(err), "error");
     } finally {
       setConfirmDialog({ open: false, id: 0 });
     }
@@ -90,11 +90,9 @@ export default function Resources() {
     <Container
       sx={{
         mt: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
       }}
     >
       <PageTitle

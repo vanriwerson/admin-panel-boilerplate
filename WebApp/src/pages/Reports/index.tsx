@@ -70,65 +70,68 @@ export default function Reports() {
       <Box p={3}>
         <PageTitle icon={permissionsMap.REPORTS} title="Relatórios de Logs" />
 
-        <Paper sx={{ p: 3, margin: "auto", mb: 4, maxWidth: 540 }}>
+        <Paper sx={{ p: 3, mb: 4, width: "100%" }}>
           <Box
             component="form"
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 2,
-              alignItems: "flex-end",
-            }}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
-            <Box sx={{ maxWidth: "48%" }}>
-              <DatePicker
-                label="Data inicial"
-                value={startDate}
-                onChange={(date) => handleDateChange("start", date)}
-                maxDate={today}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    error: !!error,
-                  },
-                }}
-              />
-            </Box>
-
-            <Box sx={{ maxWidth: "48%" }}>
-              <DatePicker
-                label="Data final"
-                value={endDate}
-                onChange={(date) => handleDateChange("end", date)}
-                minDate={startDate ?? undefined}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    error: !!error,
-                  },
-                }}
-              />
-            </Box>
-
-            <UsersProvider>
-              <Box sx={{ flex: { xs: "1 1 100%", sm: "1 1 65%" } }}>
-                <UsersSelect
-                  value={filters.userId}
-                  onChange={handleUserChange}
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2,
+                alignItems: "flex-end",
+                width: "100%",
+              }}
+            >
+              <Box sx={{ flex: "1 1 220px", maxWidth: "15%" }}>
+                <DatePicker
+                  label="Data inicial"
+                  value={startDate}
+                  onChange={(date) => handleDateChange("start", date)}
+                  maxDate={today}
+                  slotProps={{
+                    textField: {
+                      error: !!error,
+                    },
+                  }}
                 />
               </Box>
-            </UsersProvider>
 
-            <Box sx={{ flex: { xs: "1 1 100%", sm: "1 1 30%" } }}>
-              <ActionsSelect
-                value={filters.action}
-                onChange={handleActionChange}
-              />
+              <Box sx={{ flex: "1 1 220px", maxWidth: "15%" }}>
+                <DatePicker
+                  label="Data final"
+                  value={endDate}
+                  onChange={(date) => handleDateChange("end", date)}
+                  minDate={startDate ?? undefined}
+                  slotProps={{
+                    textField: {
+                      error: !!error,
+                    },
+                  }}
+                />
+              </Box>
+
+              <UsersProvider>
+                <Box sx={{ flex: "1 1 220px", minWidth: 220, maxWidth: "45%" }}>
+                  <UsersSelect
+                    value={filters.userId}
+                    onChange={handleUserChange}
+                  />
+                </Box>
+              </UsersProvider>
+
+              <Box sx={{ flex: "1 1 220px", minWidth: 220, maxWidth: "25%" }}>
+                <ActionsSelect
+                  value={filters.action}
+                  onChange={handleActionChange}
+                />
+              </Box>
             </Box>
 
             <Box
               sx={{
-                flex: "1 1 100%",
+                width: "100%",
                 display: "flex",
                 justifyContent: "flex-end",
               }}
