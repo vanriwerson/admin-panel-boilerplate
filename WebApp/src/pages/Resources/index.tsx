@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container } from "@mui/material";
+import { Box, Container, Paper, Typography } from "@mui/material";
 import type { SystemResource } from "../../interfaces";
 import {
   useNotification,
@@ -12,6 +12,7 @@ import {
   SystemResourceEditionModal,
   ConfirmDialog,
   PageTitle,
+  SystemResourceAdvice,
 } from "../../components";
 import { getErrorMessage } from "../../helpers";
 
@@ -100,7 +101,19 @@ export default function Resources() {
         title="Gerenciamento de Recursos"
       />
 
-      <SystemResourceForm onSubmit={handleCreate} />
+      <Box
+        sx={{
+          alignItems: "stretch",
+          display: "flex",
+          gap: 2,
+          marginBottom: 4,
+          width: "100%",
+        }}
+      >
+        <SystemResourceForm onSubmit={handleCreate} />
+
+        <SystemResourceAdvice />
+      </Box>
 
       <SystemResourcesTable
         onEdit={handleOpenEditionModal}
