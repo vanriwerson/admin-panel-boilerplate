@@ -4,7 +4,14 @@ import { Box, Paper, Typography } from "@mui/material";
 
 export default function SystemResourceAdvice() {
   return (
-    <Paper sx={{ maxWidth: "40%", padding: 2 }}>
+    <Paper
+      sx={{
+        maxWidth: "40%",
+        marginBottom: 4,
+        padding: 2,
+        height: "fit-content",
+      }}
+    >
       <Box
         sx={{ display: "flex", alignItems: "center", gap: 1, marginBottom: 1 }}
       >
@@ -13,7 +20,7 @@ export default function SystemResourceAdvice() {
           style={{ width: 48, height: 48, marginRight: "8px" }}
         />
 
-        <Typography color="textSecondary" align="justify">
+        <Typography color="textSecondary" align="justify" mb={"4px"}>
           Os recursos representam as permissões do sistema. Um bom ponto de
           partida é pensar neles como endpoints da api.
         </Typography>
