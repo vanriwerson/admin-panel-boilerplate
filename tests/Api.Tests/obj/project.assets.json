@@ -1731,10 +1731,10 @@
         "dependencies": {
           "BCrypt.Net-Next": "4.0.3",
           "DotNetEnv": "3.1.1",
-          "Microsoft.AspNetCore.OpenApi": "10.0.0",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0",
+          "Microsoft.AspNetCore.OpenApi": "10.0.8",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.2",
           "Resend": "0.1.7",
-          "Swashbuckle.AspNetCore": "10.0.0",
+          "Swashbuckle.AspNetCore": "10.1.7",
           "System.IdentityModel.Tokens.Jwt": "8.14.0"
         },
         "compile": {

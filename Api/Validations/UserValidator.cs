@@ -33,13 +33,15 @@ public class UserValidator
 
     public async Task ValidateUpdateAsync(UserUpdateDto dto, User user)
     {
-        if (dto.Username != user.Username &&
+        if (!string.IsNullOrWhiteSpace(dto.Username) &&
+            dto.Username != user.Username &&
             await _repository.ExistsByUsernameAsync(dto.Username))
         {
             throw new AppException("Username já está em uso.");
         }
 
-        if (dto.Email != user.Email &&
+        if (!string.IsNullOrWhiteSpace(dto.Email) &&
+            dto.Email != user.Email &&
             await _repository.ExistsByEmailAsync(dto.Email))
         {
             throw new AppException("Email já está em uso.");
