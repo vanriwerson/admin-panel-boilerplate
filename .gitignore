@@ -38,6 +38,7 @@ build/
 # Testes
 # ------------------------------
 TestResults/
+CoverageReport/
 coverage/
 coverage-report/
 *.coverage
