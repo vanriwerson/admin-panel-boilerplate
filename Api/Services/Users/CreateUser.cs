@@ -1,20 +1,20 @@
 using Api.Auditing.Services;
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Interfaces.Validators;
 using Api.Models;
 using Api.Security.Passwords;
-using Api.Validations;
 
 namespace Api.Services.Users;
 
 public class CreateUser
 {
     private readonly IUserRepository _repository;
-    private readonly UserValidator _validator;
+    private readonly IUserValidator _validator;
 
     public CreateUser(
         IUserRepository repository,
-        UserValidator validator)
+        IUserValidator validator)
     {
         _repository = repository;
         _validator = validator;

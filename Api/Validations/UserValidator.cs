@@ -1,11 +1,12 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Interfaces.Validators;
 using Api.Middlewares;
 using Api.Models;
 
 namespace Api.Validations;
 
-public class UserValidator
+public class UserValidator : IUserValidator
 {
     private readonly IUserRepository _repository;
 

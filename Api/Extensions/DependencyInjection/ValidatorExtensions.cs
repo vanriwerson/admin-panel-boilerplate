@@ -9,10 +9,8 @@ public static class ValidatorExtensions
 {
     public static IServiceCollection AddValidators(
         this IServiceCollection services,
-        ILogger logger
-    )
+        ILogger logger)
     {
-        // Obtém apenas o assembly onde estão os Validators
         var assembly = typeof(UserValidator).Assembly;
 
         var validatorTypes = assembly
@@ -24,9 +22,20 @@ public static class ValidatorExtensions
                 t.Namespace.StartsWith("Api.Validations") &&
                 t.Name.EndsWith("Validator"));
 
-        foreach (var type in validatorTypes)
+        foreach (var implementationType in validatorTypes)
         {
-            services.AddScoped(type);
+            var interfaceType = implementationType
+                .GetInterfaces()
+                .FirstOrDefault(i => i.Name == $"I{implementationType.Name}");
+
+            if (interfaceType != null)
+            {
+                services.AddScoped(interfaceType, implementationType);
+            }
+            else
+            {
+                services.AddScoped(implementationType);
+            }
         }
 
         logger.LogInformation("Validators registrados com sucesso");
