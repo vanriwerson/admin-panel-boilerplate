@@ -8,34 +8,51 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(
         this IServiceCollection services,
-        ILogger logger
-    )
+        ILogger logger)
     {
         var assembly = typeof(Program).Assembly;
+
         int count = 0;
 
-        var types = assembly.GetTypes().Where(t =>
-            t.IsClass &&
-            !t.IsAbstract &&
-            !t.IsGenericType &&
-            !t.IsNested &&
-            !typeof(Delegate).IsAssignableFrom(t) &&
-            t.Namespace != null &&
-            (
-                t.Namespace.StartsWith("Api.Services") ||
-                t.Namespace.StartsWith("Api.Security.Auth") ||
-                t.Namespace.StartsWith("Api.Security.RefreshTokens") ||
-                t.Namespace.StartsWith("Api.Auditing.Services")
-            )
-        );
+        var types = assembly.GetTypes()
+            .Where(t =>
+                t.IsClass &&
+                !t.IsAbstract &&
+                !t.IsGenericType &&
+                !t.IsNested &&
+                !typeof(Delegate).IsAssignableFrom(t) &&
+                t.Namespace != null &&
+                (
+                    t.Namespace.StartsWith("Api.Services") ||
+                    t.Namespace.StartsWith("Api.Security.Auth") ||
+                    t.Namespace.StartsWith("Api.Security.RefreshTokens") ||
+                    t.Namespace.StartsWith("Api.Auditing.Services")
+                ));
 
-        foreach (var type in types)
+        foreach (var implementationType in types)
         {
-            services.AddScoped(type);
+            var interfaces = implementationType.GetInterfaces();
+
+            if (interfaces.Any())
+            {
+                foreach (var serviceInterface in interfaces)
+                {
+                    services.AddScoped(
+                        serviceInterface,
+                        implementationType
+                    );
+                }
+            }
+
+            services.AddScoped(implementationType);
+
             count++;
         }
 
-        logger.LogInformation("{count} Services registrados com sucesso", count);
+        logger.LogInformation(
+            "{count} Services registrados com sucesso",
+            count
+        );
 
         return services;
     }

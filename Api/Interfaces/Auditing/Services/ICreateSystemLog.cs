@@ -1,7 +1,7 @@
 using Api.Dtos;
 using Api.Models;
 
-namespace Api.Interfaces.Services;
+namespace Api.Interfaces.Auditing.Services;
 
 public interface ICreateSystemLog
 {

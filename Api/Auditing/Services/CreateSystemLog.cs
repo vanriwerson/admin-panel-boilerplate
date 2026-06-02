@@ -1,6 +1,6 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
-using Api.Interfaces.Services;
+using Api.Interfaces.Auditing.Services;
 using Api.Models;
 using Api.Security.Jwt;
 
