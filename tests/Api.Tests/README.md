@@ -196,6 +196,25 @@ CoverageReport/
 
 ---
 
+# Automatizando com Script
+
+Para automatizar a geração do relatório de cobertura em um único passo, execute o script a partir da raiz do monorepo:
+
+```bash
+./scripts/coverage.sh
+```
+
+Esse script faz o seguinte:
+
+- Executa `dotnet test` com coleta de cobertura (`Coverlet`)
+- Remove a pasta antiga `CoverageReport`
+- Gera o relatório HTML com `reportgenerator`
+- Abre automaticamente `CoverageReport/index.html`
+
+> A explicação dos comandos manuais acima continua válida. Use o script quando quiser um atalho, ou os comandos separados quando precisar de controle mais fino.
+
+---
+
 # Visualizando o Relatório
 
 Ubuntu:
