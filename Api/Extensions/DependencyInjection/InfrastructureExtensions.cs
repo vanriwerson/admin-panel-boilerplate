@@ -1,8 +1,8 @@
 using Api.Helpers;
+using Api.Interfaces.Security.Policies;
 using Api.Security.Jwt;
 using Api.Security.Passwords;
 using Api.Security.Policies;
-using Microsoft.Extensions.DependencyInjection;
 using Resend;
 
 namespace Api.Extensions.DependencyInjection;
@@ -13,7 +13,7 @@ public static class InfrastructureExtensions
     {
         services.AddHttpContextAccessor();
         services.AddScoped<CurrentUserContext>();
-        services.AddScoped<UserVisibilityPolicy>();
+        services.AddScoped<IUserVisibilityPolicy, UserVisibilityPolicy>();
         services.AddScoped<SystemResourceVisibilityPolicy>();
         services.AddScoped<AccessPermissionPolicy>();
 

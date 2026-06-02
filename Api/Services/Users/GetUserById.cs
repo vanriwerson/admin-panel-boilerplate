@@ -1,19 +1,19 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Interfaces.Security.Policies;
 using Api.Mappers;
 using Api.Middlewares;
-using Api.Security.Policies;
 
 namespace Api.Services.Users;
 
 public class GetUserById
 {
     private readonly IUserRepository _repository;
-    private readonly UserVisibilityPolicy _visibility;
+    private readonly IUserVisibilityPolicy _visibility;
 
     public GetUserById(
         IUserRepository repository,
-        UserVisibilityPolicy visibility
+        IUserVisibilityPolicy visibility
     )
     {
         _repository = repository;
