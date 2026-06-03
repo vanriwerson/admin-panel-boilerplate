@@ -10,9 +10,11 @@ public static class DatabaseCleaner
     {
         await context.Database.ExecuteSqlRawAsync("""
         TRUNCATE TABLE
-            "users",
+            "access_permissions",
             "refresh_tokens",
-            "access_permissions"
+            "system_logs",
+            "system_resources",
+            "users"
         RESTART IDENTITY CASCADE;
         """);
     }
