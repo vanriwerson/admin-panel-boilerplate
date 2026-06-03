@@ -1,14 +1,12 @@
 using Api.Auditing;
-using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
+using Api.Interfaces.Auditing.Services;
 using Api.Interfaces.Repositories;
 using Api.Mappers;
 using Api.Models;
 using Api.Security.Policies;
 using Api.Services.AccessPermissions;
-using Api.Services.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services.Users.Orchestrators;
 
@@ -18,7 +16,7 @@ public class CreateUserWithAccessGranted
     private readonly CreateUser _createUser;
     private readonly CreateAccessPermissions _createAccessPermissions;
     private readonly IUserRepository _userRepository;
-    private readonly CreateSystemLog _createSystemLog;
+    private readonly ICreateSystemLog _createSystemLog;
     private readonly AccessPermissionPolicy _accessPermissionPolicy;
 
     public CreateUserWithAccessGranted(
@@ -26,7 +24,7 @@ public class CreateUserWithAccessGranted
         CreateUser createUser,
         CreateAccessPermissions createAccessPermissions,
         IUserRepository userRepository,
-        CreateSystemLog createSystemLog,
+        ICreateSystemLog createSystemLog,
         AccessPermissionPolicy accessPermissionPolicy)
     {
         _context = context;

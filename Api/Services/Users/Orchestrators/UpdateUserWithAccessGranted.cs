@@ -1,15 +1,12 @@
 using Api.Auditing;
-using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
-using Api.Helpers;
 using Api.Interfaces.Repositories;
+using Api.Interfaces.Auditing.Services;
 using Api.Mappers;
 using Api.Middlewares;
 using Api.Security.Policies;
 using Api.Services.AccessPermissions;
-using Api.Services.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services.Users.Orchestrators;
 
@@ -20,7 +17,7 @@ public class UpdateUserWithAccessGranted
     private readonly IUserRepository _userRepository;
     private readonly IAccessPermissionRepository _accessPermissionRepository;
     private readonly CreateAccessPermissions _createAccessPermissions;
-    private readonly CreateSystemLog _createSystemLog;
+    private readonly ICreateSystemLog _createSystemLog;
     private readonly AccessPermissionPolicy _accessPermissionPolicy;
 
     public UpdateUserWithAccessGranted(
@@ -29,7 +26,7 @@ public class UpdateUserWithAccessGranted
         IUserRepository userRepository,
         IAccessPermissionRepository accessPermissionRepository,
         CreateAccessPermissions createAccessPermissions,
-        CreateSystemLog createSystemLog,
+        ICreateSystemLog createSystemLog,
         AccessPermissionPolicy accessPermissionPolicy)
     {
         _context = context;
