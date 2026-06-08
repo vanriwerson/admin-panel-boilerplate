@@ -1,10 +1,11 @@
 using Api.Dtos;
+using Api.Interfaces.Security.Auth;
 using Api.Models;
 using Api.Security.Jwt;
 
 namespace Api.Security.Auth;
 
-public class LoginResponseFactory
+public class LoginResponseFactory : ILoginResponseFactory
 {
     private readonly Api.Security.RefreshTokens.RefreshTokenServices _refreshService;
 

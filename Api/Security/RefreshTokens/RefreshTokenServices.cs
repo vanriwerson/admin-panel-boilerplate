@@ -1,11 +1,12 @@
 using Api.Interfaces.Repositories;
+using Api.Interfaces.Security.RefreshTokens;
 using Api.Models;
 using System;
 using System.Threading.Tasks;
 
 namespace Api.Security.RefreshTokens;
 
-public class RefreshTokenServices
+public class RefreshTokenServices : IRefreshTokenServices
 {
     private readonly IRefreshTokenRepository _repository;
     private readonly Api.Data.ApiDbContext _context;
