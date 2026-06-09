@@ -80,14 +80,23 @@ public class AccessPermissionRepositoryTests
             Password = "hash"
         };
 
-        var resource = new SystemResource
+        var resource1 = new SystemResource
         {
             Name = "USERS",
             ExhibitionName = "Usuários"
         };
 
+        var resource2 = new SystemResource
+        {
+            Name = "REPORTS",
+            ExhibitionName = "Relatórios"
+        };
+
         context.Users.Add(user);
-        context.SystemResources.Add(resource);
+
+        context.SystemResources.AddRange(
+            resource1,
+            resource2);
 
         await context.SaveChangesAsync();
 
@@ -95,12 +104,12 @@ public class AccessPermissionRepositoryTests
             new AccessPermission
             {
                 UserId = user.Id,
-                SystemResourceId = resource.Id
+                SystemResourceId = resource1.Id
             },
             new AccessPermission
             {
                 UserId = user.Id,
-                SystemResourceId = resource.Id
+                SystemResourceId = resource2.Id
             });
 
         await context.SaveChangesAsync();
