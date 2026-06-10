@@ -1,10 +1,10 @@
 using Api.Helpers;
+using Api.Interfaces.Security.Passwords;
 using Resend;
-using System.Threading.Tasks;
 
 namespace Api.Security.Passwords;
 
-public class PasswordResetEmailService
+public class PasswordResetEmailService : IPasswordResetEmailService
 {
     private readonly ResendClient _resendClient;
 
