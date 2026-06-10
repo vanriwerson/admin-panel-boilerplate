@@ -1,10 +1,7 @@
 using Api.Dtos;
-using Api.Helpers;
 using Api.Middlewares;
-using Api.Services.AuthServices;
+using Api.Security.Passwords;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Api.Controllers;
 

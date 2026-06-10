@@ -5,23 +5,20 @@ using Api.Middlewares;
 using Api.Models;
 using Api.Helpers;
 using Api.Security.Jwt;
-using Api.Security.Passwords;
-using Api.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using Api.Interfaces.Auditing.Services;
+using Api.Interfaces.Security.Passwords;
 
-namespace Api.Services.AuthServices
+namespace Api.Security.Passwords
 {
     public class PasswordServices
     {
         private readonly ApiDbContext _context;
-        private readonly CreateSystemLog _createSystemLog;
-        private readonly PasswordResetEmailService _passwordResetEmailService;
+        private readonly ICreateSystemLog _createSystemLog;
+        private readonly IPasswordResetEmailService _passwordResetEmailService;
 
-        public PasswordServices(ApiDbContext context, CreateSystemLog createSystemLog, PasswordResetEmailService passwordResetEmailService)
+        public PasswordServices(ApiDbContext context, ICreateSystemLog createSystemLog, IPasswordResetEmailService passwordResetEmailService)
         {
             _context = context;
             _createSystemLog = createSystemLog;
