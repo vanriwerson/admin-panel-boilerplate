@@ -15,6 +15,12 @@ public class ValidateUserPermissionsTests
         Environment.SetEnvironmentVariable(
             "JWT_SECRET_KEY",
             "unit-tests-secret-key-with-32-chars");
+
+        JwtServices.Initialize(
+            new Api.Settings.JwtSettings
+            {
+                SecretKey = "unit-tests-secret-key-with-32-chars"
+            });
     }
 
     private static string GenerateToken(

@@ -1,14 +1,15 @@
 using System.Security.Claims;
-using Api.Data;
 using Api.Interfaces.Auditing.Services;
 using Api.Interfaces.Security.Passwords;
 using Api.Middlewares;
 using Api.Models;
 using Api.Security.Jwt;
 using Api.Security.Passwords;
+using Api.Settings;
 using Api.Tests.Integration.Infrastructure;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Api.Tests.Integration.Security.Passwords;
@@ -18,10 +19,33 @@ public class PasswordServicesTests
 {
     private readonly PostgreSqlTestFixture _fixture;
 
+    private static IOptions<FrontendSettings>
+    CreateFrontendSettings()
+    {
+        return Options.Create(
+            new FrontendSettings
+            {
+                Url = "http://localhost:5173"
+            });
+    }
+
     public PasswordServicesTests(
         PostgreSqlTestFixture fixture)
     {
         _fixture = fixture;
+
+        const string secretKey =
+            "unit-tests-secret-key-with-32-chars";
+
+        Environment.SetEnvironmentVariable(
+            "JWT_SECRET_KEY",
+            secretKey);
+
+        JwtServices.Initialize(
+            new Api.Settings.JwtSettings
+            {
+                SecretKey = secretKey
+            });
     }
 
     [Fact]
@@ -39,7 +63,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         var act = () =>
             service.RequestNewPasswordAsync("");
@@ -69,7 +94,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         var act = () =>
             service.RequestNewPasswordAsync(
@@ -116,7 +142,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         await service.RequestNewPasswordAsync(
             user.Email);
@@ -153,7 +180,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         var act = () =>
             service.ResetPasswordAsync(
@@ -183,7 +211,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         var act = () =>
             service.ResetPasswordAsync(
@@ -213,7 +242,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         var act = () =>
             service.ResetPasswordAsync(
@@ -255,7 +285,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         var act = () =>
             service.ResetPasswordAsync(
@@ -308,7 +339,8 @@ public class PasswordServicesTests
         var service = new PasswordServices(
             context,
             logMock.Object,
-            emailMock.Object);
+            emailMock.Object,
+            CreateFrontendSettings());
 
         await service.ResetPasswordAsync(
             token,
