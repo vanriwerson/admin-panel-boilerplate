@@ -1,5 +1,6 @@
 using Api.Interfaces.Security.Passwords;
 using Api.Settings;
+using Microsoft.Extensions.Options;
 using Resend;
 
 namespace Api.Security.Passwords;
@@ -9,10 +10,10 @@ public class PasswordResetEmailService : IPasswordResetEmailService
     private readonly ResendClient _resendClient;
     private readonly ResendSettings _settings;
 
-    public PasswordResetEmailService(ResendClient resendClient, ResendSettings settings)
+    public PasswordResetEmailService(ResendClient resendClient, IOptions<ResendSettings> settings)
     {
         _resendClient = resendClient;
-        _settings = settings;
+        _settings = settings.Value;
     }
 
     public async Task SendEmailAsync(string toEmail, string resetLink)

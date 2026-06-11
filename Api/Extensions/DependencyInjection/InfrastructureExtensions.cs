@@ -13,6 +13,25 @@ public static class InfrastructureExtensions
         this IServiceCollection services)
     {
         var resendSettings = SettingsFactory.ProvideResendSettings();
+        services.Configure<ResendSettings>(options =>
+        {
+            options.ApiKey = resendSettings.ApiKey;
+            options.FromEmail = resendSettings.FromEmail;
+        });
+
+        var jwtSettings = SettingsFactory.ProvideJwtSettings();
+        services.Configure<JwtSettings>(options =>
+        {
+            options.SecretKey = jwtSettings.SecretKey;
+        });
+
+        var frontendSettings = SettingsFactory.ProvideFrontendSettings();
+        services.Configure<FrontendSettings>(options =>
+        {
+            options.Url = frontendSettings.Url;
+        });
+
+        JwtServices.Initialize(jwtSettings);
 
         services.AddHttpContextAccessor();
 

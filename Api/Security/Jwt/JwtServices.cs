@@ -1,15 +1,18 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Api.Helpers;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Security.Jwt;
 
 public static class JwtServices
 {
-    private static readonly string SecretKey =
-        EnvLoader.GetEnv("JWT_SECRET_KEY");
+    private static string SecretKey = string.Empty;
+
+    public static void Initialize(Api.Settings.JwtSettings settings)
+    {
+        SecretKey = settings.SecretKey ?? string.Empty;
+    }
 
     public static string Create(
         IEnumerable<Claim> claims,

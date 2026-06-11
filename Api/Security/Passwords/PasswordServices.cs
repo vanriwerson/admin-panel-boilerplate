@@ -1,9 +1,8 @@
 using Api.Auditing;
-using Api.Auditing.Services;
 using Api.Data;
 using Api.Middlewares;
-using Api.Models;
-using Api.Helpers;
+using Api.Settings;
+using Microsoft.Extensions.Options;
 using Api.Security.Jwt;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -17,12 +16,14 @@ namespace Api.Security.Passwords
         private readonly ApiDbContext _context;
         private readonly ICreateSystemLog _createSystemLog;
         private readonly IPasswordResetEmailService _passwordResetEmailService;
+        private readonly string _webAppUrl;
 
-        public PasswordServices(ApiDbContext context, ICreateSystemLog createSystemLog, IPasswordResetEmailService passwordResetEmailService)
+        public PasswordServices(ApiDbContext context, ICreateSystemLog createSystemLog, IPasswordResetEmailService passwordResetEmailService, IOptions<FrontendSettings> frontendSettings)
         {
             _context = context;
             _createSystemLog = createSystemLog;
             _passwordResetEmailService = passwordResetEmailService;
+            _webAppUrl = frontendSettings.Value.Url;
         }
 
         public async Task RequestNewPasswordAsync(string email)
@@ -43,8 +44,7 @@ namespace Api.Security.Passwords
 
             var token = JwtServices.Create(claims, expireMinutes: 15);
 
-            var webAppUrl = EnvLoader.GetEnv("WEB_APP_URL");
-            var resetLink = $"{webAppUrl.TrimEnd('/')}/password-reset?token={token}";
+            var resetLink = $"{_webAppUrl.TrimEnd('/')}/password-reset?token={token}";
 
             await _passwordResetEmailService.SendEmailAsync(user.Email, resetLink);
 
