@@ -3,10 +3,18 @@ using Api.Extensions.DependencyInjection;
 using Api.Helpers;
 using Api.Middlewares;
 using Api.Security.Jwt;
+using Api.Settings;
 using DotNetEnv;
-using Microsoft.EntityFrameworkCore;
 
 Env.Load();
+
+var apiSettings = SettingsFactory.ProvideApiSettings();
+
+var databaseConnectionString =
+    SettingsFactory.ProvideDatabaseConnectionString();
+
+var frontendSettings =
+    SettingsFactory.ProvideFrontendSettings();
 
 var logger = Logger.LogToConsole("Startup");
 
@@ -15,19 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 // --- Kestrel ---
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(int.Parse(EnvLoader.GetEnv("API_PORT")));
+    options.ListenAnyIP(int.Parse(apiSettings.Port));
 });
 
-// --- DbContext ---
-builder.Services.AddDbContext<ApiDbContext>(options =>
-    options.UseNpgsql(
-        $"Host={EnvLoader.GetEnv("DB_HOST")};" +
-        $"Port={EnvLoader.GetEnv("DB_PORT")};" +
-        $"Username={EnvLoader.GetEnv("DB_USER")};" +
-        $"Password={EnvLoader.GetEnv("DB_PASSWORD")};" +
-        $"Database={EnvLoader.GetEnv("DB_NAME")}"
-    )
-);
+builder.Services.ConnectToDatabase(databaseConnectionString);
 
 // --- DependencyInjection ---
 builder.Services
@@ -38,15 +37,7 @@ builder.Services
 
 // --- Controllers / CORS / Swagger ---
 builder.Services.AddControllers();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("FrontendPolicy", policy =>
-        policy.WithOrigins(EnvLoader.GetEnv("WEB_APP_URL"))
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials()
-    );
-});
+builder.Services.AddFrontendCors(frontendSettings);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -63,7 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandlerMiddleware();
-app.UseCors("FrontendPolicy");
+app.UseCors(CorsExtensions.FrontendPolicy);
 app.UseJwtAuthentication();
 app.UseRequireAuthorization();
 app.UseValidateUserPermissions();

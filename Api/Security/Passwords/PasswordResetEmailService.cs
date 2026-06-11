@@ -1,5 +1,5 @@
-using Api.Helpers;
 using Api.Interfaces.Security.Passwords;
+using Api.Settings;
 using Resend;
 
 namespace Api.Security.Passwords;
@@ -7,15 +7,17 @@ namespace Api.Security.Passwords;
 public class PasswordResetEmailService : IPasswordResetEmailService
 {
     private readonly ResendClient _resendClient;
+    private readonly ResendSettings _settings;
 
-    public PasswordResetEmailService(ResendClient resendClient)
+    public PasswordResetEmailService(ResendClient resendClient, ResendSettings settings)
     {
         _resendClient = resendClient;
+        _settings = settings;
     }
 
     public async Task SendEmailAsync(string toEmail, string resetLink)
     {
-        var fromEmail = EnvLoader.GetEnv("RESEND_FROM_EMAIL");
+        var fromEmail = _settings.FromEmail;
 
         await _resendClient.EmailSendAsync(new EmailMessage
         {
