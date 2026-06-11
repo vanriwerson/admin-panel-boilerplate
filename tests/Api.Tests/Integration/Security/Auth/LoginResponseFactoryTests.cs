@@ -1,6 +1,7 @@
 using Api.Dtos;
 using Api.Models;
 using Api.Security.Auth;
+using Api.Security.Jwt;
 using Api.Security.RefreshTokens;
 using Api.Interfaces.Repositories;
 using Api.Tests.Integration.Infrastructure;
@@ -18,9 +19,18 @@ public class LoginResponseFactoryTests
         PostgreSqlTestFixture fixture)
     {
         _fixture = fixture;
+        const string secretKey =
+            "test-secret-key-1234567890abcdefghijklmnopqr";
+
         Environment.SetEnvironmentVariable(
             "JWT_SECRET_KEY",
-            "test-secret-key-1234567890abcdefghijklmnopqr");
+            secretKey);
+
+        JwtServices.Initialize(
+            new Api.Settings.JwtSettings
+            {
+                SecretKey = secretKey
+            });
     }
 
     #region CreateResponseAsync
