@@ -1,19 +1,18 @@
 using Api.Auditing;
-using Api.Auditing.Services;
+using Api.Interfaces.Auditing.Services;
 using Api.Interfaces.Repositories;
 using Api.Middlewares;
-using Api.Validations;
 
 namespace Api.Services.SystemResources;
 
 public class DeleteSystemResource
 {
     private readonly ISystemResourceRepository _repository;
-    private readonly CreateSystemLog _createSystemLog;
+    private readonly ICreateSystemLog _createSystemLog;
 
     public DeleteSystemResource(
         ISystemResourceRepository repository,
-        CreateSystemLog createSystemLog)
+        ICreateSystemLog createSystemLog)
     {
         _repository = repository;
         _createSystemLog = createSystemLog;

@@ -1,19 +1,18 @@
 using Api.Dtos;
-using Api.Helpers;
 using Api.Helpers.Pagination;
 using Api.Interfaces.Repositories;
-using Api.Security.Policies;
+using Api.Interfaces.Security.Policies;
 
 namespace Api.Services.Users;
 
 public class GetAllUsers
 {
     private readonly IUserRepository _repository;
-    private readonly UserVisibilityPolicy _visibility;
+    private readonly IUserVisibilityPolicy _visibility;
 
     public GetAllUsers(
         IUserRepository repository,
-        UserVisibilityPolicy visibility)
+        IUserVisibilityPolicy visibility)
     {
         _repository = repository;
         _visibility = visibility;

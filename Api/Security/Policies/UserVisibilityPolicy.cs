@@ -1,10 +1,11 @@
+using Api.Interfaces.Security.Policies;
 using Api.Models;
 using Api.Security.Jwt;
 using Api.Security.Permissions;
 
 namespace Api.Security.Policies;
 
-public class UserVisibilityPolicy
+public class UserVisibilityPolicy : IUserVisibilityPolicy
 {
     private readonly CurrentUserContext _currentUser;
 

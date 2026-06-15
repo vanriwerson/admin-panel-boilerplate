@@ -103,11 +103,10 @@ export default function Resources() {
 
       <Box
         sx={{
-          alignItems: "stretch",
           display: "flex",
           gap: 2,
-          marginBottom: 4,
           width: "100%",
+          alignItems: "flex-start",
         }}
       >
         <SystemResourceForm onSubmit={handleCreate} />

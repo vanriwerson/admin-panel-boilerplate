@@ -1,11 +1,10 @@
 using Api.Auditing;
-using Api.Auditing.Services;
 using Api.Data;
 using Api.Dtos;
+using Api.Interfaces.Auditing.Services;
 using Api.Interfaces.Repositories;
 using Api.Middlewares;
 using Api.Models;
-using Api.Validations;
 
 namespace Api.Services.SystemResources;
 
@@ -13,12 +12,12 @@ public class CreateSystemResource
 {
     private readonly ISystemResourceRepository _repository;
     private readonly ApiDbContext _context;
-    private readonly CreateSystemLog _createSystemLog;
+    private readonly ICreateSystemLog _createSystemLog;
 
     public CreateSystemResource(
         ISystemResourceRepository repository,
         ApiDbContext context,
-        CreateSystemLog createSystemLog)
+        ICreateSystemLog createSystemLog)
     {
         _repository = repository;
         _context = context;

@@ -1,11 +1,12 @@
 using Api.Data;
+using Api.Interfaces.Security.Auth;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Api.Security.Auth;
 
-public class AuthUserResolver
+public class AuthUserResolver : IAuthUserResolver
 {
     private readonly ApiDbContext _context;
 

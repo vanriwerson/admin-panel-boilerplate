@@ -1,20 +1,20 @@
 using Api.Dtos;
 using Api.Interfaces.Repositories;
+using Api.Interfaces.Validators;
 using Api.Middlewares;
 using Api.Models;
 using Api.Security.Passwords;
-using Api.Validations;
 
 namespace Api.Services.Users;
 
 public class UpdateUser
 {
     private readonly IUserRepository _repository;
-    private readonly UserValidator _validator;
+    private readonly IUserValidator _validator;
 
     public UpdateUser(
         IUserRepository repository,
-        UserValidator validator)
+        IUserValidator validator)
     {
         _repository = repository;
         _validator = validator;

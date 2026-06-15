@@ -1,31 +1,29 @@
 using Api.Auditing;
-using Api.Auditing.Services;
 using Api.Data;
 using Api.Middlewares;
-using Api.Models;
-using Api.Helpers;
+using Api.Settings;
+using Microsoft.Extensions.Options;
 using Api.Security.Jwt;
-using Api.Security.Passwords;
-using Api.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using Api.Interfaces.Auditing.Services;
+using Api.Interfaces.Security.Passwords;
 
-namespace Api.Services.AuthServices
+namespace Api.Security.Passwords
 {
     public class PasswordServices
     {
         private readonly ApiDbContext _context;
-        private readonly CreateSystemLog _createSystemLog;
-        private readonly PasswordResetEmailService _passwordResetEmailService;
+        private readonly ICreateSystemLog _createSystemLog;
+        private readonly IPasswordResetEmailService _passwordResetEmailService;
+        private readonly string _webAppUrl;
 
-        public PasswordServices(ApiDbContext context, CreateSystemLog createSystemLog, PasswordResetEmailService passwordResetEmailService)
+        public PasswordServices(ApiDbContext context, ICreateSystemLog createSystemLog, IPasswordResetEmailService passwordResetEmailService, IOptions<FrontendSettings> frontendSettings)
         {
             _context = context;
             _createSystemLog = createSystemLog;
             _passwordResetEmailService = passwordResetEmailService;
+            _webAppUrl = frontendSettings.Value.Url;
         }
 
         public async Task RequestNewPasswordAsync(string email)
@@ -46,8 +44,7 @@ namespace Api.Services.AuthServices
 
             var token = JwtServices.Create(claims, expireMinutes: 15);
 
-            var webAppUrl = EnvLoader.GetEnv("WEB_APP_URL");
-            var resetLink = $"{webAppUrl.TrimEnd('/')}/password-reset?token={token}";
+            var resetLink = $"{_webAppUrl.TrimEnd('/')}/password-reset?token={token}";
 
             await _passwordResetEmailService.SendEmailAsync(user.Email, resetLink);
 

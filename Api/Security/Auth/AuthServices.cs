@@ -1,6 +1,9 @@
 using Api.Auditing;
 using Api.Auditing.Services;
 using Api.Dtos;
+using Api.Interfaces.Auditing.Services;
+using Api.Interfaces.Security.Auth;
+using Api.Interfaces.Security.RefreshTokens;
 using Api.Security.Jwt;
 using Api.Security.Passwords;
 using Api.Security.RefreshTokens;
@@ -10,16 +13,16 @@ namespace Api.Security.Auth;
 
 public class AuthServices
 {
-    private readonly AuthUserResolver _resolver;
-    private readonly LoginResponseFactory _loginResponseFactory;
-    private readonly RefreshTokenServices _refreshService;
-    private readonly CreateSystemLog _log;
+    private readonly IAuthUserResolver _resolver;
+    private readonly ILoginResponseFactory _loginResponseFactory;
+    private readonly IRefreshTokenServices _refreshService;
+    private readonly ICreateSystemLog _log;
 
     public AuthServices(
-        AuthUserResolver resolver,
-        LoginResponseFactory loginResponseFactory,
-        RefreshTokenServices refreshService,
-        CreateSystemLog log)
+        IAuthUserResolver resolver,
+        ILoginResponseFactory loginResponseFactory,
+        IRefreshTokenServices refreshService,
+        ICreateSystemLog log)
     {
         _resolver = resolver;
         _loginResponseFactory = loginResponseFactory;
