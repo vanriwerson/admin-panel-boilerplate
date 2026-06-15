@@ -26,6 +26,7 @@ public static class ServiceExtensions
                     t.Namespace.StartsWith("Api.Services") ||
                     t.Namespace.StartsWith("Api.Security.Auth") ||
                     t.Namespace.StartsWith("Api.Security.RefreshTokens") ||
+                    t.Namespace.StartsWith("Api.Security.Passwords") ||
                     t.Namespace.StartsWith("Api.Auditing.Services")
                 ));
 
