@@ -1,4 +1,5 @@
 using Api.Data;
+using Api.Interfaces.Security.Passwords;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -80,6 +81,14 @@ public class ApiWebApplicationFactory
             {
                 options.UseNpgsql(_connectionString);
             });
+
+            var emailDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IPasswordResetEmailService));
+
+            if (emailDescriptor != null)
+                services.Remove(emailDescriptor);
+
+            services.AddScoped<IPasswordResetEmailService, NoopPasswordResetEmailService>();
         });
     }
 }
